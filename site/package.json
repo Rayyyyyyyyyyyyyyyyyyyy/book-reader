@@ -1,0 +1,31 @@
+{
+  "name": "hundred-books",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "predev": "node scripts/covers.mjs",
+    "dev": "astro dev",
+    "prebuild": "node scripts/covers.mjs",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "migrate": "node scripts/migrate.mjs",
+    "covers": "node scripts/covers.mjs"
+  },
+  "dependencies": {
+    "@astrojs/react": "^4.2.0",
+    "@astrojs/rss": "^4.0.11",
+    "@astrojs/sitemap": "^3.2.1",
+    "astro": "^5.4.0",
+    "astro-og-canvas": "^0.7.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@fontsource/cormorant-garamond": "^5.1.0",
+    "@fontsource/noto-serif-tc": "^5.1.1",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0"
+  }
+}

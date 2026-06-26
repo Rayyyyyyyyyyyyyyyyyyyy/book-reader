@@ -1,0 +1,31 @@
+---
+import { getImage } from "astro:assets";
+import Base from "../layouts/Base.astro";
+import BookGrid from "../components/BookGrid";
+import { CATEGORIES } from "../data/categories";
+import { getBooksSorted, entryToMeta } from "../lib/books";
+
+const entries = await getBooksSorted();
+
+// Optimized cover URLs (modern format, sized for grid cards).
+const coverModules = import.meta.glob<{ default: ImageMetadata }>("../assets/covers/*.jpg", { eager: true });
+async function coverUrl(file?: string): Promise<string> {
+  if (!file) return "";
+  const mod = coverModules[`../assets/covers/${file}`];
+  if (!mod) return "";
+  const img = await getImage({ src: mod.default, width: 420, format: "webp" });
+  return img.src;
+}
+
+const books = await Promise.all(
+  entries.map(async (e) => entryToMeta(e, await coverUrl(e.data.cover))),
+);
+
+const cats = CATEGORIES.map((c) => ({ key: c.key, zh: c.zh, en: c.en }));
+const base = import.meta.env.BASE_URL.endsWith("/") ? import.meta.env.BASE_URL : import.meta.env.BASE_URL + "/";
+const ogImage = `${base}og/home.png`;
+---
+
+<Base title="百冊 · 影響一個世代的一百本書" image={ogImage}>
+  <BookGrid client:load books={books} cats={cats} base={base} />
+</Base>

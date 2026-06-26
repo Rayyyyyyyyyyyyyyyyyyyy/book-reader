@@ -1,0 +1,9 @@
+# build output
+dist/
+.astro/
+
+# deps
+node_modules/
+
+# generated covers (derived from ../book-png by scripts/covers.mjs at build time)
+src/assets/covers/

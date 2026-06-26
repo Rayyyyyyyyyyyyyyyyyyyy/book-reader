@@ -1,0 +1,106 @@
+---
+import { getImage } from "astro:assets";
+import { render } from "astro:content";
+import Base from "../../layouts/Base.astro";
+import { CATEGORY_ZH, CATEGORY_EN } from "../../data/categories";
+import { getBooksSorted } from "../../lib/books";
+
+export async function getStaticPaths() {
+  const entries = await getBooksSorted();
+  return entries.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const d = entry.data;
+const cat = d.cat as keyof typeof CATEGORY_ZH;
+const { Content } = await render(entry);
+const hasNote = (entry.body ?? "").trim().length > 0;
+
+const dCover = d.zh || d.en;
+const dCaption = d.zh ? d.en : "台灣尚未出版";
+const numStr = "No." + String(d.rank).padStart(3, "0");
+
+const coverModules = import.meta.glob<{ default: ImageMetadata }>("../../assets/covers/*.jpg", { eager: true });
+const coverMod = d.cover ? coverModules[`../../assets/covers/${d.cover}`] : undefined;
+const cover = coverMod ? await getImage({ src: coverMod.default, width: 600, format: "webp" }) : null;
+
+const base = import.meta.env.BASE_URL.endsWith("/") ? import.meta.env.BASE_URL : import.meta.env.BASE_URL + "/";
+const ogImage = `${base}og/${entry.id}.png`;
+---
+
+<Base title={`${dCover}｜百冊`} description={d.desc} image={ogImage}>
+  <div class={"page cat-" + cat}>
+    <header class="topbar">
+      <a class="back" href={base}><span class="arrow">←</span> 回到書目</a>
+      <span class="badge">{CATEGORY_ZH[cat]}</span>
+    </header>
+
+    <article class="detail">
+      <div class="cover-col">
+        {cover ? (
+          <img src={cover.src} width={cover.attributes.width} height={cover.attributes.height} alt={dCover} class="cover" />
+        ) : (
+          <div class="cover placeholder"><span>{dCover}</span></div>
+        )}
+      </div>
+      <div class="meta-col">
+        <div class="eyebrow">
+          <span class="badge sm">{CATEGORY_ZH[cat]}</span>
+          <span class="num">{numStr}</span>
+          <span class="en-cat">{CATEGORY_EN[cat]}</span>
+        </div>
+        <h1>{dCover}</h1>
+        <div class="caption">{dCaption}</div>
+        <div class="author">{d.author}</div>
+        <p class="desc">{d.desc}</p>
+        {hasNote && <a class="jump" href="#note">↓ 我的讀書心得</a>}
+      </div>
+    </article>
+
+    {hasNote ? (
+      <article id="note" class="note">
+        <div class="note-label">讀書筆記</div>
+        <Content />
+      </article>
+    ) : (
+      <div id="note" class="note-pending">讀書心得整理中 <span>coming soon</span></div>
+    )}
+  </div>
+</Base>
+
+<style>
+  .page { max-width: 760px; margin: 0 auto; padding: 0 28px 130px; }
+  .topbar {
+    position: sticky; top: 0; z-index: 2; margin: 0 -28px 0;
+    padding: 15px 28px; display: flex; align-items: center; justify-content: space-between;
+    background: rgba(243,237,225,.92); backdrop-filter: blur(8px);
+    border-bottom: 1px solid #e1d8c7;
+  }
+  .back { font-family: var(--serif-tc); font-size: 14px; color: var(--ink); text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
+  .back:hover { color: var(--accent); }
+  .arrow { font-family: var(--serif-en); font-size: 17px; }
+  .badge { font-size: 11px; letter-spacing: .14em; color: var(--accent); border: 1px solid var(--accent); border-radius: 999px; padding: 4px 11px; }
+  .badge.sm { padding: 3px 10px; }
+
+  .detail { display: flex; gap: 38px; padding: 56px 0 0; flex-wrap: wrap; }
+  .cover-col { flex: 0 0 220px; }
+  .cover { width: 220px; aspect-ratio: 2/3; object-fit: cover; border: 1px solid rgba(44,38,32,.14); display: block; }
+  .cover.placeholder { background: var(--wash); display: flex; align-items: center; justify-content: center; text-align: center; padding: 20px; }
+  .cover.placeholder span { font-family: var(--serif-tc); font-weight: 600; font-size: 19px; color: var(--ink); }
+  .meta-col { flex: 1; min-width: 260px; }
+  .eyebrow { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+  .num, .en-cat { font-family: var(--serif-en); font-style: italic; color: #a59b89; font-size: 15px; }
+  h1 { font-family: var(--serif-tc); font-weight: 600; font-size: clamp(30px,5vw,44px); line-height: 1.25; color: var(--ink); margin: 0 0 10px; }
+  .caption { font-family: var(--serif-en); font-style: italic; font-size: 20px; color: #6f675b; margin-bottom: 6px; }
+  .author { font-size: 13px; color: #9a9183; letter-spacing: .04em; margin-bottom: 22px; }
+  .desc { font-size: 16px; line-height: 1.95; color: #5c544a; font-weight: 300; border-top: 1px solid #ece3d2; padding-top: 22px; margin: 0 0 24px; }
+  .jump { font-family: var(--serif-tc); font-size: 14px; color: #f3ede1; background: #2c2620; padding: 11px 18px; text-decoration: none; display: inline-block; }
+
+  .note { padding: 72px 0 0; }
+  .note-label { font-size: 11px; letter-spacing: .18em; color: var(--accent); margin-bottom: 18px; }
+  .note :global(h2) { font-family: var(--serif-tc); font-weight: 600; font-size: 22px; line-height: 1.5; color: var(--ink); margin: 50px 0 6px; letter-spacing: .02em; }
+  .note :global(h3) { font-family: var(--serif-tc); font-weight: 600; font-size: 18px; color: #4a4339; margin: 34px 0 4px; }
+  .note :global(p) { font-size: 17px; line-height: 2.05; color: #4a4339; font-weight: 300; margin: 0 0 20px; text-wrap: pretty; }
+  .note-pending { padding: 72px 0; text-align: center; font-family: var(--serif-tc); color: #a59b89; }
+  .note-pending span { font-family: var(--serif-en); font-style: italic; }
+</style>

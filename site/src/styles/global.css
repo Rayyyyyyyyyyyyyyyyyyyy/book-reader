@@ -1,0 +1,62 @@
+/* 百冊 — global styles (extracted from the Claude Design prototype) */
+
+:root {
+  --serif-tc: "Noto Serif TC", serif;
+  --serif-en: "Cormorant Garamond", serif;
+  --paper: #f3ede1;
+  --ink: #2c2620;
+  --muted: #5c544a;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--serif-tc);
+}
+::selection { background: var(--ink); color: var(--paper); }
+
+/* density + card sizing */
+#hundred-root { --cardmin: 178px; }
+#hundred-root.density-roomy { --cardmin: 196px; }
+#hundred-root.density-compact { --cardmin: 152px; }
+
+/* category accents */
+.cat-psych     { --accent: #586b8f; --wash: #e9edf3; }
+.cat-biz       { --accent: #5a7a63; --wash: #e9f1ea; }
+.cat-finance   { --accent: #9a7b3e; --wash: #f3ecdc; }
+.cat-growth    { --accent: #a5623f; --wash: #f3e9e0; }
+.cat-neuro     { --accent: #7a5f8c; --wash: #efe9f3; }
+.cat-influence { --accent: #9c5560; --wash: #f3e7e9; }
+.cat-soul      { --accent: #6e7a5e; --wash: #ebeee3; }
+
+.cover { transition: box-shadow .45s ease, border-color .45s ease; }
+
+/* chips */
+.chips::-webkit-scrollbar { height: 0; display: none; }
+.chip {
+  font-family: var(--serif-tc);
+  font-size: 13.5px;
+  color: #6f675b;
+  background: transparent;
+  border: 1px solid #d9cfbd;
+  border-radius: 999px;
+  padding: 7px 15px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all .25s ease;
+  letter-spacing: .02em;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+.chip:hover { border-color: #b09f83; color: var(--ink); }
+.chip.on { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+.chip .ct { font-family: var(--serif-en); font-style: italic; font-size: 12.5px; opacity: .65; }
+
+/* reveal-on-scroll (driven by reveal.ts). Honour reduced motion. */
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] { opacity: 1 !important; transform: none !important; }
+  [data-reveal] .cover { clip-path: none !important; }
+}

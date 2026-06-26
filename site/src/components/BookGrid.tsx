@@ -11,6 +11,12 @@ type Props = {
 
 const bookHref = (base: string, slug: string) => `${base}book/${slug}`;
 
+// "109" / "no.109" / "#109" / "第109" / "109本" → 109; non-numeric queries → null
+const queryToRank = (s: string): number | null => {
+  const m = s.replace(/\s+/g, "").match(/^(?:no\.?|#|第)?0*(\d+)本?$/i);
+  return m ? parseInt(m[1], 10) : null;
+};
+
 export default function BookGrid({ books, cats, base }: Props) {
   const [query, setQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("all");
@@ -30,11 +36,17 @@ export default function BookGrid({ books, cats, base }: Props) {
   }, [books, cats]);
 
   const sections = useMemo(() => {
+    const qRank = q ? queryToRank(q) : null;
     return cats
       .filter((c) => activeCategory === "all" || activeCategory === c.key)
       .map((c) => {
         let bs = books.filter((b) => b.cat === c.key);
-        if (q) bs = bs.filter((b) => (b.zh + " " + b.en + " " + b.author).toLowerCase().includes(q));
+        if (q)
+          bs = bs.filter(
+            (b) =>
+              (b.zh + " " + b.en + " " + b.author).toLowerCase().includes(q) ||
+              (qRank !== null && b.rank === qRank),
+          );
         if (notesOnly) bs = bs.filter((b) => b.hasNote);
         return {
           ...c,
@@ -168,7 +180,7 @@ export default function BookGrid({ books, cats, base }: Props) {
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="搜尋書名或作者…"
+              placeholder="搜尋書名、作者或編號…"
               style={{ border: "none", background: "transparent", outline: "none", fontFamily: "var(--serif-tc)", fontSize: 14, color: "var(--ink)", width: "100%" }}
             />
           </div>

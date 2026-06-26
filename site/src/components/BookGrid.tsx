@@ -14,13 +14,13 @@ const bookHref = (base: string, slug: string) => `${base}book/${slug}`;
 export default function BookGrid({ books, cats, base }: Props) {
   const [query, setQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("all");
+  const [notesOnly, setNotesOnly] = useState(false);
   const [selected, setSelected] = useState<BookMeta | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
 
   const q = query.trim().toLowerCase();
   const hasQuery = q.length > 0;
 
-  const listTotal = useMemo(() => books.filter((b) => b.cat !== "soul").length, [books]);
   const noteTotal = useMemo(() => books.filter((b) => b.hasNote).length, [books]);
 
   const counts = useMemo(() => {
@@ -35,6 +35,7 @@ export default function BookGrid({ books, cats, base }: Props) {
       .map((c) => {
         let bs = books.filter((b) => b.cat === c.key);
         if (q) bs = bs.filter((b) => (b.zh + " " + b.en + " " + b.author).toLowerCase().includes(q));
+        if (notesOnly) bs = bs.filter((b) => b.hasNote);
         return {
           ...c,
           books: bs,
@@ -42,7 +43,7 @@ export default function BookGrid({ books, cats, base }: Props) {
         };
       })
       .filter((s) => s.books.length > 0);
-  }, [books, cats, activeCategory, q]);
+  }, [books, cats, activeCategory, q, notesOnly]);
 
   const total = sections.reduce((a, s) => a + s.books.length, 0);
   const hasResults = sections.length > 0;
@@ -199,14 +200,27 @@ export default function BookGrid({ books, cats, base }: Props) {
           One hundred books that shape the way a generation thinks.
         </div>
         <p data-reveal="1" style={{ maxWidth: 560, fontSize: 16, lineHeight: 1.95, color: "#5c544a", fontWeight: 300, margin: "0 0 38px" }}>
-          從心理學、商業、投資到腦神經科學——這是一份橫跨六大領域的選書清單，收藏那些真正改變我們思考方式的好書。每本書的背後，連結著我自己的讀書心得；封面與內容，將陸續補上。
+          從心理學、商業、投資到腦神經科學——這是我的選書清單，收藏那些真正改變我們思考方式的好書。每本書的背後，連結著我自己的讀書心得；封面與內容，將陸續補上。
         </p>
         <div data-reveal="1" style={{ display: "flex", alignItems: "center", gap: 18, flexWrap: "wrap", fontFamily: "var(--serif-en)", fontStyle: "italic", fontSize: 15, color: "#9a9183", letterSpacing: ".04em" }}>
-          <span style={{ color: "var(--ink)", fontSize: 17 }}>{listTotal} 本選書</span>
-          <span style={{ width: 5, height: 5, borderRadius: "50%", background: "#cdc2ad" }} />
-          <span>6 領域</span>
-          <span style={{ width: 5, height: 5, borderRadius: "50%", background: "#cdc2ad" }} />
-          <span style={{ color: "var(--ink)", fontSize: 17 }}>{noteTotal} 篇讀書筆記</span>
+          <button
+            type="button"
+            onClick={() => setNotesOnly((v) => !v)}
+            title={notesOnly ? "顯示全部書籍" : "只看有讀書心得的書"}
+            style={{
+              font: "inherit",
+              fontSize: 17,
+              color: notesOnly ? "#a5623f" : "var(--ink)",
+              background: "transparent",
+              border: "none",
+              padding: 0,
+              cursor: "pointer",
+              borderBottom: "1px solid",
+              borderColor: notesOnly ? "#a5623f" : "transparent",
+            }}
+          >
+            {noteTotal} 篇讀書筆記
+          </button>
         </div>
       </section>
 

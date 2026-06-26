@@ -1,9 +1,9 @@
 ---
 rank: 109
-cat: soul
-zh: "神經可塑性"
-en: "Neuroplasticity"
-author: "Moheb Costandi"
+cat: growth
+zh: "Rewire－神經可塑性"
+en: "Rewire"
+author: "Nicole Vignola"
 desc: "觀念、信念與思考脈絡,都能被重新塑形。"
 cover: "109.jpg"
 ---

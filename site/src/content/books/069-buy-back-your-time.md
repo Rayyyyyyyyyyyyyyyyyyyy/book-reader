@@ -1,6 +1,6 @@
 ---
 rank: 69
-cat: growth
+cat: biz
 zh: "把時間買回來"
 en: "Buy Back Your Time"
 author: "Dan Martell"

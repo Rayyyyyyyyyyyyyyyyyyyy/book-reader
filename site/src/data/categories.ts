@@ -3,10 +3,10 @@ export const CATEGORIES = [
   { key: "psych", zh: "大眾心理學", en: "Popular Psychology" },
   { key: "biz", zh: "商業管理", en: "Business & Management" },
   { key: "finance", zh: "財經與投資", en: "Finance & Investing" },
-  { key: "growth", zh: "自我成長", en: "Self-Growth" },
+  { key: "growth", zh: "效能・方法", en: "Effectiveness & Method" },
   { key: "neuro", zh: "腦神經科學", en: "Brain & Neuroscience" },
   { key: "influence", zh: "暢銷與跨領域影響力", en: "Bestsellers & Beyond" },
-  { key: "soul", zh: "心靈・人生", en: "Soul & Life" },
+  { key: "soul", zh: "意義・心靈", en: "Meaning & Soul" },
 ] as const;
 
 export type CategoryKey = (typeof CATEGORIES)[number]["key"];

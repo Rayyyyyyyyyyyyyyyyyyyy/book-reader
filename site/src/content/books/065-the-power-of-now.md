@@ -1,6 +1,6 @@
 ---
 rank: 65
-cat: growth
+cat: soul
 zh: "當下的力量"
 en: "The Power of Now"
 author: "Eckhart Tolle"

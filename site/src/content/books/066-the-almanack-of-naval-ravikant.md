@@ -1,6 +1,6 @@
 ---
 rank: 66
-cat: growth
+cat: finance
 zh: "納瓦爾寶典"
 en: "The Almanack of Naval Ravikant"
 author: "Eric Jorgenson"

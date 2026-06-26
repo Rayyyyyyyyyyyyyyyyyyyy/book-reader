@@ -1,6 +1,6 @@
 ---
 rank: 111
-cat: soul
+cat: psych
 zh: "蛤蟆先生去看心理醫生"
 en: "Counselling for Toads"
 author: "Robert de Board"

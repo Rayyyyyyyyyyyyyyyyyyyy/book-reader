@@ -1,6 +1,6 @@
 ---
 rank: 104
-cat: soul
+cat: influence
 zh: "愛的藝術"
 en: "The Art of Loving"
 author: "Erich Fromm"

@@ -1,6 +1,6 @@
 ---
 rank: 63
-cat: growth
+cat: soul
 zh: "脆弱的力量"
 en: "Daring Greatly"
 author: "Brené Brown"

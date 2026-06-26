@@ -1,6 +1,6 @@
 ---
 rank: 68
-cat: growth
+cat: soul
 zh: "人生4千個禮拜"
 en: "Four Thousand Weeks"
 author: "Oliver Burkeman"

@@ -1,6 +1,6 @@
 ---
 rank: 59
-cat: growth
+cat: soul
 zh: "活出意義來"
 en: "Man's Search for Meaning"
 author: "Viktor Frankl"

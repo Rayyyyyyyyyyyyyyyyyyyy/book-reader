@@ -1,6 +1,6 @@
 ---
 rank: 102
-cat: soul
+cat: psych
 zh: "你的人生,他們六個說了算"
 en: "Habits of a Happy Brain"
 author: "Loretta Graziano Breuning"

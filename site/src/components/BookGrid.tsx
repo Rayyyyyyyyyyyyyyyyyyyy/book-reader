@@ -47,27 +47,19 @@ export default function BookGrid({ books, cats, base }: Props) {
   const total = sections.reduce((a, s) => a + s.books.length, 0);
   const hasResults = sections.length > 0;
 
-  const openBook = (b: BookMeta) => {
-    setSelected(b);
-    history.pushState({ slug: b.slug }, "", bookHref(base, b.slug));
-  };
-  const closeBook = () => {
-    if (selected) history.back();
-    setSelected(null);
-  };
+  // Modal is an ephemeral quick-view (no history entry). The canonical,
+  // shareable URL is the full /book/<slug> page that the modal links to —
+  // so browser "back" from a book page returns cleanly to the catalog.
+  const openBook = (b: BookMeta) => setSelected(b);
+  const closeBook = () => setSelected(null);
 
-  // popstate / escape: close modal when navigating back
+  // Escape closes the modal.
   useEffect(() => {
-    const onPop = () => setSelected(null);
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") setSelected(null);
     };
-    window.addEventListener("popstate", onPop);
     document.addEventListener("keydown", onKey);
-    return () => {
-      window.removeEventListener("popstate", onPop);
-      document.removeEventListener("keydown", onKey);
-    };
+    return () => document.removeEventListener("keydown", onKey);
   }, []);
 
   // reveal-on-scroll + cover clip-path + parallax (ported from the prototype,

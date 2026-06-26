@@ -82,9 +82,9 @@ const ogImage = `${base}og/${entry.id}.png`;
   .badge { font-size: 11px; letter-spacing: .14em; color: var(--accent); border: 1px solid var(--accent); border-radius: 999px; padding: 4px 11px; }
   .badge.sm { padding: 3px 10px; }
 
-  .detail { display: flex; gap: 38px; padding: 56px 0 0; flex-wrap: wrap; }
-  .cover-col { flex: 0 0 220px; }
-  .cover { width: 220px; aspect-ratio: 2/3; object-fit: cover; border: 1px solid rgba(44,38,32,.14); display: block; }
+  .detail { display: flex; gap: 38px; padding: 56px 0 0; flex-wrap: wrap; align-items: flex-start; }
+  .cover-col { flex: 0 0 200px; max-width: 200px; }
+  .cover { width: 100%; height: auto; aspect-ratio: 2/3; object-fit: cover; border: 1px solid rgba(44,38,32,.14); display: block; }
   .cover.placeholder { background: var(--wash); display: flex; align-items: center; justify-content: center; text-align: center; padding: 20px; }
   .cover.placeholder span { font-family: var(--serif-tc); font-weight: 600; font-size: 19px; color: var(--ink); }
   .meta-col { flex: 1; min-width: 260px; }

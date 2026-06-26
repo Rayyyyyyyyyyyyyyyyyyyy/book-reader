@@ -22,7 +22,7 @@ except Exception:
     SSL_CTX.check_hostname = False
     SSL_CTX.verify_mode = ssl.CERT_NONE
 
-ROOT = os.path.dirname(os.path.abspath(__file__))
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CSV = os.path.join(ROOT, "bookList.csv")
 OUT = os.path.join(ROOT, "book-png")
 UA = "Mozilla/5.0 (cover-fetch; contact zxcvbnmjfy518@gmail.com)"

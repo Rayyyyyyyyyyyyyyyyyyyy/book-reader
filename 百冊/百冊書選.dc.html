@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Noto+Serif+TC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="./book-notes.js"></script>
+<style>
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{background:#f3ede1;}
+::selection{background:#2c2620;color:#f3ede1;}
+#hundred-root{--cardmin:178px;}
+#hundred-root.density-roomy{--cardmin:196px;}
+#hundred-root.density-compact{--cardmin:152px;}
+.cat-psych{--accent:#586b8f;--wash:#e9edf3;}
+.cat-biz{--accent:#5a7a63;--wash:#e9f1ea;}
+.cat-finance{--accent:#9a7b3e;--wash:#f3ecdc;}
+.cat-growth{--accent:#a5623f;--wash:#f3e9e0;}
+.cat-neuro{--accent:#7a5f8c;--wash:#efe9f3;}
+.cat-influence{--accent:#9c5560;--wash:#f3e7e9;}
+.cat-soul{--accent:#6e7a5e;--wash:#ebeee3;}
+.cover{transition:box-shadow .45s ease,border-color .45s ease;}
+.chips::-webkit-scrollbar{height:0;display:none;}
+.chip{font-family:'Noto Serif TC',serif;font-size:13.5px;color:#6f675b;background:transparent;border:1px solid #d9cfbd;border-radius:999px;padding:7px 15px;cursor:pointer;white-space:nowrap;transition:all .25s ease;letter-spacing:.02em;display:inline-flex;align-items:center;gap:7px;}
+.chip:hover{border-color:#b09f83;color:#2c2620;}
+.chip.on{background:#2c2620;border-color:#2c2620;color:#f3ede1;}
+.chip .ct{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:12.5px;opacity:.65;}
+</style>
+</helmet>
+<div id="hundred-root" class="density-{{ density }} reveal-armed" style="font-family:'Noto Serif TC',serif;background:#f3ede1;color:#2c2620;min-height:100vh;">
+
+  <header style="position:sticky;top:0;z-index:60;background:rgba(243,237,225,.86);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid #e1d8c7;">
+    <div style="max-width:1200px;margin:0 auto;padding:13px 28px;display:flex;align-items:center;justify-content:space-between;gap:24px;">
+      <div style="display:flex;flex-direction:column;gap:1px;flex:0 0 auto;">
+        <div style="font-family:'Noto Serif TC',serif;font-weight:700;font-size:21px;letter-spacing:.14em;color:#2c2620;">百冊</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:11.5px;letter-spacing:.2em;color:#a59b89;">ONE HUNDRED · 選書</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;flex:0 1 340px;border-bottom:1px solid #c9bda6;padding-bottom:5px;">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#b3a892" stroke-width="1.3"><circle cx="6" cy="6" r="4.2"></circle><line x1="9.4" y1="9.4" x2="12.6" y2="12.6" stroke-linecap="round"></line></svg>
+        <input value="{{ query }}" onInput="{{ onSearch }}" placeholder="搜尋書名或作者…" style="border:none;background:transparent;outline:none;font-family:'Noto Serif TC',serif;font-size:14px;color:#2c2620;width:100%;">
+      </div>
+    </div>
+    <div style="max-width:1200px;margin:0 auto;padding:0 28px 13px;">
+      <div class="chips" style="display:flex;gap:9px;overflow-x:auto;padding-bottom:2px;">
+        <sc-for list="{{ chips }}" as="chip" hint-placeholder-count="7">
+          <button class="chip {{ chip.onCls }}" onClick="{{ chip.onClick }}">
+            <span>{{ chip.zh }}</span><span class="ct">{{ chip.count }}</span>
+          </button>
+        </sc-for>
+      </div>
+    </div>
+  </header>
+
+  <section style="max-width:1200px;margin:0 auto;padding:88px 28px 64px;">
+    <div data-reveal="1" style="font-family:'Cormorant Garamond',serif;font-style:italic;letter-spacing:.32em;font-size:13px;color:#a5623f;text-transform:uppercase;margin-bottom:26px;">A Reading List · 選書清單</div>
+    <h1 data-reveal="1" style="font-family:'Noto Serif TC',serif;font-weight:600;font-size:clamp(40px,7vw,82px);line-height:1.12;letter-spacing:.01em;color:#2c2620;margin:0 0 26px;">影響一個世代的<br>一百本書。</h1>
+    <div data-reveal="1" style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:clamp(18px,2.4vw,25px);color:#6f675b;margin-bottom:30px;">One hundred books that shape the way a generation thinks.</div>
+    <p data-reveal="1" style="max-width:560px;font-size:16px;line-height:1.95;color:#5c544a;font-weight:300;margin:0 0 38px;">從心理學、商業、投資到腦神經科學——這是一份橫跨六大領域的選書清單,收藏那些真正改變我們思考方式的好書。每本書的背後,連結著我自己的讀書心得;封面與內容,將陸續補上。</p>
+    <div data-reveal="1" style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:15px;color:#9a9183;letter-spacing:.04em;">
+      <span style="color:#2c2620;font-size:17px;">{{ listTotal }} 本選書</span>
+      <span style="width:5px;height:5px;border-radius:50%;background:#cdc2ad;"></span>
+      <span>6 領域</span>
+      <span style="width:5px;height:5px;border-radius:50%;background:#cdc2ad;"></span>
+      <span style="color:#2c2620;font-size:17px;">{{ noteTotal }} 篇讀書筆記</span>
+    </div>
+  </section>
+
+  <main style="max-width:1200px;margin:0 auto;padding:8px 28px 110px;">
+
+    <sc-if value="{{ hasQuery }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:36px;flex-wrap:wrap;border-bottom:1px solid #e1d8c7;padding-bottom:18px;">
+        <span style="font-size:14px;color:#5c544a;">找到 <strong style="font-weight:600;color:#2c2620;">{{ total }}</strong> 本符合「{{ query }}」的書</span>
+        <button onClick="{{ clearSearch }}" style="font-family:'Noto Serif TC',serif;font-size:13px;color:#a5623f;background:transparent;border:none;border-bottom:1px solid #d8b6a6;cursor:pointer;padding:0 0 1px;">清除搜尋</button>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ hasResults }}" hint-placeholder-val="{{ true }}">
+      <div>
+        <sc-for list="{{ sections }}" as="sec" hint-placeholder-count="6">
+          <section class="cat-{{ sec.key }}" style="margin-bottom:72px;">
+            <div data-reveal="1" style="display:flex;align-items:baseline;justify-content:space-between;gap:18px;flex-wrap:wrap;border-bottom:1px solid #d6cbb8;padding-bottom:14px;margin-bottom:34px;">
+              <div style="display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;">
+                <h2 style="font-family:'Noto Serif TC',serif;font-weight:600;font-size:clamp(22px,3vw,30px);color:#2c2620;margin:0;letter-spacing:.02em;">{{ sec.zh }}</h2>
+                <span style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:18px;color:var(--accent);">{{ sec.en }}</span>
+              </div>
+              <span style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:15px;color:#9a9183;letter-spacing:.06em;">{{ sec.countLabel }}</span>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(var(--cardmin),1fr));gap:38px 28px;">
+              <sc-for list="{{ sec.books }}" as="book" hint-placeholder-count="6">
+                <article data-reveal="1" onClick="{{ book.onOpen }}" style="display:flex;flex-direction:column;gap:15px;cursor:pointer;">
+                  <div class="cover" style="position:relative;aspect-ratio:2/3;border:1px solid rgba(44,38,32,.12);overflow:hidden;" style-hover="border-color:var(--accent);box-shadow:0 18px 42px rgba(44,38,32,.17);">
+                    <div class="cover-inner" style="position:absolute;left:0;right:0;top:-9%;bottom:-9%;background:var(--wash);display:flex;flex-direction:column;justify-content:center;align-items:center;padding:24px 18px;text-align:center;will-change:transform;">
+                      <div style="position:absolute;inset:0;background:repeating-linear-gradient(135deg,transparent 0 13px,rgba(44,38,32,.028) 13px 14px);pointer-events:none;"></div>
+                      <div style="position:relative;font-size:10px;letter-spacing:.16em;color:var(--accent);margin-bottom:14px;">{{ book.catZh }}</div>
+                      <div style="position:relative;font-family:'Noto Serif TC',serif;font-weight:600;font-size:18px;line-height:1.42;color:#2c2620;">{{ book.dCover }}</div>
+                      <sc-if value="{{ showCoverNote }}" hint-placeholder-val="{{ true }}">
+                        <div style="position:absolute;bottom:14px;left:0;right:0;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:10px;letter-spacing:.1em;color:#b3a892;">封面待補</div>
+                      </sc-if>
+                    </div>
+                    <div style="position:absolute;inset:9px;border:1px solid rgba(44,38,32,.13);pointer-events:none;z-index:2;"></div>
+                  </div>
+                  <div style="display:flex;flex-direction:column;gap:7px;">
+                    <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:15px;color:#6f675b;line-height:1.35;">{{ book.dCaption }}</div>
+                    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+                      <span style="font-size:12px;color:#9a9183;letter-spacing:.02em;">{{ book.author }}</span>
+                      <span style="font-family:'Cormorant Garamond',serif;font-size:14px;color:var(--accent);letter-spacing:.04em;">{{ book.tagStr }}</span>
+                    </div>
+                  </div>
+                </article>
+              </sc-for>
+            </div>
+          </section>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ noResults }}" hint-placeholder-val="{{ false }}">
+      <div style="text-align:center;padding:90px 20px;">
+        <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:30px;color:#bcb19c;margin-bottom:14px;">Nothing here yet.</div>
+        <div style="font-size:15px;color:#8a8175;">找不到符合「{{ query }}」的書,試試其他關鍵字。</div>
+      </div>
+    </sc-if>
+  </main>
+
+  <footer style="border-top:1px solid #e1d8c7;background:#efe8da;">
+    <div style="max-width:1200px;margin:0 auto;padding:42px 28px;display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap;">
+      <div>
+        <div style="font-family:'Noto Serif TC',serif;font-weight:700;font-size:19px;letter-spacing:.14em;color:#2c2620;margin-bottom:6px;">百冊</div>
+        <div style="font-size:13px;color:#8a8175;line-height:1.7;">一份持續更新的選書清單與讀書心得。<br>書封與心得連結將陸續補上。</div>
+      </div>
+      <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:13px;color:#a59b89;letter-spacing:.08em;">One Hundred · A Reading List</div>
+    </div>
+  </footer>
+
+  <sc-if value="{{ hasSelected }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeBook }}" style="position:fixed;inset:0;z-index:100;background:rgba(28,22,16,.52);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);display:flex;align-items:center;justify-content:center;padding:24px;">
+      <div class="cat-{{ selected.cat }}" onClick="{{ stopProp }}" style="background:#fbf7ee;max-width:720px;width:100%;border:1px solid #e3dacb;box-shadow:0 40px 100px rgba(28,22,16,.35);display:flex;position:relative;max-height:90vh;overflow:auto;">
+        <button onClick="{{ closeBook }}" style="position:absolute;top:16px;right:16px;z-index:2;width:34px;height:34px;border-radius:50%;border:1px solid #e0d6c4;background:#fbf7ee;color:#6f675b;cursor:pointer;font-size:17px;line-height:1;display:flex;align-items:center;justify-content:center;transition:all .2s ease;" style-hover="background:#2c2620;color:#f3ede1;border-color:#2c2620;">×</button>
+        <div style="flex:0 0 210px;padding:32px 26px;border-right:1px solid #ece3d2;display:flex;align-items:center;justify-content:center;background:#f6f0e4;">
+          <div style="position:relative;width:100%;aspect-ratio:2/3;background:var(--wash);border:1px solid rgba(44,38,32,.14);display:flex;flex-direction:column;justify-content:center;align-items:center;padding:22px 16px;text-align:center;overflow:hidden;">
+            <div style="position:absolute;inset:0;background:repeating-linear-gradient(135deg,transparent 0 13px,rgba(44,38,32,.028) 13px 14px);pointer-events:none;"></div>
+            <div style="position:absolute;inset:9px;border:1px solid rgba(44,38,32,.14);pointer-events:none;"></div>
+            <div style="position:relative;font-family:'Noto Serif TC',serif;font-weight:600;font-size:19px;line-height:1.42;color:#2c2620;">{{ selected.dCover }}</div>
+          </div>
+        </div>
+        <div style="flex:1;padding:38px 36px 36px;min-width:0;">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;">
+            <span style="font-size:11px;letter-spacing:.14em;color:var(--accent);border:1px solid var(--accent);border-radius:999px;padding:4px 11px;">{{ selected.catZh }}</span>
+            <span style="font-family:'Cormorant Garamond',serif;font-size:15px;color:#a59b89;letter-spacing:.05em;">{{ selected.numStr }}</span>
+          </div>
+          <h2 style="font-family:'Noto Serif TC',serif;font-weight:600;font-size:28px;line-height:1.3;color:#2c2620;margin:0 0 8px;">{{ selected.dCover }}</h2>
+          <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:18px;color:#6f675b;margin-bottom:6px;">{{ selected.dCaption }}</div>
+          <div style="font-size:13px;color:#9a9183;letter-spacing:.03em;margin-bottom:24px;">{{ selected.author }}</div>
+          <p style="font-size:15.5px;line-height:1.95;color:#5c544a;font-weight:300;margin:0 0 30px;border-top:1px solid #ece3d2;padding-top:24px;">{{ selected.desc }}</p>
+          <sc-if value="{{ selected.hasNote }}" hint-placeholder-val="{{ false }}">
+            <button onClick="{{ selected.onOpenNote }}" style="display:inline-flex;align-items:center;gap:9px;font-family:'Noto Serif TC',serif;font-size:14px;color:#f3ede1;background:#2c2620;border:none;padding:12px 20px;cursor:pointer;letter-spacing:.04em;transition:opacity .2s ease;" style-hover="opacity:.85;">閱讀我的讀書心得 <span style="font-family:'Cormorant Garamond',serif;font-size:16px;">→</span></button>
+          </sc-if>
+          <sc-if value="{{ selected.noNote }}" hint-placeholder-val="{{ true }}">
+            <div style="display:inline-flex;align-items:center;gap:9px;font-family:'Noto Serif TC',serif;font-size:14px;color:#a59b89;border:1px dashed #cdc2ad;padding:12px 20px;letter-spacing:.04em;">讀書心得整理中 <span style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:13px;">coming soon</span></div>
+          </sc-if>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ hasReading }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;z-index:130;background:#f3ede1;overflow:auto;">
+      <div class="cat-{{ reading.cat }}" style="position:sticky;top:0;z-index:2;background:rgba(243,237,225,.92);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid #e1d8c7;">
+        <div style="max-width:720px;margin:0 auto;padding:15px 28px;display:flex;align-items:center;justify-content:space-between;gap:16px;">
+          <button onClick="{{ closeReading }}" style="display:inline-flex;align-items:center;gap:8px;font-family:'Noto Serif TC',serif;font-size:14px;color:#2c2620;background:transparent;border:none;cursor:pointer;letter-spacing:.03em;" style-hover="color:var(--accent);"><span style="font-family:'Cormorant Garamond',serif;font-size:17px;">←</span> 回到書目</button>
+          <span style="font-size:11px;letter-spacing:.14em;color:var(--accent);border:1px solid var(--accent);border-radius:999px;padding:4px 11px;">讀書筆記</span>
+        </div>
+      </div>
+      <article class="cat-{{ reading.cat }}" style="max-width:680px;margin:0 auto;padding:64px 28px 130px;">
+        <div style="font-size:11px;letter-spacing:.18em;color:var(--accent);margin-bottom:18px;">{{ reading.catZh }}</div>
+        <h1 style="font-family:'Noto Serif TC',serif;font-weight:600;font-size:clamp(30px,5vw,46px);line-height:1.25;color:#2c2620;margin:0 0 12px;">{{ reading.title }}</h1>
+        <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:20px;color:#6f675b;margin-bottom:6px;">{{ reading.en }}</div>
+        <div style="font-size:13px;color:#9a9183;letter-spacing:.04em;margin-bottom:42px;">{{ reading.author }}</div>
+        <sc-for list="{{ reading.blocks }}" as="blk" hint-placeholder-count="6">
+          <sc-if value="{{ blk.isH2 }}" hint-placeholder-val="{{ false }}">
+            <h2 style="font-family:'Noto Serif TC',serif;font-weight:600;font-size:22px;line-height:1.5;color:#2c2620;margin:50px 0 6px;letter-spacing:.02em;">{{ blk.text }}</h2>
+          </sc-if>
+          <sc-if value="{{ blk.isH3 }}" hint-placeholder-val="{{ false }}">
+            <h3 style="font-family:'Noto Serif TC',serif;font-weight:600;font-size:18px;color:#4a4339;margin:34px 0 4px;">{{ blk.text }}</h3>
+          </sc-if>
+          <sc-if value="{{ blk.isP }}" hint-placeholder-val="{{ true }}">
+            <p style="font-size:17px;line-height:2.05;color:#4a4339;font-weight:300;margin:0 0 20px;text-wrap:pretty;">{{ blk.text }}</p>
+          </sc-if>
+        </sc-for>
+      </article>
+    </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showCoverNote&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;},&quot;density&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;roomy&quot;,&quot;options&quot;:[&quot;roomy&quot;,&quot;compact&quot;],&quot;tsType&quot;:&quot;string&quot;}}">
+class Component extends DCLogic {
+  state = { activeCategory: "all", query: "", selected: null, reading: null };
+
+  cats = [
+    { key: "psych", zh: "大眾心理學", en: "Popular Psychology" },
+    { key: "biz", zh: "商業管理", en: "Business & Management" },
+    { key: "finance", zh: "財經與投資", en: "Finance & Investing" },
+    { key: "growth", zh: "自我成長", en: "Self-Growth" },
+    { key: "neuro", zh: "腦神經科學", en: "Brain & Neuroscience" },
+    { key: "influence", zh: "暢銷與跨領域影響力", en: "Bestsellers & Beyond" },
+    { key: "soul", zh: "心靈・人生", en: "Soul & Life" },
+  ];
+
+  books = [
+    { n:1, cat:"psych", zh:"快思慢想", en:"Thinking, Fast and Slow", author:"Daniel Kahneman", desc:"系統一與系統二,揭開直覺與理性如何主宰我們的每一個判斷。" },
+    { n:2, cat:"psych", zh:"影響力", en:"Influence", author:"Robert Cialdini", desc:"互惠、承諾、稀少性等六大說服原理的心理學經典。" },
+    { n:3, cat:"psych", zh:"誰說人是理性的!", en:"Predictably Irrational", author:"Dan Ariely", desc:"人類的非理性其實有跡可循,而且可以被預測。" },
+    { n:4, cat:"psych", zh:"情緒跟你以為的不一樣", en:"How Emotions Are Made", author:"Lisa Feldman Barrett", desc:"情緒不是被觸發的,而是大腦主動建構出來的。" },
+    { n:5, cat:"psych", zh:"好人總是自以為是", en:"The Righteous Mind", author:"Jonathan Haidt", desc:"道德直覺如何分裂左右、形塑善惡之爭。" },
+    { n:6, cat:"psych", zh:"快樂為什麼不幸福?", en:"Stumbling on Happiness", author:"Daniel Gilbert", desc:"我們為何總是預測錯自己未來的快樂。" },
+    { n:7, cat:"psych", zh:"推出你的影響力", en:"Nudge", author:"Thaler & Sunstein", desc:"用選擇設計,溫和地推動人們做出更好的決定。" },
+    { n:8, cat:"psych", zh:"錯不在我?", en:"Mistakes Were Made (But Not by Me)", author:"Tavris & Aronson", desc:"認知失調如何讓我們不斷自我合理化。" },
+    { n:9, cat:"psych", zh:"人性18法則", en:"The Laws of Human Nature", author:"Robert Greene", desc:"解讀人性深層動機的權力與洞察之書。" },
+    { n:10, cat:"psych", zh:"安靜,就是力量", en:"Quiet", author:"Susan Cain", desc:"內向者安靜的力量,與被世界低估的價值。" },
+    { n:11, cat:"psych", zh:"逆思維", en:"Think Again", author:"Adam Grant", desc:"重新思考的能力,往往比知道更重要。" },
+    { n:12, cat:"psych", zh:"奪回專注力", en:"Stolen Focus", author:"Johann Hari", desc:"注意力為何被偷走,我們又該如何奪回。" },
+    { n:13, cat:"psych", zh:"失控的焦慮世代", en:"The Anxious Generation", author:"Jonathan Haidt", desc:"智慧型手機如何重塑了一整個世代的心理。" },
+    { n:14, cat:"psych", zh:"清晰思考", en:"Clear Thinking", author:"Shane Parrish", desc:"在關鍵時刻做出更好決定的思考術。" },
+    { n:15, cat:"psych", zh:"隨他們去", en:"The Let Them Theory", author:"Mel Robbins", desc:"放下對他人的控制,奪回屬於自己的能量。" },
+    { n:16, cat:"psych", zh:"強大內心的自我對話習慣", en:"Chatter", author:"Ethan Kross", desc:"如何馴服腦中那個喋喋不休的內在聲音。" },
+    { n:17, cat:"psych", zh:"人的心", en:"Psych", author:"Paul Bloom", desc:"耶魯最受歡迎的心理學公開課,探索人性的心智旅程。" },
+    { n:18, cat:"psych", zh:"修復關係的正向衝突", en:"High Conflict", author:"Amanda Ripley", desc:"如何辨識並走出高衝突的惡性循環,把破壞力轉為修復關係的動力。" },
+
+    { n:19, cat:"biz", zh:"從A到A+", en:"Good to Great", author:"Jim Collins", desc:"卓越企業如何從優秀躍升為偉大。" },
+    { n:20, cat:"biz", zh:"創新的兩難", en:"The Innovator's Dilemma", author:"Clayton Christensen", desc:"領先者為何總是被破壞式創新擊敗。" },
+    { n:21, cat:"biz", zh:"精實創業", en:"The Lean Startup", author:"Eric Ries", desc:"用最小可行產品快速驗證、學習與迭代。" },
+    { n:22, cat:"biz", zh:"藍海策略", en:"Blue Ocean Strategy", author:"Kim & Mauborgne", desc:"跳出競爭紅海,開創無人爭搶的新市場。" },
+    { n:23, cat:"biz", zh:"好策略.壞策略", en:"Good Strategy Bad Strategy", author:"Richard Rumelt", desc:"真正的策略,是直面並解決核心難題。" },
+    { n:24, cat:"biz", zh:"葛洛夫給經理人的第一課", en:"High Output Management", author:"Andrew Grove", desc:"英特爾傳奇執行長的管理聖經。" },
+    { n:25, cat:"biz", zh:"從0到1", en:"Zero to One", author:"Peter Thiel", desc:"從無到有,創造獨一無二的價值。" },
+    { n:26, cat:"biz", zh:"OKR:做最重要的事", en:"Measure What Matters", author:"John Doerr", desc:"用目標與關鍵結果驅動組織的成長。" },
+    { n:27, cat:"biz", zh:"跨越鴻溝", en:"Crossing the Chasm", author:"Geoffrey Moore", desc:"科技產品如何跨越通往主流市場的鴻溝。" },
+    { n:28, cat:"biz", zh:"什麼才是經營最難的事?", en:"The Hard Thing About Hard Things", author:"Ben Horowitz", desc:"創業裡那些沒有標準答案的艱難抉擇。" },
+    { n:29, cat:"biz", zh:"零規則", en:"No Rules Rules", author:"Hastings & Meyer", desc:"Netflix 自由與責任並重的文化解密。" },
+    { n:30, cat:"biz", zh:"7大市場力量", en:"7 Powers", author:"Hamilton Helmer", desc:"打造持久競爭優勢的七種市場力量。" },
+    { n:31, cat:"biz", zh:"", en:"The Great CEO Within", author:"Matt Mochary", desc:"新創執行長的實戰營運手冊。" },
+    { n:32, cat:"biz", zh:"亞馬遜逆向工作法", en:"Working Backwards", author:"Bryar & Carr", desc:"從顧客需求倒推回去的亞馬遜方法論。" },
+    { n:33, cat:"biz", zh:"執行長日記", en:"The Diary of a CEO", author:"Steven Bartlett", desc:"關於成功與商業的 33 條法則。" },
+    { n:34, cat:"biz", zh:"超乎常理的款待", en:"Unreasonable Hospitality", author:"Will Guidara", desc:"把服務做到讓人一生難忘的境界。" },
+    { n:35, cat:"biz", zh:"", en:"Scaling Up", author:"Verne Harnish", desc:"企業規模化成長的四大決策框架。" },
+    { n:36, cat:"biz", zh:"正確犯錯", en:"Right Kind of Wrong", author:"Amy Edmondson", desc:"聰明地失敗,是進步的必經之路。" },
+
+    { n:37, cat:"finance", zh:"致富心態", en:"The Psychology of Money", author:"Morgan Housel", desc:"財富與快樂,取決於行為而非聰明。" },
+    { n:38, cat:"finance", zh:"窮查理的普通常識", en:"Poor Charlie's Almanack", author:"Charlie Munger", desc:"蒙格的多元思維模型與處世智慧。" },
+    { n:39, cat:"finance", zh:"智慧型股票投資人", en:"The Intelligent Investor", author:"Benjamin Graham", desc:"價值投資永恆不朽的奠基經典。" },
+    { n:40, cat:"finance", zh:"彼得林區選股戰略", en:"One Up On Wall Street", author:"Peter Lynch", desc:"從日常生活中,發現會漲的好股票。" },
+    { n:41, cat:"finance", zh:"原則:生活和工作", en:"Principles", author:"Ray Dalio", desc:"達利歐淬鍊一生的人生與工作原則。" },
+    { n:42, cat:"finance", zh:"漫步華爾街", en:"A Random Walk Down Wall Street", author:"Burton Malkiel", desc:"指數投資與效率市場的入門經典。" },
+    { n:43, cat:"finance", zh:"約翰柏格投資常識", en:"The Little Book of Common Sense Investing", author:"John Bogle", desc:"低成本指數基金之父的誠摯忠告。" },
+    { n:44, cat:"finance", zh:"投資最重要的事", en:"The Most Important Thing", author:"Howard Marks", desc:"第二層思考,與對風險的深刻體悟。" },
+    { n:45, cat:"finance", zh:"隨機騙局", en:"Fooled by Randomness", author:"Nassim Taleb", desc:"別把運氣,誤認成自己的實力。" },
+    { n:46, cat:"finance", zh:"簡單致富", en:"The Simple Path to Wealth", author:"JL Collins", desc:"通往財務自由,其實有條簡單的路。" },
+    { n:47, cat:"finance", zh:"股票作手回憶錄", en:"Reminiscences of a Stock Operator", author:"Edwin Lefèvre", desc:"投機之王李佛摩的傳奇與心法。" },
+    { n:48, cat:"finance", zh:"為投資人賺錢的CEO長怎樣?", en:"The Outsiders", author:"William Thorndike", desc:"八位非典型 CEO 的資本配置智慧。" },
+    { n:49, cat:"finance", zh:"一如既往", en:"Same as Ever", author:"Morgan Housel", desc:"在變動的世界裡,那些不變的人性法則。" },
+    { n:50, cat:"finance", zh:"別把你的錢留到死", en:"Die with Zero", author:"Bill Perkins", noteKey:"die0", desc:"把錢花在創造一生難忘的回憶上。" },
+    { n:51, cat:"finance", zh:"持續買進", en:"Just Keep Buying", author:"Nick Maggiulli", desc:"用數據支持的簡單致富策略。" },
+    { n:52, cat:"finance", zh:"矽谷創投啟示錄", en:"The Power Law", author:"Sebastian Mallaby", desc:"創投如何以少數豪賭改變世界。" },
+    { n:53, cat:"finance", zh:"", en:"In This Economy?", author:"Kyla Scanlon", desc:"用白話,讀懂經濟究竟如何運作。" },
+    { n:54, cat:"finance", zh:"更富有、更睿智、更快樂", en:"Richer, Wiser, Happier", author:"William Green", desc:"偉大投資人們的人生與心靈智慧。" },
+
+    { n:55, cat:"growth", zh:"原子習慣", en:"Atomic Habits", author:"James Clear", desc:"微小的改變,如何累積成巨大的成果。" },
+    { n:56, cat:"growth", zh:"與成功有約", en:"The 7 Habits of Highly Effective People", author:"Stephen Covey", desc:"高效能人士的七個習慣。" },
+    { n:57, cat:"growth", zh:"深度工作力", en:"Deep Work", author:"Cal Newport", desc:"在分心的世界裡,專注是稀有的能力。" },
+    { n:58, cat:"growth", zh:"心態致勝", en:"Mindset", author:"Carol Dweck", desc:"成長型心態,如何決定你能走多遠。" },
+    { n:59, cat:"growth", zh:"活出意義來", en:"Man's Search for Meaning", author:"Viktor Frankl", desc:"在最深的苦難中,尋找生命的意義。" },
+    { n:60, cat:"growth", zh:"被討厭的勇氣", en:"The Courage to Be Disliked", author:"岸見一郎、古賀史健", desc:"阿德勒心理學的幸福與自由勇氣。" },
+    { n:61, cat:"growth", zh:"少,但是更好", en:"Essentialism", author:"Greg McKeown", desc:"專準主義:只做真正重要的事。" },
+    { n:62, cat:"growth", zh:"恆毅力", en:"Grit", author:"Angela Duckworth", desc:"熱情與毅力,比天賦更能決定成就。" },
+    { n:63, cat:"growth", zh:"脆弱的力量", en:"Daring Greatly", author:"Brené Brown", desc:"勇於示弱,才是真正的勇敢。" },
+    { n:64, cat:"growth", zh:"障礙就是道路", en:"The Obstacle Is the Way", author:"Ryan Holiday", desc:"把眼前的阻礙,化為前進的動力。" },
+    { n:65, cat:"growth", zh:"當下的力量", en:"The Power of Now", author:"Eckhart Tolle", desc:"活在當下,放下心智無止盡的喧囂。" },
+    { n:66, cat:"growth", zh:"納瓦爾寶典", en:"The Almanack of Naval Ravikant", author:"Eric Jorgenson", noteKey:"naval", desc:"關於財富與幸福的思維結晶。" },
+    { n:67, cat:"growth", zh:"高效原力", en:"Feel-Good Productivity", author:"Ali Abdaal", desc:"用愉悅,而非痛苦來驅動生產力。" },
+    { n:68, cat:"growth", zh:"人生4千個禮拜", en:"Four Thousand Weeks", author:"Oliver Burkeman", desc:"關於有限人生的時間哲學。" },
+    { n:69, cat:"growth", zh:"把時間買回來", en:"Buy Back Your Time", author:"Dan Martell", desc:"用授權與系統,把時間重新買回來。" },
+    { n:70, cat:"growth", zh:"創造力的修行", en:"The Creative Act", author:"Rick Rubin", desc:"關於創作與存在的一場冥想。" },
+    { n:71, cat:"growth", zh:"打造你要的人生", en:"Build the Life You Want", author:"Brooks & Winfrey", desc:"經營幸福的科學與日常實踐。" },
+    { n:72, cat:"growth", zh:"10倍成長思維", en:"10x Is Easier Than 2x", author:"Sullivan & Hardy", desc:"為何十倍成長,反而比兩倍更輕鬆。" },
+
+    { n:73, cat:"neuro", zh:"為什麼要睡覺?", en:"Why We Sleep", author:"Matthew Walker", desc:"睡眠,是健康與大腦運作的根本。" },
+    { n:74, cat:"neuro", zh:"多巴胺國度", en:"Dopamine Nation", author:"Anna Lembke", desc:"在縱慾的時代,重新尋找平衡。" },
+    { n:75, cat:"neuro", zh:"貪婪的多巴胺", en:"The Molecule of More", author:"Lieberman & Long", desc:"多巴胺如何驅動慾望與對未來的渴求。" },
+    { n:76, cat:"neuro", zh:"改變是大腦的天性", en:"The Brain That Changes Itself", author:"Norman Doidge", desc:"神經可塑性,那些驚人的真實故事。" },
+    { n:77, cat:"neuro", zh:"行為", en:"Behave", author:"Robert Sapolsky", desc:"解析人類善惡行為背後的生物根源。" },
+    { n:78, cat:"neuro", zh:"千腦智能新理論", en:"A Thousand Brains", author:"Jeff Hawkins", desc:"關於大腦智能運作的全新理論。" },
+    { n:79, cat:"neuro", zh:"尋找腦中幻影", en:"Phantoms in the Brain", author:"V.S. Ramachandran", desc:"從異常案例,看見大腦的隱藏祕密。" },
+    { n:80, cat:"neuro", zh:"身為自己", en:"Being You", author:"Anil Seth", desc:"意識,如何由大腦一手建構而成。" },
+    { n:81, cat:"neuro", zh:"錯把太太當帽子的人", en:"The Man Who Mistook His Wife for a Hat", author:"Oliver Sacks", desc:"神經科裡那些奇異而動人的病例。" },
+    { n:82, cat:"neuro", zh:"躲在我腦中的陌生人", en:"Incognito", author:"David Eagleman", desc:"潛意識,如何在暗中操控你的大腦。" },
+    { n:83, cat:"neuro", zh:"體驗機器", en:"The Experience Machine", author:"Andy Clark", desc:"大腦如何預測並塑造我們所經驗的現實。" },
+    { n:84, cat:"neuro", zh:"超預期壽命", en:"Outlive", author:"Peter Attia", desc:"長壽醫學的科學與實踐之道。" },
+    { n:85, cat:"neuro", zh:"", en:"The Hidden Spring", author:"Mark Solms", desc:"從情感,探尋意識真正的源頭。" },
+    { n:86, cat:"neuro", zh:"", en:"How to Change a Memory", author:"Steve Ramirez", desc:"記憶能否被改寫的前沿腦科學。" },
+
+    { n:87, cat:"influence", zh:"人類大歷史", en:"Sapiens", author:"Yuval Noah Harari", desc:"智人如何一步步主宰整個地球的大歷史。" },
+    { n:88, cat:"influence", zh:"異數", en:"Outliers", author:"Malcolm Gladwell", desc:"成功背後的機遇,與一萬小時法則。" },
+    { n:89, cat:"influence", zh:"黑天鵝效應", en:"The Black Swan", author:"Nassim Taleb", desc:"極端而意外的事件,如何顛覆世界。" },
+    { n:90, cat:"influence", zh:"槍炮、病菌與鋼鐵", en:"Guns, Germs, and Steel", author:"Jared Diamond", desc:"地理,如何決定了文明的命運。" },
+    { n:91, cat:"influence", zh:"真確", en:"Factfulness", author:"Hans Rosling", desc:"用數據,看見世界真正的樣貌。" },
+    { n:92, cat:"influence", zh:"雜訊", en:"Noise", author:"Kahneman, Sibony & Sunstein", desc:"判斷之中,那些被忽視的隨機誤差。" },
+    { n:93, cat:"influence", zh:"跨能致勝", en:"Range", author:"David Epstein", desc:"廣度與跨領域,才是長期的優勢。" },
+    { n:94, cat:"influence", zh:"不對稱陷阱", en:"Skin in the Game", author:"Nassim Taleb", desc:"風險共擔,才會有真實的判斷。" },
+    { n:95, cat:"influence", zh:"反脆弱", en:"Antifragile", author:"Nassim Taleb", desc:"在混亂中反而變得更強的生存之道。" },
+    { n:96, cat:"influence", zh:"超級預測", en:"Superforecasting", author:"Tetlock & Gardner", desc:"頂尖預測者,如何更準地看見未來。" },
+    { n:97, cat:"influence", zh:"3.3秒的呼吸奧祕", en:"Breath", author:"James Nestor", desc:"呼吸的方式,如何深刻改變健康。" },
+    { n:98, cat:"influence", zh:"引爆趨勢", en:"The Tipping Point", author:"Malcolm Gladwell", desc:"流行與趨勢,如何被引爆並擴散。" },
+    { n:99, cat:"influence", zh:"命定:沒有自由意志的科學", en:"Determined", author:"Robert Sapolsky", desc:"一場關於沒有自由意志的科學論證。" },
+    { n:100, cat:"influence", zh:"五感之外的世界", en:"An Immense World", author:"Ed Yong", desc:"動物如何用人類無法想像的感官,感知這個世界。" },
+    { n:101, cat:"soul", noteKey:"cafe", zh:"世界盡頭的咖啡館", en:"The Café on the Edge of the World", author:"John Strelecky", desc:"在世界盡頭的咖啡館,重新問自己為何而活。" },
+    { n:102, cat:"soul", noteKey:"six", zh:"你的人生,他們六個說了算", en:"Habits of a Happy Brain", author:"Loretta Graziano Breuning", desc:"六種腦內化學物質,如何悄悄主宰你的情緒。" },
+    { n:103, cat:"soul", noteKey:"teach", zh:"別人怎麼對你,都是你教的", en:"", author:"黃啟團", desc:"別人對待你的方式,其實是你一次次教會的。" },
+    { n:104, cat:"soul", noteKey:"love", zh:"愛的藝術", en:"The Art of Loving", author:"Erich Fromm", desc:"愛不是一種感覺,而是一門需要練習的能力。" },
+    { n:105, cat:"soul", noteKey:"maybe", zh:"我可能錯了", en:"I May Be Wrong", author:"Björn Natthiko Lindeblad", desc:"森林僧侶的最後一課:放下確定,擁抱不確定。" },
+    { n:106, cat:"soul", noteKey:"joy", zh:"最後一次相遇,我們只談喜悅", en:"The Book of Joy", author:"Dalai Lama & Desmond Tutu", desc:"兩位心靈導師,談苦難中依然喜悅的祕密。" },
+    { n:107, cat:"soul", noteKey:"dying", zh:"死過一次才學會愛", en:"Dying to Be Me", author:"Anita Moorjani", desc:"一場瀕死經驗,教她學會無條件地愛自己。" },
+    { n:108, cat:"soul", noteKey:"breath", zh:"當呼吸化為空氣", en:"When Breath Becomes Air", author:"Paul Kalanithi", desc:"一位神經外科醫師,面對死亡時寫下的生命之書。" },
+    { n:109, cat:"soul", noteKey:"neuroplastic", zh:"神經可塑性", en:"Neuroplasticity", author:"Moheb Costandi", desc:"觀念、信念與思考脈絡,都能被重新塑形。" },
+    { n:110, cat:"soul", noteKey:"surrender", zh:"臣服實驗", en:"The Surrender Experiment", author:"Michael A. Singer", desc:"放下小我的設定,讓生命之流帶你前行。" },
+    { n:111, cat:"soul", noteKey:"toad", zh:"蛤蟆先生去看心理醫生", en:"Counselling for Toads", author:"Robert de Board", desc:"陪蛤蟆先生走一趟心理諮商的自我探索。" },
+  ];
+
+  componentDidMount() {
+    this._items = [];
+    this._hide = (el) => {
+      el.style.opacity = "0";
+      el.style.transform = "translateY(26px)";
+      const c = el.querySelector(".cover");
+      if (c) c.style.clipPath = "inset(0 0 100% 0)";
+    };
+    this._refresh = () => {
+      this._items = Array.prototype.slice.call(document.querySelectorAll("#hundred-root [data-reveal]"));
+      for (let k = 0; k < this._items.length; k++) {
+        const el = this._items[k];
+        if (el._rv === undefined) { el._rv = 0; this._hide(el); }
+      }
+    };
+    this._refresh();
+    this._curY = window.scrollY; this._targetY = window.scrollY; this._self = false;
+    this._smooth = !matchMedia("(prefers-reduced-motion: reduce)").matches;
+    this._maxScroll = () => Math.max(0, (document.documentElement.scrollHeight || document.body.scrollHeight) - window.innerHeight);
+    this._onWheel = (e) => {
+      if (!this._smooth || this.state.selected || e.ctrlKey) return;
+      e.preventDefault();
+      let dy = e.deltaY;
+      if (e.deltaMode === 1) dy *= 16; else if (e.deltaMode === 2) dy *= window.innerHeight;
+      this._targetY = Math.min(this._maxScroll(), Math.max(0, this._targetY + dy));
+    };
+    this._onExtScroll = () => {
+      if (this._self) { this._self = false; return; }
+      this._curY = window.scrollY; this._targetY = window.scrollY;
+    };
+    window.addEventListener("wheel", this._onWheel, { passive: false });
+    window.addEventListener("scroll", this._onExtScroll, { passive: true });
+    const DUR = 700, CLIP = 860, ease = (t) => 1 - Math.pow(1 - t, 3);
+    this._tick = (ts) => {
+      if (this._smooth && !this.state.selected) {
+        const max = this._maxScroll();
+        if (this._targetY > max) this._targetY = max;
+        const diff = this._targetY - this._curY;
+        if (Math.abs(diff) > 0.4) {
+          this._curY += diff * 0.12;
+          this._self = true;
+          window.scrollTo(0, this._curY);
+        } else {
+          this._curY = this._targetY;
+        }
+      }
+      const h = window.innerHeight || 800;
+      let nc = 0;
+      for (let k = 0; k < this._items.length; k++) {
+        const el = this._items[k];
+        const r = el.getBoundingClientRect();
+        if (el._rv === 0 && r.top < h * 0.97) { el._rv = 1; el._t0 = ts + (nc % 6) * 70; nc++; }
+        if (el._rv === 1) {
+          const p = Math.min(1, Math.max(0, (ts - el._t0) / DUR));
+          const e = ease(p);
+          el.style.opacity = e.toFixed(3);
+          el.style.transform = "translateY(" + ((1 - e) * 26).toFixed(1) + "px)";
+          const c = el._c || (el._c = el.querySelector(".cover"));
+          if (c) {
+            const cp = Math.min(1, Math.max(0, (ts - el._t0) / CLIP));
+            c.style.clipPath = "inset(0 0 " + ((1 - ease(cp)) * 100).toFixed(2) + "% 0)";
+          }
+          if (p >= 1 && (!c || ts - el._t0 >= CLIP)) {
+            el._rv = 2;
+            el.style.opacity = "";
+            el.style.transform = "";
+            if (c) c.style.clipPath = "";
+          }
+        }
+        const inner = el._ci || (el._ci = el.querySelector(".cover-inner"));
+        if (inner && r.bottom > -160 && r.top < h + 160) {
+          const center = r.top + r.height / 2;
+          const pr = (center - h / 2) / h;
+          inner.style.transform = "translateY(" + (pr * -18).toFixed(1) + "px)";
+        }
+      }
+      this._rafId = requestAnimationFrame(this._tick);
+    };
+    this._rafId = requestAnimationFrame(this._tick);
+    this._onKey = (e) => { if (e.key === "Escape") this.setState({ selected: null, reading: null }); };
+    document.addEventListener("keydown", this._onKey);
+  }
+  componentDidUpdate() { if (this._refresh) this._refresh(); }
+  componentWillUnmount() {
+    if (this._rafId) cancelAnimationFrame(this._rafId);
+    document.removeEventListener("keydown", this._onKey);
+    window.removeEventListener("wheel", this._onWheel);
+    window.removeEventListener("scroll", this._onExtScroll);
+  }
+  parseNote(md) {
+    const lines = (md || "").replace(/\r/g, "").split("\n");
+    const blocks = []; let para = [];
+    const flush = () => { if (para.length) { blocks.push({ t: "p", text: para.join("") }); para = []; } };
+    for (const ln of lines) {
+      const s = ln.trim();
+      if (!s) { flush(); continue; }
+      if (s.indexOf("### ") === 0) { flush(); blocks.push({ t: "h3", text: s.slice(4) }); }
+      else if (s.indexOf("## ") === 0) { flush(); blocks.push({ t: "h2", text: s.slice(3) }); }
+      else if (s.indexOf("# ") === 0) { flush(); blocks.push({ t: "h1", text: s.slice(2) }); }
+      else para.push(s);
+    }
+    flush();
+    return blocks;
+  }
+  openNote(book) {
+    const raw = (typeof window !== "undefined" && window.BOOK_NOTES) ? window.BOOK_NOTES[book.noteKey] : null;
+    if (!raw) return;
+    const blocks = this.parseNote(raw).filter((b) => b.t !== "h1").map((b) => ({ text: b.text, isH2: b.t === "h2", isH3: b.t === "h3", isP: b.t === "p" }));
+    this.setState({ reading: { cat: book.cat, catZh: book.catZh, title: book.dCover, en: book.dCaption, author: book.author, blocks } });
+  }
+
+  renderVals() {
+    const q = (this.state.query || "").trim().toLowerCase();
+    const active = this.state.activeCategory || "all";
+    const pad = (n) => (n < 10 ? "0" + n : "" + n);
+    const catZh = {};
+    this.cats.forEach((c) => { catZh[c.key] = c.zh; });
+    const enrich = (b) => {
+      const o = {
+        ...b,
+        dCover: b.zh || b.en,
+        dCaption: b.zh ? b.en : "台灣尚未出版",
+        catZh: catZh[b.cat],
+        numStr: b.n ? "No." + pad(b.n) : "",
+        tagStr: b.n ? "No." + pad(b.n) : "筆記",
+        hasNote: !!b.noteKey,
+        noNote: !b.noteKey,
+      };
+      o.onOpen = () => this.setState({ selected: o });
+      o.onOpenNote = () => this.openNote(o);
+      return o;
+    };
+    const all = this.books.map(enrich);
+    const sections = this.cats
+      .filter((c) => active === "all" || active === c.key)
+      .map((c) => {
+        let bs = all.filter((b) => b.cat === c.key);
+        if (q) bs = bs.filter((b) => (b.zh + " " + b.en + " " + b.author).toLowerCase().includes(q));
+        return { key: c.key, zh: c.zh, en: c.en, books: bs, count: bs.length, countLabel: bs.length + (c.key === "soul" ? " 篇筆記" : " 本") };
+      })
+      .filter((s) => s.books.length > 0);
+    const total = sections.reduce((a, s) => a + s.books.length, 0);
+
+    const counts = {};
+    this.cats.forEach((c) => { counts[c.key] = this.books.filter((b) => b.cat === c.key).length; });
+    const chips = [{ key: "all", zh: "全部", count: this.books.length }].concat(
+      this.cats.map((c) => ({ key: c.key, zh: c.zh, count: counts[c.key] }))
+    );
+    chips.forEach((ch) => { ch.onCls = active === ch.key ? "on" : ""; ch.onClick = () => this.setState({ activeCategory: ch.key, selected: null }); });
+
+    const sel = this.state.selected;
+    const rd = this.state.reading;
+    const listTotal = this.books.filter((b) => b.cat !== "soul").length;
+    const noteTotal = this.books.filter((b) => b.cat === "soul").length;
+    return {
+      density: this.props.density ?? "roomy",
+      showCoverNote: this.props.showCoverNote ?? true,
+      libraryTotal: this.books.length,
+      listTotal,
+      noteTotal,
+      reading: rd,
+      hasReading: !!rd,
+      closeReading: () => this.setState({ reading: null }),
+      chips,
+      sections,
+      total,
+      hasResults: sections.length > 0,
+      noResults: sections.length === 0,
+      query: this.state.query || "",
+      hasQuery: !!q,
+      onSearch: (e) => this.setState({ query: e.target.value }),
+      clearSearch: () => this.setState({ query: "" }),
+      selected: sel,
+      hasSelected: !!sel,
+      closeBook: () => this.setState({ selected: null }),
+      stopProp: (e) => e.stopPropagation(),
+    };
+  }
+}
+</script>
+</body>
+</html>

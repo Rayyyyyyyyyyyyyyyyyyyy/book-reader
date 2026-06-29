@@ -29,4 +29,4 @@ The analysis task: read chat files in 2000-line batches, update `Rui-Xuan.md` af
 ## Skills Available
 
 - `/rui-xuan` — simulate Rui-Xuan's speaking style
-- `/rui-xuan-book` — write a book reflection in Rui-Xuan's style
+- `/rui-xuan-book` — write in Rui-Xuan's formal-writing voice: book reflections (讀書心得) or memory-triggered reflective essays (反思隨筆)

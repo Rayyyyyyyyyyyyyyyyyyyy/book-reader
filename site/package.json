@@ -6,13 +6,17 @@
   "scripts": {
     "predev": "node scripts/covers.mjs",
     "dev": "astro dev",
-    "prebuild": "node scripts/covers.mjs",
+    "prebuild": "node scripts/covers.mjs && node scripts/manuscript-reader.mjs --public",
     "build": "astro build",
     "preview": "astro preview",
+    "reader": "node scripts/manuscript-reader.mjs --serve",
+    "reader:phone": "node scripts/manuscript-reader.mjs --serve --phone",
+    "reader:build": "node scripts/manuscript-reader.mjs --build",
     "astro": "astro",
     "covers": "node scripts/covers.mjs"
   },
   "dependencies": {
+    "@astrojs/markdown-remark": "^6.3.11",
     "@astrojs/react": "^4.2.0",
     "@astrojs/rss": "^4.0.11",
     "@astrojs/sitemap": "^3.2.1",

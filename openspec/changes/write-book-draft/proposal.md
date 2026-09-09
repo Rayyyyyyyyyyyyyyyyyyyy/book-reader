@@ -2,7 +2,7 @@
 
 ## Why
 
-書的規格已完備（`docs/chapter.md`：四部十二章架構、字數配額、每章五件事 checklist、現場檔判準、引用策略「默默吸收」皆已定案），寫作聲音已封存於 `$rui-xuan-book` skill。全書約 12 萬字、橫跨數十個寫作 session，需要一個進度追蹤機制讓每個 session 能一句話接續「寫下一章」。
+書的規格已完備（`docs/chapter.md`：四部十二章架構、字數配額、每章五件事 checklist、現場檔判準、引用策略「默默吸收」皆已定案），寫作聲音已封存於 `$rui-xuan-book-v2` skill。全書約 12 萬字、橫跨數十個寫作 session，需要一個進度追蹤機制讓每個 session 能一句話接續「寫下一章」。
 
 ## What Changes
 
@@ -14,7 +14,7 @@
 
 ### New Capabilities
 
-- `book-manuscript`: 全書初稿的驗收標準——每章滿足 `docs/chapter.md` 的五件事 checklist、字數配額、引用策略與現場檔判準，聲音符合 `$rui-xuan-book` skill
+- `book-manuscript`: 全書初稿的驗收標準——每章滿足 `docs/chapter.md` 的五件事 checklist、字數配額、引用策略與現場檔判準，聲音符合 `$rui-xuan-book-v2` skill
 
 ### Modified Capabilities
 
@@ -24,4 +24,4 @@
 
 - 新增 `book-reader/book/` 目錄與各章 `.md` 初稿
 - 不動網站、不動讀書心得、不動 skill
-- 寫作依據：`docs/chapter.md`；寫作聲音：`.agents/skills/rui-xuan-book/SKILL.md`
+- 寫作依據：`docs/chapter.md`；寫作聲音：`.agents/skills/rui-xuan-book-v2/SKILL.md`

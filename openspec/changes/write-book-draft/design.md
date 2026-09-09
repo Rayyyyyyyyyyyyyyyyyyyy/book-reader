@@ -2,7 +2,7 @@
 
 ## Context
 
-書的規格（`docs/chapter.md`）與寫作聲音（`/rui-xuan-book` skill）皆已定案，本 change 只負責「按規格把書寫出來」的執行與追蹤。相關決策已在 explore 階段討論完畢，此處記錄結論。
+書的規格（`docs/chapter.md`）與寫作聲音（`$rui-xuan-book` skill）皆已定案，本 change 只負責「按規格把書寫出來」的執行與追蹤。相關決策已在 explore 階段討論完畢，此處記錄結論。
 
 ## Goals / Non-Goals
 
@@ -12,7 +12,7 @@
 
 **Non-Goals:**
 - 不在本 change 內調整書的架構（改架構 → 改 `docs/chapter.md`）
-- 不動 `/rui-xuan-book` skill、不動讀書心得、不動網站
+- 不動 `$rui-xuan-book` skill、不動讀書心得、不動網站
 - 不含出版、排版、投稿等後續流程
 
 ## Decisions

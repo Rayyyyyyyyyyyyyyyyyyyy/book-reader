@@ -1,6 +1,6 @@
 # Tasks
 
-> 每章的內容規格看 `docs/chapter.md` 對應章節；聲音用 `/rui-xuan-book` skill。一個 session 寫一章為原則。
+> 每章的內容規格看 `docs/chapter.md` 對應章節；聲音用 `$rui-xuan-book` skill。一個 session 寫一章為原則。
 > 固定流程：初稿 → 乾淨讀者子代理 → 獨立編輯子代理 → 主 session 使用 `humanizer` 潤飾全文 → 主 session 驗收。流程細節與 skill 路徑見 `design.md`，各部引言／練習／小結及結語同樣適用。驗收通過才勾選，記錄初稿、編輯後與 humanizer 後／最終驗收字數；後續 session 交接須帶上此流程。
 
 ## 現有稿件字數盤點（2026-09-09）

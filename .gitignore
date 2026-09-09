@@ -1,4 +1,2 @@
 .DS_Store
 .idea/
-.claude/settings.local.json
-.claude/scheduled_tasks.lock

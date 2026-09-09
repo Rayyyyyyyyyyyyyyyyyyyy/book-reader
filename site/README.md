@@ -35,7 +35,6 @@ SITE_URL=https://example.com BASE_PATH=/ npm run build
 |--------|------|
 | `src/content/books/*.md` | **Source of truth** — edit these to add/change books or notes |
 | `../book-png/NNN_*.jpg` | Raw covers; `scripts/covers.mjs` renames them to `src/assets/covers/NNN.jpg` at build (gitignored) |
-| `scripts/migrate.mjs` | **One-time** importer that generated the collection from the old prototype. Not part of the build. |
 
 - A book "has a note" when its Markdown body is non-empty (empty → 「整理中」).
 - Cover matched by rank; missing cover → typographic placeholder.

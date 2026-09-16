@@ -192,6 +192,7 @@
             <button class="panel-button" id="export-json" type="button">備份 JSON</button>
             <label class="import-label" for="import-json">匯入 JSON</label>
             <input class="sr-only" id="import-json" type="file" accept="application/json,.json" />
+            <button class="panel-button" id="clear-notes" type="button">清除全部註解</button>
           </div>
           <p class="local-note">註解會一直留在這個瀏覽器，可以分很多次慢慢讀。交給網頁版 ChatGPT 時使用「複製給 ChatGPT」；要直接交回 Codex，可匯出 Markdown。</p>
           <form class="composer" id="composer" hidden novalidate>
@@ -388,6 +389,25 @@
           pendingDelete = null;
           if (persistNotes(notes.filter((note) => note.id !== id))) showToast("註解已刪除");
         }
+
+        document.getElementById("clear-notes").addEventListener("click", () => {
+          if (!window.confirm("確定清除這個瀏覽器中的全部註解？未儲存的修改也會捨棄，清除後無法復原。需要保留註解，請先取消並使用「備份 JSON」。閱讀進度與字級設定會保留。")) return;
+          try {
+            localStorage.removeItem(NOTES_KEY);
+          } catch {
+            showToast("無法清除瀏覽器中的註解，請稍後重試；現有註解仍保留");
+            return;
+          }
+          notes = [];
+          pendingDelete = null;
+          closeComposer();
+          noteInput.value = "";
+          quotePreview.textContent = "";
+          selectionAction.classList.remove("is-visible");
+          window.getSelection()?.removeAllRanges();
+          renderNotes();
+          showToast("已清除全部註解");
+        });
 
         function jumpToNote(note) {
           const block = blocks.get(note.blockId);

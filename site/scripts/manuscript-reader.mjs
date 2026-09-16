@@ -59,10 +59,11 @@ function blockLineRanges(markdown, firstLine = 1, lastLine = Number.POSITIVE_INF
 function splitPart(markdown, prefix) {
   const sourceTitle = titleOf(markdown);
   const partTitle = sourceTitle.replace(/（引言・練習・小結）$/, "");
-  const introStart = markdown.indexOf("## 部引言");
+  const titleHeading = markdown.match(/^#\s+.+$/m);
+  const introStart = titleHeading ? titleHeading.index + titleHeading[0].length : -1;
   const practiceStart = markdown.indexOf("## 練習");
   if (introStart < 0 || practiceStart < 0) {
-    throw new Error(`${prefix} 缺少「部引言」或「練習」標題`);
+    throw new Error(`${prefix} 缺少分部標題或「練習」標題`);
   }
   const introLine = lineNumberAt(markdown, introStart);
   const practiceLine = lineNumberAt(markdown, practiceStart);

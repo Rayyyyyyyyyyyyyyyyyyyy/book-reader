@@ -15,8 +15,8 @@
 依既有 `write-book-draft/design.md` 流程完成本輪受影響的 12 份稿件：主 session 初修 → 三位 `fork_turns:none` 乾淨讀者 → 三位獨立編輯 → 主 session 以 humanizer 完整回讀 12 份編輯後全文 → 驗收。
 
 - A 組：01、02、03、P1；B 組：04、08、P2、P3；C 組：10、11、12、P4。
-- 讀者只讀 `docs/ai-reader.md` 與指定稿件全文，未讀規格、skill 或寫作歷程，未改稿。
-- 編輯讀 `docs/ai-editor.md`、Rui-Xuan V2、四份全文與回饋，獨立判斷後輕修，未修改 tasks。
+- 讀者只讀 `.agents/skills/ai-reader/SKILL.md` 與指定稿件全文，未讀規格、其他寫作 skill 或寫作歷程，未改稿。
+- 編輯讀 `.agents/skills/ai-editor/SKILL.md`、Rui-Xuan V2、四份全文與回饋，獨立判斷後輕修，未修改 tasks。
 - 主 session 完整回讀後，僅再把 P1「仍有中間環的空間」改成明確落點、10 的停止投入句補清主詞、11 補上「最外圈的部分」。其餘自然段落、假設碎片與必要限制保留。
 
 | 回饋 | 編輯裁決與處理 |

@@ -32,7 +32,7 @@ docs/book-v2-pipeline.sh audit  06 "這一次，我們真的在一起了" "第�
 - `expand`：既有章擴寫到目標字數，第一步改為以現稿為底展開場景，保留作者手改過的句子，其餘四步相同
 - `audit`：只跑一致性稽核
 
-看 Codex 即時過程：`tail -f ~/.cache/book-v2-logs/current.log`（永遠指向正在跑的那一步）；各步完整紀錄在同目錄的 `NN-步驟.log`，最後回報在 `NN-步驟.last.md`。
+Codex 的即時過程直接輸出在執行腳本的 terminal（由 Claude 在背景執行時，可在 Claude Code 的背景任務輸出中查看）；同時存成 `~/.cache/book-v2-logs/NN-步驟.log`，最後回報在 `NN-步驟.last.md`。
 
 ## 每章五步
 

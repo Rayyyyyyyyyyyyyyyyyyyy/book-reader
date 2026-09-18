@@ -20,10 +20,10 @@ mkdir -p "$REPO/$FB" "$LOG"
 # 每一步都是新的 codex session，避免上下文污染
 run() { # step name, prompt
   echo "=== [$NN] $1 start $(date +%T)"
-  : > "$LOG/${NN}-$1.log"; ln -sf "$LOG/${NN}-$1.log" "$LOG/current.log"   # tail -f $LOG/current.log 看即時過程
+  # 輸出同時顯示在 terminal 並存成 log
   codex exec -m gpt-5.6-sol -c model_reasoning_effort="high" -C "$REPO" -s workspace-write --color never \
-    -o "$LOG/${NN}-$1.last.md" "$2" > "$LOG/${NN}-$1.log" 2>&1
-  local rc=$?
+    -o "$LOG/${NN}-$1.last.md" "$2" 2>&1 | tee "$LOG/${NN}-$1.log"
+  local rc=${pipestatus[1]}
   echo "=== [$NN] $1 end rc=$rc $(date +%T)"
   [[ $rc -ne 0 ]] && { tail -30 "$LOG/${NN}-$1.log"; exit $rc; }
 }

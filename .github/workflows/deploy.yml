@@ -6,6 +6,7 @@ on:
     paths:
       - "site/**"
       - "book-png/**"
+      - "book-reader/book/**"
       - ".github/workflows/deploy.yml"
   workflow_dispatch:
 

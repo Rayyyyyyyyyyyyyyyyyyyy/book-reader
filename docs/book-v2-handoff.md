@@ -7,13 +7,12 @@
 `/clear` 後不會收到完成通知，要自己查進度：
 
 ```bash
-tail -3 /private/tmp/claude-502/-Users-ray-shao-book-reader/c3ac6f98-aa36-4abe-b552-f2c05b2e18d6/tasks/bheet6ewz.output   # 第五章 expand
 tail -3 /private/tmp/claude-502/-Users-ray-shao-book-reader/c3ac6f98-aa36-4abe-b552-f2c05b2e18d6/tasks/bnj1pbj2r.output   # 第二章 reflect
 pgrep -fl "codex exec"                          # 還有沒有 codex 在跑
 ls -t ~/.cache/book-v2-logs | head             # 各步 log 與 .last.md 回報
 ```
 
-最後一行出現 `=== [05] pipeline done` 或 `=== [02] reflect done` 才算跑完。交接時：第五章在 reader 步驟（19:24 起，後面還有 editor、polish、audit），第二章回頭看第一版太像契約條文被退回，已收緊規則（0346044）後重跑（19:52 起）。
+最後一行出現 `=== [05] pipeline done` 或 `=== [02] reflect done` 才算跑完。第五章已完成並 commit；第二章回頭看第一版太像契約條文被退回，已收緊規則（0346044）後重跑（19:52 起）。
 
 ## 各章狀態
 
@@ -24,7 +23,7 @@ ls -t ~/.cache/book-v2-logs | head             # 各步 log 與 .last.md 回報
 | 第二章 | 擴寫定稿約 5,200 | 已校閱 | **跑中**（bnj1pbj2r） |
 | 第三章 | 擴寫定稿約 8,400 | 已校閱 | 待寫 |
 | 第四章 | 擴寫定稿約 5,200 | 已校閱（2cf7fa2） | 待寫 |
-| 第五章 | **擴寫跑中**（bheet6ewz），目標 8,000–9,000 | 未校閱 | 等作者校閱後 |
+| 第五章 | 擴寫定稿 7,932（33fd512） | **待作者校閱** | 等作者校閱後 |
 | 第六章 | 9,9xx 字（新篇幅寫的，未擴寫） | 讀過舊版 | 等第四、五章後 |
 | 第七至十二章、結語 | 未寫 | | |
 | 部稿 P1–P4 | 未寫 | | |
@@ -33,7 +32,7 @@ ls -t ~/.cache/book-v2-logs | head             # 各步 log 與 .last.md 回報
 
 **回頭看線**（只寫作者已校閱的章，追上正文就停）：第二章跑完 → 整節讀過、修掉抽象或後設句 → commit → `reflect 03` → `part P1 "第一部｜我們怎麼走到一起，又失去彼此" "第一部｜我們怎麼走到一起，又失去彼此" "4,000–5,000"`（檔名標題可再議）→ `reflect 04` → 停，等作者校閱第五章。
 
-**故事線**：第五章跑完 → 整章讀過（照一致性清單，特別是擴寫殘留、同類場景重演、資訊邊界、跨章重複的梗）→ 修 → 在 `_feedback/05-audit.md` 末尾記「Claude 人工核對補修」→ commit → 請作者校閱第五章。第六章已是新篇幅，接著請作者校閱；之後照 `full` 模式寫第七章起（目標見 `docs/chapter.md` 篇幅表，第七章 7,000–8,000）。
+**故事線**：第五章已完成，等作者校閱。第六章已是新篇幅，接著請作者校閱；之後照 `full` 模式寫第七章起（目標見 `docs/chapter.md` 篇幅表，第七章 7,000–8,000）。
 
 ## 注意事項
 

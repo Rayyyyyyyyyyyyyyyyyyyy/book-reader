@@ -7,6 +7,7 @@
 `/clear` 後不會收到完成通知，要自己查進度：
 
 ```bash
+tail -3 /private/tmp/claude-502/-Users-ray-shao-book-reader/c3ac6f98-aa36-4abe-b552-f2c05b2e18d6/tasks/bads06ibt.output   # 第四章 reflect（=== [04] reflect done）
 tail -3 /private/tmp/claude-502/-Users-ray-shao-book-reader/c3ac6f98-aa36-4abe-b552-f2c05b2e18d6/tasks/bin2n8zth.output   # 第五章修訂＋稽核（最後一行 === [05] audit done）
 pgrep -fl "codex exec"                          # 還有沒有 codex 在跑
 ls -t ~/.cache/book-v2-logs | head             # 各步 log 與 .last.md 回報
@@ -22,7 +23,7 @@ ls -t ~/.cache/book-v2-logs | head             # 各步 log 與 .last.md 回報
 | 第一章 | 擴寫定稿約 6,400 | 已校閱 | 已完成並經作者手改（e344d10） |
 | 第二章 | 擴寫定稿約 5,200 | 已校閱 | 已完成（8d07b01），待作者看 |
 | 第三章 | 擴寫定稿約 8,400 | 已校閱 | 已完成（567e2cd），待作者看 |
-| 第四章 | 擴寫定稿約 5,200 | 已校閱（2cf7fa2） | 待寫 |
+| 第四章 | 擴寫定稿約 5,200 | 已校閱（2cf7fa2） | **跑中**（bads06ibt） |
 | 第五章 | 作者校閱中（手改 97f146e）；依作者要求修訂中（bin2n8zth）：營區與她同城、他休假留在她的城市不回台北；多寫他被排在第二順位的場景；目標 8,500–9,000。修訂指示在 scratchpad `05-revise-prompt.md` | 校閱中 | 等作者校閱後 |
 | 第六章 | 9,9xx 字（新篇幅寫的，未擴寫） | 讀過舊版 | 等第四、五章後 |
 | 第七至十二章、結語 | 未寫 | | |
@@ -30,7 +31,7 @@ ls -t ~/.cache/book-v2-logs | head             # 各步 log 與 .last.md 回報
 
 ## 接下來要做的
 
-**回頭看線**（只寫作者已校閱的章，追上正文就停）：下一步 `reflect 04 "每年的七月三十一日" "第四章｜每年的七月三十一日" "800–1,200"` → 停，等作者校閱第五章。
+**回頭看線**（只寫作者已校閱的章，追上正文就停）：第四章回頭看跑完 → 整節讀過、修掉抽象或重述 → commit → 停，等作者校閱第五章。
 
 **故事線**：第五章已完成，等作者校閱。第六章已是新篇幅，接著請作者校閱；之後照 `full` 模式寫第七章起（目標見 `docs/chapter.md` 篇幅表，第七章 7,000–8,000）。
 

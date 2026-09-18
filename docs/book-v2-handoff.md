@@ -8,12 +8,12 @@
 
 ```bash
 tail -3 /private/tmp/claude-502/-Users-ray-shao-book-reader/c3ac6f98-aa36-4abe-b552-f2c05b2e18d6/tasks/bheet6ewz.output   # 第五章 expand
-tail -3 /private/tmp/claude-502/-Users-ray-shao-book-reader/c3ac6f98-aa36-4abe-b552-f2c05b2e18d6/tasks/bcre2e57y.output   # 第二章 reflect
+tail -3 /private/tmp/claude-502/-Users-ray-shao-book-reader/c3ac6f98-aa36-4abe-b552-f2c05b2e18d6/tasks/bnj1pbj2r.output   # 第二章 reflect
 pgrep -fl "codex exec"                          # 還有沒有 codex 在跑
 ls -t ~/.cache/book-v2-logs | head             # 各步 log 與 .last.md 回報
 ```
 
-最後一行出現 `=== [05] pipeline done` 或 `=== [02] reflect done` 才算跑完。交接時：第五章在 reader 步驟（19:24 起，後面還有 editor、polish、audit），第二章回頭看在 reflect-reader 步驟（19:31 起，後面還有 editor、polish、audit）。
+最後一行出現 `=== [05] pipeline done` 或 `=== [02] reflect done` 才算跑完。交接時：第五章在 reader 步驟（19:24 起，後面還有 editor、polish、audit），第二章回頭看第一版太像契約條文被退回，已收緊規則（0346044）後重跑（19:52 起）。
 
 ## 各章狀態
 
@@ -21,7 +21,7 @@ ls -t ~/.cache/book-v2-logs | head             # 各步 log 與 .last.md 回報
 |---|---|---|---|
 | 序章 | 擴寫定稿 1,7xx 字 | 已校閱 | 不設 |
 | 第一章 | 擴寫定稿約 6,400 | 已校閱 | 已完成並經作者手改（e344d10） |
-| 第二章 | 擴寫定稿約 5,200 | 已校閱 | **跑中**（bcre2e57y） |
+| 第二章 | 擴寫定稿約 5,200 | 已校閱 | **跑中**（bnj1pbj2r） |
 | 第三章 | 擴寫定稿約 8,400 | 已校閱 | 待寫 |
 | 第四章 | 擴寫定稿約 5,200 | 已校閱（2cf7fa2） | 待寫 |
 | 第五章 | **擴寫跑中**（bheet6ewz），目標 8,000–9,000 | 未校閱 | 等作者校閱後 |

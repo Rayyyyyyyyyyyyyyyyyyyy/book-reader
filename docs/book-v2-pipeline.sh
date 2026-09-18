@@ -5,6 +5,8 @@
 #   docs/book-v2-pipeline.sh full  <NN> <檔名標題> <章卡名稱> <目標字數>   寫作→讀者→編輯→潤飾→稽核
 #   docs/book-v2-pipeline.sh expand <NN> <檔名標題> <章卡名稱> <目標字數>  擴寫既有章→讀者→編輯→潤飾→稽核
 #   docs/book-v2-pipeline.sh audit <NN> <檔名標題> <章卡名稱>              只跑一致性稽核
+#   docs/book-v2-pipeline.sh reflect <NN> <檔名標題> <章卡名稱> <字數>     章末 ## 回頭看 的五步
+#   docs/book-v2-pipeline.sh part <P1..P4> <檔名標題> <部名> <字數>         部稿的五步
 # 例：
 #   docs/book-v2-pipeline.sh full 07 "住在一起以後" "第七章｜住在一起以後" "8,000–9,000"
 set -u
@@ -38,7 +40,7 @@ LENGTH="篇幅：全書目標 10–12 萬字，本章目標 ${TARGET} 字。${CO
 - 摘要只用在真正需要跳過的時間；每次跳接後，盡快落回一個具體的時刻
 - 回看聲音仍然短，不以說理灌字數"
 
-COMMON="新書《把自己的部分做完》是經使用者授權的改編敘事書稿。章節腳本：docs/chapter.md（寫作總則、全書進程、章卡「${CARD}」、初版觀念核對、連續性紀錄、篇幅）。已完成的前文在 book-reader/book-v2/（依檔名序號）；跨章已定的事實與資訊邊界記在 ${CONT}；本章場景表在 ${SCENES}；docs/book-v2-workflow.md 的「使用者修稿偏好」與「一致性清單」必須遵守。不要修改 docs/、book-reader/book/、book-reader/is-me/ 以及其他章節檔。"
+COMMON="新書《把自己的部分做完》是經使用者授權的改編敘事書稿。章節腳本：docs/chapter.md（寫作總則、全書進程、章卡「${CARD}」、初版觀念核對、連續性紀錄、篇幅）。已完成的前文在 book-reader/book-v2/（依檔名序號）；跨章已定的事實與資訊邊界記在 ${CONT}；本章場景表在 ${SCENES}；docs/book-v2-workflow.md 的「使用者修稿偏好」與「一致性清單」必須遵守。章末若已有 \`## 回頭看\` 一節，除非本步驟明說要處理它，否則不要修改。不要修改 docs/、book-reader/book/、book-reader/is-me/ 以及其他章節檔。"
 
 CONSISTENCY="一致性要求：
 - 細節要從已建立的設定推出來，不從類型的預設想像補上（例如已設定為豪華露營，就不會自己煮鍋、在帳篷外刷牙）
@@ -76,6 +78,42 @@ if [[ "$MODE" == "audit" ]]; then
   echo "=== [$NN] audit done"
   exit 0
 fi
+# ── 章末回看拆解與部稿 ──────────────────────────────────────────
+# reflect：在既有章節末尾寫 `## 回頭看`，五步只處理這一節
+# part：寫部稿（NN 用 P1–P4），檔名 book-reader/book-v2/P1-標題.md
+if [[ "$MODE" == "reflect" || "$MODE" == "part" ]]; then
+  [[ -z "$TARGET" ]] && { echo "usage: $0 reflect|part NN TITLE CARD TARGET"; exit 2; }
+  if [[ "$MODE" == "reflect" ]]; then
+    K="${NN}-reflect"
+    SCOPE="只處理 ${OUT} 末尾的 \`## 回頭看\` 一節；故事正文一字不動。"
+    WHAT="第 ${NN} 章「${CARD}」章末的回看拆解"
+    RULES="依 docs/chapter.md「核心困境與回看聲音」下的「章末回看拆解」：篇幅 ${TARGET} 字（只計這一節）；由現在的我直接對讀者說話，從本章核心困境拆一個機制，對照「初版觀念保留核對」選本章主要驗收的觀念，一節只一個主軸；用「你／我們」讓讀者代入，「我」承認自己的參與；可給一個今天就能做的小動作或自問句，工具與練習留給部稿；只用一兩句點到故事畫面，不重述情節；不替她下結論；聲音依 \$rui-xuan-book-v2 的反思隨筆，不喊口號、不說教。讀 book-reader/book-v2/ 其他章已寫好的 \`## 回頭看\`，不要與它們的主軸或句子重複。"
+  else
+    K="${NN}"
+    SCOPE="只處理部稿檔 ${OUT}。"
+    WHAT="部稿「${CARD}」"
+    RULES="依 docs/chapter.md 該部的「部稿」說明、「部稿、hook 與工具」「工具與適用條件」與「初版觀念保留核對」寫。篇幅 ${TARGET} 字。結構：\`## 引言\`（放在本部各章之前，短，交代這一部要跟著故事看什麼，不劇透）與 \`## 部末\`（放在本部最後一章之後，把本部各章的回看拆解整理成可遷移的方法、一個讀者能實際做的練習與適用限制）。參考舊書 book-reader/book/ 的部稿（P1–P4）與相關章節的觀念，但改寫成承接新書故事的版本；故事只作為例子點到，不重述情節；讀本部所有章節（含章末 \`## 回頭看\`），不重複它們已說過的句子。聲音依 \$rui-xuan-book-v2，用「你／我們」，不說教、不喊口號，給適用邊界與不適用的情況。"
+  fi
+  run ${MODE} "使用 \$rui-xuan-book-v2（.agents/skills/rui-xuan-book-v2/SKILL.md）撰寫${WHAT}。
+${COMMON}
+${RULES}
+${SCOPE}
+寫完量字數（\`## 回頭看\` 或部稿本文，不含標題行與空白），須落在 ${TARGET}。完成後簡短回報：主軸、對應的觀念、字數。"
+  run ${MODE}-reader "使用 \$ai-reader（.agents/skills/ai-reader/SKILL.md），以一般讀者的身份讀 ${OUT}（${WHAT}；reflect 模式請先讀完該章故事再讀章末一節）。不要先讀 docs/chapter.md。
+回饋寫到 ${FB}/${K}-reader.md，只寫這個檔。內容：這一節讓你多理解了什麼、能不能帶走一個觀念或做法；哪裡像說教、口號、重述故事或替她下結論；機制講得準不準、有沒有過度簡化、有沒有交代適用邊界；和故事的銜接是否自然；與書中其他回看或部稿是否重複。區分原始反應與推測原因，不改稿。"
+  run ${MODE}-editor "使用 \$ai-editor（.agents/skills/ai-editor/SKILL.md）判讀 ${FB}/${K}-reader.md，對照 ${OUT}、docs/chapter.md 的相關規則與觀念核對表、.agents/skills/rui-xuan-book-v2/SKILL.md、docs/book-v2-workflow.md 的使用者修稿偏好。${SCOPE}
+判讀寫到 ${FB}/${K}-editor.md，只寫這個檔：合併意見並分級（必須處理／建議處理／暫時觀察／不建議修改）；補上讀者沒提的問題（觀念錯誤或過度簡化、替她定性、與故事事實不符、說白、重複其他章、字數不在 ${TARGET}）；列出要保留的句子與修訂清單。"
+  run ${MODE}-polish "使用 \$rui-xuan-book-v2 依 ${FB}/${K}-editor.md 修訂${WHAT}。
+${COMMON}
+${RULES}
+${SCOPE}
+執行「必須處理」與「建議處理」，保留編輯指定的句子；完成後量字數須落在 ${TARGET}；在 ${FB}/${K}-editor.md 末尾追加「## 潤飾紀錄」。"
+  run ${MODE}-audit "對${WHAT}做事實稽核，只抓與故事事實、連續性（${CONT}）或資訊邊界不符之處並最小修正；不改文風與觀點。${SCOPE}
+核對：提到的故事細節是否與正文一致；是否把她的動機或心情寫成確定事實；是否提到人物當時不可能知道的事而沒有標明是現在的理解；作者手改或確認過的句子（git log 中 hand edits／author）不改，列入留給作者決定。結果寫到 ${FB}/${K}-audit.md。"
+  echo "=== [$NN] ${MODE} done"
+  exit 0
+fi
+
 [[ "$MODE" != "full" && "$MODE" != "expand" || -z "$TARGET" ]] && { echo "usage: $0 full|expand|audit NN TITLE CARD [TARGET]"; exit 2; }
 
 if [[ "$MODE" == "expand" ]]; then

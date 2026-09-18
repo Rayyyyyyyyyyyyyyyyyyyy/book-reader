@@ -53,7 +53,7 @@ Codex 的即時過程直接輸出在執行腳本的 terminal（由 Claude 在背
 
 稽核碰到作者手改或確認過的句子不直接改，列入 `NN-audit.md` 的「留給作者決定」並附建議改法，供作者人工校閱時參考。
 
-之後由 Claude 整章讀過，照下方清單核對，再 commit；回報時列出「留給作者決定」的項目。
+之後由 Claude 整章讀過，照下方清單核對並修正，交給作者校閱；回報時列出「留給作者決定」的項目。作者說好後才 commit。
 
 ## 篇幅
 
@@ -108,8 +108,10 @@ Codex 的即時過程直接輸出在執行腳本的 terminal（由 Claude 在背
 
 ## Commit 規則
 
-- 每章 commit 一次，只加入該章正文、該章回饋檔（scenes／reader／editor／audit）與 `_continuity.md`
-- 使用者手動修改的其他章節不處理、不 commit
+- **書稿內容等作者說好才 commit**：章節正文、章末回頭看、該章回饋檔與 `_continuity.md`，跑完流程、Claude 讀過並修正後，先留在工作區，交給作者人工校閱；作者說好之後，才一次 commit
+- 作者校閱時的手改一起放進這次 commit，訊息寫成 `Apply the author's hand edits and approve …`（含「hand edit」字樣，腳本才抽得到作者手改句清單）
+- 等待校閱期間，同一章不再跑新的 Codex 步驟，免得覆蓋作者的手改
+- 流程腳本、文件與規格（`docs/`、skill）的調整照常直接 commit
 - 回饋檔與 `_continuity.md` 照常隨流程更新
 
 ## 為什麼加入場景表與稽核

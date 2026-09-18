@@ -26,6 +26,11 @@ run() { # step name, prompt
     -o "$LOG/${NN}-$1.last.md" "$2" 2>&1 | tee "$LOG/${NN}-$1.log"
   local rc=${pipestatus[1]}
   echo "=== [$NN] $1 end rc=$rc $(date +%T)"
+  # Codex 偶爾漏掉 book-reader/ 前綴，把檔案寫到 repo 根目錄的 book-v2/；移到 log 並警告
+  if [[ -d "$REPO/book-v2" ]]; then
+    mkdir -p "$LOG/stray"; mv "$REPO/book-v2" "$LOG/stray/${NN}-$1-$(date +%H%M%S)"
+    echo "!!! [$NN] $1 wrote files to repo-root book-v2/ (moved to $LOG/stray); check the real output path"
+  fi
   [[ $rc -ne 0 ]] && { tail -30 "$LOG/${NN}-$1.log"; exit $rc; }
 }
 
@@ -39,7 +44,7 @@ LENGTH="篇幅：全書目標 10–12 萬字，本章目標 ${TARGET} 字。${CO
 - 摘要只用在真正需要跳過的時間；每次跳接後，盡快落回一個具體的時刻
 - 回看聲音仍然短，不以說理灌字數"
 
-COMMON="新書《把自己的部分做完》是經使用者授權的改編敘事書稿。章節腳本：docs/chapter.md（寫作總則、全書進程、章卡「${CARD}」、初版觀念核對、連續性紀錄、篇幅）。已完成的前文在 book-reader/book-v2/（依檔名序號）；跨章已定的事實與資訊邊界記在 ${CONT}；本章場景表在 ${SCENES}；docs/book-v2-workflow.md 的「使用者修稿偏好」與「一致性清單」必須遵守。章末若已有 \`## 回頭看\` 一節，除非本步驟明說要處理它，否則不要修改。不要修改 docs/、book-reader/book/、book-reader/is-me/ 以及其他章節檔。"
+COMMON="新書《把自己的部分做完》是經使用者授權的改編敘事書稿。章節腳本：docs/chapter.md（寫作總則、全書進程、章卡「${CARD}」、初版觀念核對、連續性紀錄、篇幅）。已完成的前文在 book-reader/book-v2/（依檔名序號）；跨章已定的事實與資訊邊界記在 ${CONT}；本章場景表在 ${SCENES}；docs/book-v2-workflow.md 的「使用者修稿偏好」與「一致性清單」必須遵守。章末若已有 \`## 回頭看\` 一節，除非本步驟明說要處理它，否則不要修改。所有書稿與回饋檔都在 book-reader/book-v2/ 底下，寫檔時使用完整路徑；repo 根目錄沒有 book-v2/，不要在那裡建立檔案。不要修改 docs/、book-reader/book/、book-reader/is-me/ 以及其他章節檔。"
 
 CONSISTENCY="一致性要求：
 - 細節要從已建立的設定推出來，不從類型的預設想像補上（例如已設定為豪華露營，就不會自己煮鍋、在帳篷外刷牙）

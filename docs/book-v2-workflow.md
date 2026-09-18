@@ -23,9 +23,16 @@
 - 模型 `gpt-5.6-sol`，reasoning effort high（使用者也接受 `gpt-6-astra` high；同一本書盡量維持同一模型）
 
 ```bash
-docs/book-v2-pipeline.sh full  07 "住在一起以後" "第七章｜住在一起以後" "8,000–9,000"
-docs/book-v2-pipeline.sh audit 06 "這一次，我們真的在一起了" "第六章｜這一次，我們真的在一起了"
+docs/book-v2-pipeline.sh full   07 "住在一起以後" "第七章｜住在一起以後" "8,000–9,000"
+docs/book-v2-pipeline.sh expand 01 "十一點的電話" "第一章｜十一點的電話" "6,000–7,000"
+docs/book-v2-pipeline.sh audit  06 "這一次，我們真的在一起了" "第六章｜這一次，我們真的在一起了"
 ```
+
+- `full`：新章，寫作→讀者→編輯→潤飾→稽核
+- `expand`：既有章擴寫到目標字數，第一步改為以現稿為底展開場景，保留作者手改過的句子，其餘四步相同
+- `audit`：只跑一致性稽核
+
+看 Codex 即時過程：`tail -f ~/.cache/book-v2-logs/current.log`（永遠指向正在跑的那一步）；各步完整紀錄在同目錄的 `NN-步驟.log`，最後回報在 `NN-步驟.last.md`。
 
 ## 每章五步
 

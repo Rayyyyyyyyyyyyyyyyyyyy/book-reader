@@ -3,6 +3,7 @@
 #
 # 用法：
 #   docs/book-v2-pipeline.sh full  <NN> <檔名標題> <章卡名稱> <目標字數>   寫作→讀者→編輯→潤飾→稽核
+#   docs/book-v2-pipeline.sh expand <NN> <檔名標題> <章卡名稱> <目標字數>  擴寫既有章→讀者→編輯→潤飾→稽核
 #   docs/book-v2-pipeline.sh audit <NN> <檔名標題> <章卡名稱>              只跑一致性稽核
 # 例：
 #   docs/book-v2-pipeline.sh full 07 "住在一起以後" "第七章｜住在一起以後" "8,000–9,000"
@@ -19,6 +20,7 @@ mkdir -p "$REPO/$FB" "$LOG"
 # 每一步都是新的 codex session，避免上下文污染
 run() { # step name, prompt
   echo "=== [$NN] $1 start $(date +%T)"
+  : > "$LOG/${NN}-$1.log"; ln -sf "$LOG/${NN}-$1.log" "$LOG/current.log"   # tail -f $LOG/current.log 看即時過程
   codex exec -m gpt-5.6-sol -c model_reasoning_effort="high" -C "$REPO" -s workspace-write --color never \
     -o "$LOG/${NN}-$1.last.md" "$2" > "$LOG/${NN}-$1.log" 2>&1
   local rc=$?
@@ -64,8 +66,23 @@ if [[ "$MODE" == "audit" ]]; then
   echo "=== [$NN] audit done"
   exit 0
 fi
-[[ "$MODE" != "full" || -z "$TARGET" ]] && { echo "usage: $0 full|audit NN TITLE CARD [TARGET]"; exit 2; }
+[[ "$MODE" != "full" && "$MODE" != "expand" || -z "$TARGET" ]] && { echo "usage: $0 full|expand|audit NN TITLE CARD [TARGET]"; exit 2; }
 
+if [[ "$MODE" == "expand" ]]; then
+run expand "使用 \$rui-xuan-book-v2（.agents/skills/rui-xuan-book-v2/SKILL.md）的「改編敘事書稿」分流，把已完成的 ${OUT} 擴寫到本章目標字數。這不是重寫：以現稿為底，把摘要帶過的時刻展開成場景。
+${COMMON}
+${LENGTH}
+${CONSISTENCY}
+動筆前讀：docs/chapter.md 全文（尤其章卡「${CARD}」）、${CONT}、book-reader/book-v2/ 所有已完成的章節（包括本章之後的章節，擴寫不能與它們衝突）、book-reader/is-me/story-base.txt、docs/my-story/ 中相關章稿與 story.txt、book-reader/is-me/Rui-Xuan-生命素材.md，以及 \`git log -p --follow -- ${OUT}\`。
+要求：
+- 作者手改過或確認過的句子（見 git log 中 commit 訊息提到 hand edits／author 的修改），保留原樣，擴寫圍繞它們展開，不改回、不換句
+- 保留現稿所有事件、先後、已成立的事實與有效對白；不改變章卡事件與停點，也不新增會改變後續章節事實的情節
+- 先寫場景表 ${SCENES}：列出本章 3–5 個要完整展開的場景（優先是現稿以幾行摘要帶過、章卡卻需要讀者親身經過的時刻），每場記地點與場地配備、時間與天氣、在場人物、關鍵物件與其歸屬、兩人各自此時知道與不知道的事
+- 照場景表展開；新增的細節要合乎年代與人物處境，並與前後章一致
+- 本章新增、後續需沿用的事實追加到 ${CONT} 的本章小節，並補上「資訊邊界」：沒說出口的事、誰不知道什麼
+- 完成後量字數，須達 ${TARGET} 下限；不足時繼續把摘要展開成場景，而非加形容
+完成後簡短回報：擴寫前後字數、展開了哪些場景、新增的連續性設定、刻意未處理的問題。"
+else
 run write "使用 \$rui-xuan-book-v2（.agents/skills/rui-xuan-book-v2/SKILL.md）的「改編敘事書稿」分流，撰寫章卡「${CARD}」的正文初稿。
 ${COMMON}
 ${LENGTH}
@@ -79,6 +96,7 @@ ${CONSISTENCY}
 - 本章新定下、後續章節需沿用的事實，追加到 ${CONT} 的本章小節（條列、只記事實），並另列「資訊邊界」：沒說出口的事、誰不知道什麼
 - 完成後量字數；未達 ${TARGET} 下限時，回頭把仍是摘要的段落展開成場景，而非加形容
 完成後簡短回報：字數、主要場景、新增的連續性設定、刻意未處理的問題。"
+fi
 
 run reader "使用 \$ai-reader（.agents/skills/ai-reader/SKILL.md）的判斷力，以一般讀者的身份讀 ${OUT}（新書正文，改編敘事）。必要時參考 book-reader/book-v2/ 的前文了解脈絡，但以「第一次讀到這章的讀者」回應，不要先讀 docs/chapter.md 的章卡與場景表，避免用作者意圖替原稿補完。
 回饋寫到 ${FB}/${NN}-reader.md，只寫這個檔，不改正文。內容包含：

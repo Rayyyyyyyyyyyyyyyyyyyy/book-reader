@@ -41,7 +41,7 @@ run() { # step name, prompt
   echo "=== [$NN] $1 start $(date +%T)"
   # 輸出同時顯示在 terminal 並存成 log
   codex exec -m gpt-5.6-sol -c model_reasoning_effort="high" -C "$REPO" -s workspace-write --color never \
-    -o "$LOG/${NN}-$1.last.md" "$2" 2>&1 | tee "$LOG/${NN}-$1.log"
+    -o "$LOG/${NN}-$1.last.md" "$2" < /dev/null 2>&1 | tee "$LOG/${NN}-$1.log"   # stdin 關掉，否則在背景執行時 codex 會卡在 "Reading additional input from stdin"
   local rc=${pipestatus[1]}
   echo "=== [$NN] $1 end rc=$rc $(date +%T)"
   # Codex 偶爾漏掉 book-reader/ 前綴，把檔案寫到 repo 根目錄的 book-v2/；移到 log 並警告

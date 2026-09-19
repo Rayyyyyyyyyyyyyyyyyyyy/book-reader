@@ -4,6 +4,7 @@
 # 用法：
 #   docs/book-v2-pipeline.sh full  <NN> <檔名標題> <章卡名稱> <目標字數>   寫作→讀者→編輯→潤飾→稽核
 #   docs/book-v2-pipeline.sh expand <NN> <檔名標題> <章卡名稱> <目標字數>  擴寫既有章→讀者→編輯→潤飾→稽核
+#   docs/book-v2-pipeline.sh review <NN> <檔名標題> <章卡名稱> <目標字數>  不重寫，作者改過結構後重跑讀者→編輯→潤飾→稽核
 #   docs/book-v2-pipeline.sh audit <NN> <檔名標題> <章卡名稱>              只跑一致性稽核
 #   docs/book-v2-pipeline.sh reflect <NN> <檔名標題> <章卡名稱> <字數>     章末 ## 回頭看 的五步
 # 例：
@@ -34,6 +35,8 @@ AUTHOR="$LOG/${NN}-author-lines.md"
     | while read c; do git show -U0 --format= "$c" -- "$OUT" 2>/dev/null; done \
     | grep '^+[^+]' | sed 's/^+//' | grep -v '^[[:space:]]*$' | sort -u \
     | while IFS= read -r l; do grep -qxF -- "$l" "$OUT" 2>/dev/null && echo "- $l"; done)
+  # 尚未 commit 的作者手改句：EXTRA_AUTHOR 指向每行一句的檔案
+  [[ -n "${EXTRA_AUTHOR:-}" && -f "$EXTRA_AUTHOR" ]] && while IFS= read -r l; do [[ -n "$l" ]] && (cd "$REPO" && grep -qxF -- "$l" "$OUT") && echo "- $l"; done < "$EXTRA_AUTHOR"
 } > "$AUTHOR"
 
 # 每一步都是新的 codex session，避免上下文污染
@@ -66,6 +69,8 @@ LENGTH="篇幅：全書目標 10–12 萬字，本章目標 ${TARGET} 字。${CO
 - 回看聲音仍然短，不以說理灌字數"
 
 COMMON="新書《把自己的部分做完》是經使用者授權的改編敘事書稿。章節腳本已分檔：總則 ${GENERAL}（寫作總則、章末回看拆解、全書進程、篇幅），本章章卡 ${CARDFILE}；除非本步驟另外指定，不要讀 docs/chapter.md 或其他章卡。跨章已定的事實與資訊邊界記在 ${CONT}；本章場景表在 ${SCENES}；作者手改句清單在 ${AUTHOR}（清單內的句子原樣保留）。docs/book-v2-workflow.md 的「使用者修稿偏好」與「一致性清單」必須遵守。章末若已有 \`## 回頭看\` 一節，除非本步驟明說要處理它，否則不要修改。所有書稿與回饋檔都在 book-reader/book-v2/ 底下，寫檔時使用完整路徑；repo 根目錄沒有 book-v2/，不要在那裡建立檔案。不要修改 docs/、book-reader/book/、book-reader/is-me/ 以及其他章節檔。"
+[[ "$MODE" == "review" ]] && COMMON="${COMMON}
+本章的場景結構已由作者親自調整，正文現況優先於場景表 ${SCENES} 與舊回饋；不要恢復作者已刪除的場景或事件，也不要新增事件。修改限於現有場景內的句子、銜接與事實。"
 
 CONSISTENCY="一致性要求：
 - 細節要從已建立的設定推出來，不從類型的預設想像補上（例如已設定為豪華露營，就不會自己煮鍋、在帳篷外刷牙）
@@ -143,9 +148,11 @@ ${SCOPE}
   exit 0
 fi
 
-[[ "$MODE" != "full" && "$MODE" != "expand" || -z "$TARGET" ]] && { echo "usage: $0 full|expand|audit NN TITLE CARD [TARGET]"; exit 2; }
+[[ "$MODE" != "full" && "$MODE" != "expand" && "$MODE" != "review" || -z "$TARGET" ]] && { echo "usage: $0 full|expand|review|audit NN TITLE CARD [TARGET]"; exit 2; }
 
-if [[ "$MODE" == "expand" ]]; then
+if [[ "$MODE" == "review" ]]; then
+  :
+elif [[ "$MODE" == "expand" ]]; then
 run expand "使用 \$rui-xuan-book-v2（.agents/skills/rui-xuan-book-v2/SKILL.md）的「改編敘事書稿」分流，把已完成的 ${OUT} 擴寫到本章目標字數。這不是重寫：以現稿為底，把摘要帶過的時刻展開成場景。
 ${COMMON}
 ${LENGTH}

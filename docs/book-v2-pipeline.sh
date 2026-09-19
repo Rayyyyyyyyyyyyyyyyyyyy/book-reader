@@ -40,6 +40,8 @@ AUTHOR="$LOG/${NN}-author-lines.md"
 run() { # step name, prompt
   echo "=== [$NN] $1 start $(date +%T)"
   # 輸出同時顯示在 terminal 並存成 log
+  # 每步上限 30 分鐘（正常 3–12 分鐘，最久約 25 分鐘）；逾時由 SIGALRM 中止並回報失敗
+  perl -e 'alarm shift; exec @ARGV' "${STEP_TIMEOUT:-1800}" \
   codex exec -m gpt-5.6-sol -c model_reasoning_effort="high" -C "$REPO" -s workspace-write --color never \
     -o "$LOG/${NN}-$1.last.md" "$2" < /dev/null 2>&1 | tee "$LOG/${NN}-$1.log"   # stdin 關掉，否則在背景執行時 codex 會卡在 "Reading additional input from stdin"
   local rc=${pipestatus[1]}
@@ -49,6 +51,7 @@ run() { # step name, prompt
     mkdir -p "$LOG/stray"; mv "$REPO/book-v2" "$LOG/stray/${NN}-$1-$(date +%H%M%S)"
     echo "!!! [$NN] $1 wrote files to repo-root book-v2/ (moved to $LOG/stray); check the real output path"
   fi
+  [[ $rc -eq 142 ]] && echo "!!! [$NN] $1 timed out after ${STEP_TIMEOUT:-1800}s"
   [[ $rc -ne 0 ]] && { tail -30 "$LOG/${NN}-$1.log"; exit $rc; }
 }
 

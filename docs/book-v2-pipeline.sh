@@ -6,7 +6,6 @@
 #   docs/book-v2-pipeline.sh expand <NN> <檔名標題> <章卡名稱> <目標字數>  擴寫既有章→讀者→編輯→潤飾→稽核
 #   docs/book-v2-pipeline.sh review <NN> <檔名標題> <章卡名稱> <目標字數>  不重寫，作者改過結構後重跑讀者→編輯→潤飾→稽核
 #   docs/book-v2-pipeline.sh audit <NN> <檔名標題> <章卡名稱>              只跑一致性稽核
-#   docs/book-v2-pipeline.sh reflect <NN> <檔名標題> <章卡名稱> <字數>     章末 ## 回頭看 的五步
 # 例：
 #   docs/book-v2-pipeline.sh full 07 "住在一起以後" "第七章｜住在一起以後" "8,000–9,000"
 set -u
@@ -61,14 +60,14 @@ run() { # step name, prompt
 COUNT="字數計法：不含標題行與所有空白，含標點（\`sed 1d 檔案 | tr -d '[:space:]' | wc -m\`）。"
 
 LENGTH="篇幅：全書目標 10–12 萬字，本章目標 ${TARGET} 字。${COUNT}
-長度來自場景完整展開，不是形容詞、同義反覆或回看說理：
+長度來自場景完整展開，不是形容詞、同義反覆或說理：
 - 章卡的主要場次寫成「場景」而非「摘要」：有時間、地點、進場與離場，對白之間有動作、停頓與距離的變化，讓讀者和人物一起經過那段時間
 - 用具體、屬於那個年代與處境的物件、聲音、光線、氣味、身體感受錨定畫面；細節要有作用（揭露人物、改變關係、之後會回來），不堆砌
 - 日常與甜蜜可以完整發生，讓兩人為什麼喜歡彼此被讀者親身經歷
 - 摘要只用在真正需要跳過的時間；每次跳接後，盡快落回一個具體的時刻
-- 回看聲音仍然短，不以說理灌字數"
+- 現在的我只短暫出現，不以說理灌字數"
 
-COMMON="新書《把自己的部分做完》是經使用者授權的改編敘事書稿。章節腳本已分檔：總則 ${GENERAL}（寫作總則、章末回看拆解、全書進程、篇幅），本章章卡 ${CARDFILE}；除非本步驟另外指定，不要讀 docs/chapter.md 或其他章卡。跨章已定的事實與資訊邊界記在 ${CONT}；本章場景表在 ${SCENES}；作者手改句清單在 ${AUTHOR}（清單內的句子原樣保留）。docs/book-v2-workflow.md 的「使用者修稿偏好」與「一致性清單」必須遵守。章末若已有 \`## 回頭看\` 一節，除非本步驟明說要處理它，否則不要修改。所有書稿與回饋檔都在 book-reader/book-v2/ 底下，寫檔時使用完整路徑；repo 根目錄沒有 book-v2/，不要在那裡建立檔案。不要修改 docs/、book-reader/book/、book-reader/is-me/ 以及其他章節檔。"
+COMMON="新書《把自己的部分做完》是經使用者授權的改編敘事書稿。章節腳本已分檔：總則 ${GENERAL}（寫作總則、全書進程、篇幅），本章章卡 ${CARDFILE}；除非本步驟另外指定，不要讀 docs/chapter.md 或其他章卡。跨章已定的事實與資訊邊界記在 ${CONT}；本章場景表在 ${SCENES}；作者手改句清單在 ${AUTHOR}（清單內的句子原樣保留）。docs/book-v2-workflow.md 的「使用者修稿偏好」與「一致性清單」必須遵守。所有書稿與回饋檔都在 book-reader/book-v2/ 底下，寫檔時使用完整路徑；repo 根目錄沒有 book-v2/，不要在那裡建立檔案。不要修改 docs/、book-reader/book/、book-reader/is-me/ 以及其他章節檔。"
 REVIEWNOTE="本章的場景結構已由作者親自調整，正文現況優先於場景表 ${SCENES} 與舊回饋；不要恢復作者已刪除的場景或事件，也不要新增事件或把一兩句帶過的事展開成新場景（作者刻意只用一句帶過）。修改限於現有場景內的句子、銜接與事實；字數不足不是展開的理由。"
 # review 模式：編輯與潤飾都讀 LENGTH，把限制放進去，免得編輯照一般流程建議「摘要展開成場景」
 if [[ "$MODE" == "review" ]]; then
@@ -116,44 +115,6 @@ if [[ "$MODE" == "audit" ]]; then
   echo "=== [$NN] audit done"
   exit 0
 fi
-# ── 章末回看拆解 ──────────────────────────────────────────
-# reflect：在既有章節末尾寫 `## 回頭看`，五步只處理這一節（部稿已取消）
-if [[ "$MODE" == "reflect" ]]; then
-  [[ -z "$TARGET" ]] && { echo "usage: $0 reflect NN TITLE CARD TARGET"; exit 2; }
-  REFLECTIONS="$LOG/reflections.md"
-  (cd "$REPO" && for f in book-reader/book-v2/[0-9][0-9]-*.md; do [[ "$f" == "$OUT" ]] && continue; grep -q "^## 回頭看" "$f" && { echo "# $f"; awk '/^## 回頭看/{x=1} x' "$f"; echo; }; done) > "$REFLECTIONS"
-  if true; then
-    K="${NN}-reflect"
-    SCOPE="只處理 ${OUT} 末尾的 \`## 回頭看\` 一節；故事正文一字不動。"
-    WHAT="第 ${NN} 章「${CARD}」章末的回看拆解"
-    RULES="依 ${GENERAL}「核心困境與回看聲音」下的「章末回看拆解」與本章章卡 ${CARDFILE}：篇幅 ${TARGET} 字（只計這一節）；由現在的我直接對讀者說話，從本章核心困境拆一個機制，對照 ${CONCEPTS} 的「初版觀念保留核對」選本章主要驗收的觀念，一節只一個主軸；用「你／我們」讓讀者代入，「我」承認自己的參與；可給一個今天就能做的小動作或自問句，不做表格或練習清單；相關工具只取一個區分或一個動作；只用一兩句點到故事畫面，不重述情節；不替她下結論；聲音依 \$rui-xuan-book-v2 的反思隨筆，不喊口號、不說教。其他章已寫好的 \`## 回頭看\` 集中在 ${REFLECTIONS}，不要與它們的主軸或句子重複；不必讀其他章的故事正文。
-口吻與密度以第一章的 \`## 回頭看\`（作者已校閱）為範本。另外遵守：
-- 不照搬章卡或觀念核對表的分析詞（例如約定的範圍、履行、續期、詮釋、共同確認、內耗、控制），改成人回想自己時會說的話
-- 故事只點一兩個畫面當錨點，不按時間順序重述本章；不重複故事裡已經寫過的回看句
-- 至少一個具體畫面當入口，結尾留一個讀者可以問自己的問題或今天能做的小動作
-- 不為了公平替每一方補免責句；「不等於……也不表示……」這類兩邊都顧的平衡句全節最多一次
-- 一節只講一件事，講清楚就停，寧可短"
-  fi
-  run ${MODE} "使用 \$rui-xuan-book-v2（.agents/skills/rui-xuan-book-v2/SKILL.md）撰寫${WHAT}。
-${COMMON}
-${RULES}
-${SCOPE}
-寫完量字數（只計 \`## 回頭看\` 一節，不含標題行與空白），須落在 ${TARGET}。完成後簡短回報：主軸、對應的觀念、字數。"
-  run ${MODE}-reader "使用 \$ai-reader（.agents/skills/ai-reader/SKILL.md），以一般讀者的身份讀 ${OUT}（${WHAT}；請先讀完該章故事再讀章末一節）。不要讀 docs/chapter/ 的任何檔案。
-回饋寫到 ${FB}/${K}-reader.md，只寫這個檔。內容：這一節讓你多理解了什麼、能不能帶走一個觀念或做法；哪裡像說教、口號、重述故事或替她下結論；機制講得準不準、有沒有過度簡化、有沒有交代適用邊界；和故事的銜接是否自然；與書中其他回看是否重複。區分原始反應與推測原因，不改稿。"
-  run ${MODE}-editor "使用 \$ai-editor（.agents/skills/ai-editor/SKILL.md）判讀 ${FB}/${K}-reader.md，對照 ${OUT}、${GENERAL} 的章末回看拆解、${CARDFILE}、${CONCEPTS}、.agents/skills/rui-xuan-book-v2/SKILL.md、docs/book-v2-workflow.md 的使用者修稿偏好。${SCOPE}
-判讀寫到 ${FB}/${K}-editor.md，只寫這個檔：合併意見並分級（必須處理／建議處理／暫時觀察／不建議修改）；補上讀者沒提的問題（觀念錯誤或過度簡化、替她定性、與故事事實不符、說白、重複其他章、字數不在 ${TARGET}）；列出要保留的句子與修訂清單。"
-  run ${MODE}-polish "使用 \$rui-xuan-book-v2 依 ${FB}/${K}-editor.md 修訂${WHAT}。
-${COMMON}
-${RULES}
-${SCOPE}
-執行「必須處理」與「建議處理」，保留編輯指定的句子；完成後量字數須落在 ${TARGET}；在 ${FB}/${K}-editor.md 末尾追加「## 潤飾紀錄」。"
-  run ${MODE}-audit "對${WHAT}做事實稽核，只抓與故事事實、連續性（${CONT}）或資訊邊界不符之處並最小修正；不改文風與觀點。${SCOPE}
-核對：提到的故事細節是否與正文一致；是否把她的動機或心情寫成確定事實；是否提到人物當時不可能知道的事而沒有標明是現在的理解；作者手改句清單 ${AUTHOR} 內的句子不改，列入留給作者決定。結果寫到 ${FB}/${K}-audit.md。"
-  echo "=== [$NN] ${MODE} done"
-  exit 0
-fi
-
 [[ "$MODE" != "full" && "$MODE" != "expand" && "$MODE" != "review" || -z "$TARGET" ]] && { echo "usage: $0 full|expand|review|audit NN TITLE CARD [TARGET]"; exit 2; }
 
 if [[ "$MODE" == "review" ]]; then
@@ -180,7 +141,7 @@ ${CONSISTENCY}
 動筆前讀：${GENERAL}、${CARDFILE}、${CONT}、前一章 ${PREV}（需要時再往前查一章），以及素材 book-reader/is-me/story-base.txt、docs/my-story/ 中相關章稿、book-reader/is-me/Rui-Xuan-生命素材.md 的相關條目。
 要求：
 - 先寫場景表 ${SCENES}：列出本章 3–5 個要完整展開的場景，每場記地點與場地配備、時間與天氣、在場人物、關鍵物件與其歸屬、兩人各自此時知道與不知道的事。正文照場景表寫
-- 依章卡的核心困境、場次、回看、停點與交接寫。回看欄是暫定落點，不是配額
+- 依章卡的核心困境、場次、回看落點、停點與交接寫。回看欄是故事中短暫回看的暫定落點，不是配額
 - 觀念核對表只在初稿完成後自我驗收，不為補觀念加戲
 - 正文寫到 ${OUT}，第一行為 \`# ${CARD}\`
 - 本章新定下、後續章節需沿用的事實，追加到 ${CONT} 的本章小節（條列、只記事實），並另列「資訊邊界」：沒說出口的事、誰不知道什麼

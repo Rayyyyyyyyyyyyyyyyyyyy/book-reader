@@ -14,6 +14,7 @@
 ## 寫作與生命素材
 
 - 撰寫、改寫 Rui-Xuan 讀書心得與反思隨筆，或整理生命素材時，使用 [rui-xuan-book-v2](.agents/skills/rui-xuan-book-v2/SKILL.md)。先辨認使用者要整理素材、提供回饋，還是寫作；貼上隨筆不等於要求改寫。
+- 同一份 skill 也適用於 `book-reader/book-v2/` 的正文：不論是流水線產出的整章，還是只手改幾句，都要照它的聲音規則，並遵守 `docs/book-v2-workflow.md` 的「使用者修稿偏好」與「一致性清單」。
 - 更新 `book-reader/is-me/Rui-Xuan-生命素材.md` 時，沿用「主題（真實的事）／可接到的概念／落地句範例」三欄表格。
 - **主題**只抓核心經歷、觀察或比喻，保留辨識所需的細節，不貼全文或寫成長摘要。
 - **可接到的概念**需思考素材背後的機制、矛盾與適用條件，不能只摘關鍵字，也不推定未提供的心理動機。
@@ -46,7 +47,7 @@ TypeScript、TSX 與 Astro 採兩格縮排、雙引號及分號，並維持現�
 
 ## Commit 與 Pull Request
 
-歷史提交採簡短、祈使語氣的英文主旨，例如 `Support searching books by catalog number`。每個 commit 聚焦一項變更，避免混入產生檔或無關重排。套用作者親手修改的書稿句子時，commit 主旨必須含 `hand edit`（如 `Apply the author's hand edit and approve chapter 6`）——`docs/book-v2-pipeline.sh` 以 `git log --grep="hand edit"` 抽出這些句子並要求後續步驟原樣保留，訊息漏字會讓下一輪把它們改掉。PR 應說明目的、影響範圍與驗證方式，連結相關 issue 或 OpenSpec change；若改動視覺或響應式行為，附上前後截圖。合併前確認 GitHub Pages 建置成功。
+歷史提交採簡短、祈使語氣的英文主旨，例如 `Support searching books by catalog number`。每個 commit 聚焦一項變更，避免混入產生檔或無關重排。`book-reader/book-v2/` 的章節正文、`_continuity.md` 與該章回饋檔，要等作者人工校閱並明確同意後才 commit；未經同意的章節即使已寫完也留在工作區。提交書稿時逐一指定檔案，不要用 `git add -A`，以免把尚未校閱的章節一起帶進去。套用作者親手修改的書稿句子時，commit 主旨必須含 `hand edit`（如 `Apply the author's hand edit and approve chapter 6`）——`docs/book-v2-pipeline.sh` 以 `git log --grep="hand edit"` 抽出這些句子並要求後續步驟原樣保留，訊息漏字會讓下一輪把它們改掉。PR 應說明目的、影響範圍與驗證方式，連結相關 issue 或 OpenSpec change；若改動視覺或響應式行為，附上前後截圖。合併前確認 GitHub Pages 建置成功。
 
 ## 設定與資產注意事項
 

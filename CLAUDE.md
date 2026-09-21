@@ -28,19 +28,21 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## book-v2 寫作流水線
 
-流程與理由見 `docs/book-v2-workflow.md`；章節腳本分檔在 `docs/chapter/`（`00-總則.md`、各章 `NN-章名.md`、`觀念核對.md`、`參考.md`），跨章事實與資訊邊界在 `book-reader/book-v2/_continuity.md`，每章回饋在 `_feedback/NN-{scenes,reader,editor,audit}.md`。
+流程與理由見 `docs/book-v2-workflow.md`；章節腳本分檔在 `docs/chapter/`（`00-總則.md`、各章 `NN-章名.md`、`觀念核對.md`、`參考.md`），跨章事實與資訊邊界在 `book-reader/book-v2/_continuity.md`，每章回饋在 `_feedback/NN-{scenes,reader,editor,audit}.md`；臨時諮詢（例如把改寫提案送讀者與編輯判斷）另存成 `_feedback/NN-<議題>-{reader,editor}.md`。
 
 ```bash
-docs/book-v2-pipeline.sh full   07 "住在一起以後" "第七章｜住在一起以後" "8,000–9,000"
-docs/book-v2-pipeline.sh expand 01 "十一點的電話" "第一章｜十一點的電話" "6,000–7,000"
-docs/book-v2-pipeline.sh review 07 "住在一起以後" "第七章｜住在一起以後" "8,000–9,000"
+docs/book-v2-pipeline.sh full   07 "住在一起以後" "第七章｜住在一起以後" "<目標字數>"
+docs/book-v2-pipeline.sh expand 01 "十一點的電話" "第一章｜十一點的電話" "<目標字數>"
+docs/book-v2-pipeline.sh review 07 "住在一起以後" "第七章｜住在一起以後" "<目標字數>"
 docs/book-v2-pipeline.sh audit  06 "這一次，我們真的在一起了" "第六章｜這一次，我們真的在一起了"
 ```
+
+目標字數以該章章卡（`docs/chapter/NN-*.md`）與 `00-總則.md` 的篇幅表為準，不沿用範例數字。
 
 - 五步：寫作 → 讀者 → 編輯 → 潤飾 → 稽核。每一步都是**全新的 `codex exec` session**（`gpt-5.6-sol`，reasoning effort high），刻意不共用上下文；每步限時 30 分鐘（`STEP_TIMEOUT`）。
 - `review` 模式用於作者已親手調整結構之後：正文現況優先於場景表與舊回饋，不得復原被刪場景，也不得把一句帶過的事展開成新場景。
 - log 在 `~/.cache/book-v2-logs/`（`BOOK_V2_LOG` 可改），**不進 repo**。
-- **作者手改句**由腳本從含 `hand edit` 的 commit 抽成 `~/.cache/book-v2-logs/NN-author-lines.md`，後續步驟只保留不改動（commit 訊息規則見 `AGENTS.md`）。
+- **作者手改句**由腳本從含 `hand edit` 的 commit 抽成 `~/.cache/book-v2-logs/NN-author-lines.md`，後續步驟只保留不改動（commit 訊息規則見 `AGENTS.md`）。作者剛手改、還沒 commit 時腳本抓不到，改用 `EXTRA_AUTHOR` 指向一個每行一句的檔案，腳本會把仍在正文裡的句子併進同一份清單，例如 `EXTRA_AUTHOR=~/.cache/book-v2-logs/05-extra-author.txt docs/book-v2-pipeline.sh review 05 ...`。
 - 腳本若警告檔案被寫到 repo 根目錄的 `book-v2/`，代表該步走錯路徑（已被移到 log 的 `stray/`），要回頭確認產出位置。
 - 一章跑完由 Claude 整章讀過、核對後交作者校閱，作者同意才 commit；稽核碰到作者手改句不直接改，列進 `NN-audit.md` 的「留給作者決定」。
 

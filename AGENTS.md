@@ -1,11 +1,14 @@
 # Repository Guidelines
 
+本檔是 Claude Code 與 Codex 共用的規則層。**架構與機制細節在 `CLAUDE.md`**（建置期產物、書稿閱讀器管線、book-v2 流水線、skills 對應、openspec 檔案結構）——兩個 agent 都應一併讀取，本檔不重複那些內容。
+
 ## 專案結構與模組組織
 
 - `site/` 是正式網站：Astro 頁面位於 `src/pages/`，React 互動元件位於 `src/components/`，共用邏輯放在 `src/lib/`，全域樣式放在 `src/styles/`。
 - `site/src/content/books/` 是網站書籍資料與已發布讀書心得的單一真實來源；每本書使用一個 Markdown 檔，frontmatter 存放書目資料，正文存放心得。
-- `book-png/` 保存原始封面；`site/scripts/covers.mjs` 依三位數排名產生網站封面。`book-reader/` 保存草稿與寫作材料，`research/books/` 保存書籍研究，`docs/` 保存規格與提示詞。
-- `book-reader/讀書心得/` 保存心得稿，檔名即書名；`book-reader/book/` 保存書稿；`book-reader/is-me/` 保存私人生命素材與寫作參考，不直接發布到網站。
+- `book-png/` 保存原始封面；`site/scripts/covers.mjs` 依三位數排名產生網站封面。`book-reader/` 保存草稿與寫作材料，`docs/` 保存規格、章節腳本與流程腳本。
+- `book-reader/讀書心得/` 保存心得稿，檔名即書名；`book-reader/is-me/` 保存私人生命素材與寫作參考，不直接發布到網站。
+- 書稿有兩份：`book-reader/book/` 是 v1 完稿，也是網站書稿閱讀器實際發布的內容；`book-reader/book-v2/` 是進行中的新版正文，一章一檔，另有 `_continuity.md` 與 `_feedback/`。兩份不互相覆蓋，改動前先確認在哪一份。
 - `openspec/` 保存功能規格、設計與變更紀錄；較大的功能調整應同步更新相關 change。
 
 ## 寫作與生命素材
@@ -27,11 +30,15 @@ npm run dev          # 產生封面並啟動本機開發伺服器
 npm run build        # 建置靜態網站至 dist/，也是主要驗證指令
 npm run preview      # 預覽已建置的網站
 npm run covers       # 僅重新整理封面資產
+npm run reader       # 本機預覽書稿閱讀器（127.0.0.1:4178，READER_PORT 可改）
+npm run reader:phone # 綁 0.0.0.0，手機同網段可連
 ```
+
+`dev` 與 `build` 之前會自動產生封面與書稿閱讀器，細節見 `CLAUDE.md`。
 
 ## 程式風格與命名慣例
 
-TypeScript、TSX 與 Astro 採兩格縮排、雙引號及分號，並維持現有 strict TypeScript 設定。React 元件使用 PascalCase（如 `BookGrid.tsx`），函式與變數使用 camelCase。書籍檔名採 `NNN-english-slug.md`；沒有英文書名時可只用排名，例如 `103.md`。Frontmatter 的 `rank`、`cat`、`zh`、`en`、`author`、`desc` 應符合 `src/content.config.ts` schema。
+TypeScript、TSX 與 Astro 採兩格縮排、雙引號及分號，並維持現有 strict TypeScript 設定。React 元件使用 PascalCase（如 `BookGrid.tsx`），函式與變數使用 camelCase。書籍檔名採 `NNN-english-slug.md`；沒有英文書名時可只用排名，例如 `103.md`。Frontmatter 的 `rank`、`cat`、`zh`、`en`、`author`、`desc` 應符合 `src/content.config.ts` schema，其中 `cat` 必須是 `src/data/categories.ts` 的 key。
 
 ## 測試指南
 
@@ -39,7 +46,7 @@ TypeScript、TSX 與 Astro 採兩格縮排、雙引號及分號，並維持現�
 
 ## Commit 與 Pull Request
 
-歷史提交採簡短、祈使語氣的英文主旨，例如 `Support searching books by catalog number`。每個 commit 聚焦一項變更，避免混入產生檔或無關重排。PR 應說明目的、影響範圍與驗證方式，連結相關 issue 或 OpenSpec change；若改動視覺或響應式行為，附上前後截圖。合併前確認 GitHub Pages 建置成功。
+歷史提交採簡短、祈使語氣的英文主旨，例如 `Support searching books by catalog number`。每個 commit 聚焦一項變更，避免混入產生檔或無關重排。套用作者親手修改的書稿句子時，commit 主旨必須含 `hand edit`（如 `Apply the author's hand edit and approve chapter 6`）——`docs/book-v2-pipeline.sh` 以 `git log --grep="hand edit"` 抽出這些句子並要求後續步驟原樣保留，訊息漏字會讓下一輪把它們改掉。PR 應說明目的、影響範圍與驗證方式，連結相關 issue 或 OpenSpec change；若改動視覺或響應式行為，附上前後截圖。合併前確認 GitHub Pages 建置成功。
 
 ## 設定與資產注意事項
 

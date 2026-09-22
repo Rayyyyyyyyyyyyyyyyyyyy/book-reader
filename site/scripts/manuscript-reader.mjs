@@ -8,7 +8,7 @@ import { createMarkdownProcessor } from "@astrojs/markdown-remark";
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const projectRoot = resolve(scriptDir, "../..");
-const manuscriptDir = join(projectRoot, "book-reader/book");
+const manuscriptDir = join(projectRoot, "book-reader/book-v2");
 const isPublicBuild = process.argv.includes("--public");
 const outputDir = isPublicBuild
   ? join(projectRoot, "site/public/manuscript")
@@ -27,10 +27,6 @@ const escapeHtml = (value) =>
     .replaceAll('"', "&quot;");
 
 const titleOf = (markdown) => markdown.match(/^#\s+(.+)$/m)?.[1]?.trim() ?? "未命名章節";
-
-function lineNumberAt(markdown, index) {
-  return markdown.slice(0, index).split("\n").length;
-}
 
 function blockLineRanges(markdown, firstLine = 1, lastLine = Number.POSITIVE_INFINITY) {
   const lines = markdown.split("\n");
@@ -56,36 +52,8 @@ function blockLineRanges(markdown, firstLine = 1, lastLine = Number.POSITIVE_INF
   return ranges;
 }
 
-function splitPart(markdown, prefix) {
-  const sourceTitle = titleOf(markdown);
-  const partTitle = sourceTitle.replace(/（引言・練習・小結）$/, "");
-  const titleHeading = markdown.match(/^#\s+.+$/m);
-  const introStart = titleHeading ? titleHeading.index + titleHeading[0].length : -1;
-  const practiceStart = markdown.indexOf("## 練習");
-  if (introStart < 0 || practiceStart < 0) {
-    throw new Error(`${prefix} 缺少分部標題或「練習」標題`);
-  }
-  const introLine = lineNumberAt(markdown, introStart);
-  const practiceLine = lineNumberAt(markdown, practiceStart);
-
-  return [
-    {
-      key: `${prefix.toLowerCase()}-intro`,
-      title: partTitle,
-      markdown: `# ${partTitle}\n\n${markdown.slice(introStart, practiceStart).trim()}\n`,
-      blockLines: blockLineRanges(markdown, introLine, practiceLine - 1),
-    },
-    {
-      key: `${prefix.toLowerCase()}-practice`,
-      title: `${partTitle}｜練習與小結`,
-      markdown: `# ${partTitle}｜練習與小結\n\n${markdown.slice(practiceStart).trim()}\n`,
-      blockLines: blockLineRanges(markdown, practiceLine),
-    },
-  ];
-}
-
 async function buildReader() {
-  const names = (await readdir(manuscriptDir)).filter((name) => name.endsWith(".md"));
+  const names = (await readdir(manuscriptDir)).filter((name) => /^\d\d-.+\.md$/.test(name));
   const fileByPrefix = new Map(names.map((name) => [name.split("-")[0], name]));
   const source = new Map();
 
@@ -96,36 +64,23 @@ async function buildReader() {
     });
   }
 
-  const required = ["00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "P1", "P2", "P3", "P4"];
+  const required = ["00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14"];
   const missing = required.filter((prefix) => !source.has(prefix));
   if (missing.length > 0) throw new Error(`缺少稿件：${missing.join(", ")}`);
 
   const sectionsByKey = new Map();
   for (const prefix of required) {
     const item = source.get(prefix);
-    if (prefix.startsWith("P")) {
-      for (const section of splitPart(item.markdown, prefix)) {
-        sectionsByKey.set(section.key, { ...section, sourceFile: item.name });
-      }
-    } else {
-      sectionsByKey.set(prefix, {
-        key: prefix,
-        title: titleOf(item.markdown),
-        markdown: item.markdown,
-        blockLines: blockLineRanges(item.markdown),
-        sourceFile: item.name,
-      });
-    }
+    sectionsByKey.set(prefix, {
+      key: prefix,
+      title: titleOf(item.markdown),
+      markdown: item.markdown,
+      blockLines: blockLineRanges(item.markdown),
+      sourceFile: item.name,
+    });
   }
 
-  const readingOrder = [
-    "00",
-    "p1-intro", "01", "02", "03", "p1-practice",
-    "p2-intro", "04", "05", "06", "p2-practice",
-    "p3-intro", "07", "08", "09", "p3-practice",
-    "p4-intro", "10", "11", "12", "p4-practice",
-    "13",
-  ];
+  const readingOrder = [...required];
   const processor = await createMarkdownProcessor({ syntaxHighlight: false });
   const sections = [];
 

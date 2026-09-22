@@ -15,16 +15,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 | 腳本 | 來源 → 產物 |
 |---|---|
-| `scripts/covers.mjs` | `book-png/NNN_*.jpg` → `site/src/assets/covers/NNN.jpg`（只看三位數排名前綴；缺圖時前台退回排版式 placeholder） |
-| `scripts/manuscript-reader.mjs --public` | `book-reader/book/*.md` + `scripts/manuscript-reader-template.html` → `site/public/manuscript/`（單一 HTML + service worker） |
-| `scripts/manuscript-reader.mjs --serve` | 同上，輸出到 `site/.offline-reader/`，供 `npm run reader` 離線預覽 |
+| `site/scripts/covers.mjs` | `book-png/NNN_*.jpg` → `site/src/assets/covers/NNN.jpg`（只看三位數排名前綴；缺圖時前台退回排版式 placeholder） |
+| `site/scripts/manuscript-reader.mjs --public` | `book-reader/book-v2/NN-*.md` + `site/scripts/manuscript-reader-template.html` → `site/public/manuscript/`（單一 HTML + service worker） |
+| `site/scripts/manuscript-reader.mjs --serve` | 同上，輸出到 `site/.offline-reader/`，供 `npm run reader` 離線預覽 |
 
 ## 網站架構要點
 
 - **「有心得」是算出來的**：Markdown body 非空 → `hasNote`，否則前台顯示「整理中」。邏輯集中在 `src/lib/books.ts` 的 `entryToMeta()`，頁面（`index.astro`、`pages/book/[...slug].astro`）與 React island `BookGrid.tsx` 都吃它產出的 `BookMeta`。
 - **slug 就是檔名**：`entry.id` 直接當路由用，沒有另一層 slug 映射；封面依 `rank` 配對。
-- **書稿閱讀器是獨立頁**：不在網站導覽裡，也不走 Astro content collection，網址是 `/manuscript`。它發布的是 **v1**（`book-reader/book/`），不是 book-v2。
-- **部署觸發有 path filter**：`.github/workflows/deploy.yml` 只在 `site/**`、`book-png/**`、`book-reader/book/**`、workflow 本身變動時跑。只改 `book-reader/book-v2/` 或 `docs/` 不會觸發部署。
+- **書稿閱讀器是獨立頁**：不在網站導覽裡，也不走 Astro content collection，網址是 `/manuscript`。2026-09-22 起發布的是 **book-v2**（`book-reader/book-v2/`，序章至後記十五篇，只吃 `NN-*.md`，`_continuity.md` 與 `_feedback/` 自動略過）。**註解功能暫時關閉**：開關是模板裡的 `NOTES_ENABLED`，設回 `true` 即恢復，既有註解仍留在讀者的 localStorage。
+- **部署觸發有 path filter**：`.github/workflows/deploy.yml` 只在 `site/**`、`book-png/**`、`book-reader/book-v2/**`、workflow 本身變動時跑。改 `book-reader/book/`（v1）或 `docs/` 不會觸發部署。
 
 ## book-v2 寫作流水線
 

@@ -1,13 +1,8 @@
----
-name: book-v2-direct-edit
-description: 直接修改 `book-reader/book-v2/` 正文時使用，包括只手改幾句、依清單或回饋補寫、套用作者裁定、潤飾既有章節；在不經 book-v2 流水線動筆前，強制從原檔取材並先交出逐字引文。只讀、診斷、統計或回報不觸發
----
-
 # Book V2 正文直接修改
 
-這個 skill 管的是**直接動正文的工作流程**，不是寫作聲音。修改 `book-reader/book-v2/*.md` 正文時，不論整章或只改幾句，都先執行本流程；依清單或回饋補寫、套用作者裁定、潤飾既有章節也一樣。
+這是 `rui-xuan-book-v2` 的**直接修改正文分支**。直接修改 `book-reader/book-v2/*.md` 正文時，不論整章或只改幾句，都先執行本流程；依清單或回饋補寫、套用作者裁定、潤飾既有章節也一樣。
 
-聲音、文體分流、比喻與句法只讀 `.agents/skills/rui-xuan-book-v2/SKILL.md` 的相關分流，不在這裡重複。由 `docs/book-v2-pipeline.sh` 啟動的 `codex exec` 步驟，其 prompt 已直接送入必讀材料，不重跑本門檻。只讀、診斷、統計或回報不觸發。
+由 `docs/book-v2-pipeline.sh` 啟動的 `codex exec` 步驟，其 prompt 已直接送入必讀材料，不重跑本門檻。只讀、診斷、統計或回報不觸發。
 
 ## 先確定章號與改動範圍
 
@@ -24,7 +19,7 @@ description: 直接修改 `book-reader/book-v2/` 正文時使用，包括只手�
 5. `book-reader/book-v2/_feedback/全書-人物弧線.md`：讀 A／B／C 分層、本章成熟度定位，以及本章「不能提早出現」。
 6. `book-reader/book-v2/_feedback/全書-手改對照.md` 的按章索引、相關 before／after 與親筆句樣本：先看樣本怎麼寫，再用條文理解為什麼刪。
 7. 與本次段落或問題相關的 `book-reader/book-v2/_feedback/全書-*.md` 掃描：連同其中的「該留不動」、前提更正、作者裁定與未套用狀態一起讀。
-8. `.agents/skills/rui-xuan-book-v2/SKILL.md` 的改編敘事書稿分流：只用來決定聲音與敘事寫法，不取代上述章級材料。
+8. 本 skill 的 [`adapted-narrative.md`](adapted-narrative.md) 分流：用來決定聲音、人物基準與敘事寫法，不取代上述章級材料。
 
 若某章缺少流程檔，先讀 `_feedback/README.md` 確認是刻意空缺還是尚未產出；不要自行假設內容。
 

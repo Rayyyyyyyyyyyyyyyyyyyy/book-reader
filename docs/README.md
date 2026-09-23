@@ -6,7 +6,7 @@
 
 | 檔案 | 什麼時候讀 |
 |---|---|
-| [.agents/skills/book-v2-direct-edit/SKILL.md](../.agents/skills/book-v2-direct-edit/SKILL.md) | **要直接修改 `book-reader/book-v2/*.md` 正文之前，不論範圍大小。** 同輪取材、逐字引文門檻、衝突停手與作者校閱後七步；門檻由來另見 [book-v2-動筆前規範.md](book-v2-動筆前規範.md) |
+| [rui-xuan-book-v2](../.agents/skills/rui-xuan-book-v2/SKILL.md) | Rui-Xuan 寫作與 book-v2 正文修改的單一入口。**直接修改 `book-reader/book-v2/*.md` 正文之前，不論範圍大小**，依其中的 [正文直改分支](../.agents/skills/rui-xuan-book-v2/references/book-v2-direct-edit.md) 執行同輪取材、逐字引文門檻、衝突停手與作者校閱後七步；門檻由來另見 [book-v2-動筆前規範.md](book-v2-動筆前規範.md) |
 | [book-v2-workflow.md](book-v2-workflow.md) | 流程本身、五步分工、一致性清單、**使用者修稿偏好四十條**、作者校閱完成後七步、commit 規則 |
 | [book-v2-handoff.md](book-v2-handoff.md) | 接手時先讀：repo 是什麼、各章字數與狀態、現在做到哪裡、不可違背的設定 |
 

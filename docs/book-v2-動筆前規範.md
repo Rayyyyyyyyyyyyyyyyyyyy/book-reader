@@ -1,6 +1,6 @@
 # 為什麼 book-v2 直接修改需要動筆門檻
 
-> 現行操作流程已移至 `.agents/skills/book-v2-direct-edit/SKILL.md`。本檔只保留這道門檻的由來與失效分析，不再承擔操作指示。
+> 現行操作流程已併入 `.agents/skills/rui-xuan-book-v2/references/book-v2-direct-edit.md`。本檔只保留這道門檻的由來與失效分析，不再承擔操作指示。
 
 ## 2026-09-23 的失敗
 
@@ -22,4 +22,4 @@ Claude 依人物補寫清單修改了十三處正文，作者校閱後刪掉九�
 
 引文門檻的理由很簡單：摘要可以憑印象生成，引文不行；引文在對話裡缺席時，作者一眼就看得出來。真正有效的不是「記得先讀」這句提醒，而是把已讀證據變成動筆前可見、不可省略的產物。
 
-這也是操作流程必須移進 `.agents/skills/book-v2-direct-edit/SKILL.md` 的原因：被動文件等人來讀，skill 跟著任務到達。
+這也是操作流程必須放進 `.agents/skills/rui-xuan-book-v2/` 的原因：被動文件等人來讀，skill 跟著任務到達。它現在是同一 skill 的正文直改 reference，避免聲音規則與動筆門檻由兩個重疊 skill 分別觸發。

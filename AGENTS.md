@@ -15,6 +15,7 @@
 
 - 撰寫、改寫 Rui-Xuan 讀書心得與反思隨筆、整理生命素材，或處理 `book-reader/book-v2/` 正文時，使用 [rui-xuan-book-v2](.agents/skills/rui-xuan-book-v2/SKILL.md)。先辨認使用者要整理素材、提供回饋，還是寫作；貼上隨筆不等於要求改寫。
 - 同一份 skill 是聲音與 book-v2 直接修改流程的單一入口：流水線產出的整章與只手改幾句都要遵守它，並遵守 `docs/book-v2-workflow.md` 的「使用者修稿偏好」與「一致性清單」。
+- 討論 book-v2 人物時，以「男主角／女主角」代稱，不自行替人物取名字；正文仍依敘事視角使用原有人稱。
 - 直接修改 `book-reader/book-v2/*.md` 正文時，依該 skill 的 [正文直改分支](.agents/skills/rui-xuan-book-v2/references/book-v2-direct-edit.md) 執行；只改幾句、依回饋補寫、套用作者裁定或潤飾也會觸發。它要求同一輪實際開原檔並先交出附行號的逐字引文；**貼不出引文就是沒讀，沒讀不動筆。** 只讀不改不觸發，由 `codex exec` 執行的流水線步驟不重跑。
 - 更新 `book-reader/is-me/Rui-Xuan-生命素材.md` 時，沿用「主題（真實的事）／可接到的概念／落地句範例」三欄表格。
 - **主題**只抓核心經歷、觀察或比喻，保留辨識所需的細節，不貼全文或寫成長摘要。

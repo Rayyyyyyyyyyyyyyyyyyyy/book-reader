@@ -58,7 +58,7 @@ docs/book-v2-pipeline.sh audit  06 "這一次，我們真的在一起了" "第�
 - **作者手改句**由腳本從含 `hand edit` 的 commit 抽成 `~/.cache/book-v2-logs/NN-author-lines.md`，後續步驟只保留不改動（commit 訊息規則見 `AGENTS.md`）。作者剛手改、還沒 commit 時腳本抓不到，改用 `EXTRA_AUTHOR` 指向一個每行一句的檔案，腳本會把仍在正文裡的句子併進同一份清單，例如 `EXTRA_AUTHOR=~/.cache/book-v2-logs/05-extra-author.txt docs/book-v2-pipeline.sh review 05 ...`。
 - 腳本若警告檔案被寫到 repo 根目錄的 `book-v2/`，代表該步走錯路徑（已被移到 log 的 `stray/`），要回頭確認產出位置。
 - 一章跑完由 Claude 整章讀過、核對後交作者校閱，作者同意才 commit；稽核碰到作者手改句不直接改，列進 `NN-audit.md` 的「留給作者決定」。
-- **作者校閱完成後不是只有 commit**：照 `docs/book-v2-workflow.md`「作者校閱完成後」六步做完。第 3 步（從本章手改迭代「使用者修稿偏好」）與第 4 步（更新 `docs/book-v2-handoff.md` 的字數與各章狀態）不會立刻產生可見產物，最常被跳過，收到核准時先把這兩步排進去。
+- **作者校閱完成後不是只有 commit**：照 `docs/book-v2-workflow.md`「作者校閱完成後」**七步**做完。第 3 步（從本章手改迭代「使用者修稿偏好」）、第 4 步（重新產生 `_feedback/全書-作者手改句.md`）與第 5 步（更新 `docs/book-v2-handoff.md` 的字數與各章狀態）不會立刻產生可見產物，最常被跳過，收到核准時先把這三步排進去。
 
 ## Skills（`.agents/skills/`）
 

@@ -1,5 +1,7 @@
 # 為什麼 book-v2 直接修改需要動筆門檻
 
+> 狀態：機制決策紀錄，不是另一份操作手冊。現行操作以 `.agents/skills/rui-xuan-book-v2/references/book-v2-direct-edit.md` 為準。
+
 > 現行操作流程已併入 `.agents/skills/rui-xuan-book-v2/references/book-v2-direct-edit.md`。本檔只保留這道門檻的由來與失效分析，不再承擔操作指示。
 
 ## 2026-09-23 的失敗

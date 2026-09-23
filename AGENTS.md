@@ -8,7 +8,7 @@
 - `site/src/content/books/` 是網站書籍資料與已發布讀書心得的單一真實來源；每本書使用一個 Markdown 檔，frontmatter 存放書目資料，正文存放心得。
 - `book-png/` 保存原始封面；`site/scripts/covers.mjs` 依三位數排名產生網站封面。`book-reader/` 保存草稿與寫作材料，`docs/` 保存規格、章節腳本與流程腳本。
 - `book-reader/讀書心得/` 保存心得稿，檔名即書名；`book-reader/is-me/` 保存私人生命素材與寫作參考，不直接發布到網站。
-- 書稿有兩份：`book-reader/book/` 是 v1 完稿，也是網站書稿閱讀器實際發布的內容；`book-reader/book-v2/` 是進行中的新版正文，一章一檔，另有 `_continuity.md` 與 `_feedback/`。兩份不互相覆蓋，改動前先確認在哪一份。
+- 書稿有兩份：`book-reader/book/` 是保留的 v1 完稿；`book-reader/book-v2/` 是持續修訂、也是網站書稿閱讀器目前實際發布的正文，一章一檔，另有 `_continuity.md` 與 `_feedback/`。兩份不互相覆蓋，改動前先確認在哪一份。
 - `openspec/` 保存功能規格、設計與變更紀錄；較大的功能調整應同步更新相關 change。
 
 ## 寫作與生命素材

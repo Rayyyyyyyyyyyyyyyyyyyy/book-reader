@@ -1,5 +1,7 @@
 # 新書寫作流程（book-v2）
 
+> 狀態：現行操作規格。當前稿件與下一步看 `docs/book-v2-handoff.md`；研究與機制理由分別放在 `docs/research/`、`docs/decisions/`，不在本檔累積逐輪進度。
+
 > 2026-09-18 建立。記錄《把自己的部分做完》新版正文的逐章產出流程、分工與檢查。故事與章節功能依 `docs/chapter/`（總則 `00-總則.md` 與各章章卡，`docs/chapter.md` 只是索引），聲音依 `.agents/skills/rui-xuan-book-v2/SKILL.md`。
 
 ## 檔案位置

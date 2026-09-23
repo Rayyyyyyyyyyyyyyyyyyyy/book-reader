@@ -1,35 +1,41 @@
 # docs 索引
 
-規格、章節腳本、流程與參考資料。架構與機制見 `../CLAUDE.md`，共用規則見 `../AGENTS.md`。
+這裡只放 book-v2 的現行入口、章節腳本，以及可追溯的研究與決策。Repo 架構與建置機制見 `../CLAUDE.md`，共用規則見 `../AGENTS.md`。
 
-## 動筆前必讀
+## 現行入口
 
-| 檔案 | 什麼時候讀 |
+| 檔案 | 責任 |
 |---|---|
-| [rui-xuan-book-v2](../.agents/skills/rui-xuan-book-v2/SKILL.md) | Rui-Xuan 寫作與 book-v2 正文修改的單一入口。**直接修改 `book-reader/book-v2/*.md` 正文之前，不論範圍大小**，依其中的 [正文直改分支](../.agents/skills/rui-xuan-book-v2/references/book-v2-direct-edit.md) 執行同輪取材、逐字引文門檻、衝突停手與作者校閱後七步；門檻由來另見 [book-v2-動筆前規範.md](book-v2-動筆前規範.md) |
-| [book-v2-workflow.md](book-v2-workflow.md) | 流程本身、五步分工、一致性清單、**使用者修稿偏好四十條**、作者校閱完成後七步、commit 規則 |
-| [book-v2-handoff.md](book-v2-handoff.md) | 接手時先讀：repo 是什麼、各章字數與狀態、現在做到哪裡、不可違背的設定 |
+| [book-v2-handoff.md](book-v2-handoff.md) | **現在快照**：目前稿件、發布狀態、已知風險與下一步；不保存逐輪日誌 |
+| [book-v2-workflow.md](book-v2-workflow.md) | **現行操作規格**：五步流程、一致性清單、作者修稿偏好、校閱與 commit 規則 |
+| [book-v2-pipeline.sh](book-v2-pipeline.sh) | `full`／`expand`／`review`／`audit` 的實際執行腳本 |
+| [book-v2-titles.md](book-v2-titles.md) | 書名與篇章名的提案紀錄；目前所有候選仍未採納 |
+| [rui-xuan-book-v2](../.agents/skills/rui-xuan-book-v2/SKILL.md) | Rui-Xuan 寫作與 book-v2 正文修改的單一 skill 入口 |
+
+直接修改 `book-reader/book-v2/*.md` 正文前，不論範圍大小，都要依 skill 的 [正文直改分支](../.agents/skills/rui-xuan-book-v2/references/book-v2-direct-edit.md) 完成同輪取材與逐字引文門檻。門檻的由來另見 [決策紀錄](decisions/book-v2-動筆前規範.md)。
 
 ## 章節腳本
 
-`chapter/` 一章一檔：`00-總則.md`（寫作總則、全書進程、篇幅表）、各章 `NN-章名.md`、`觀念核對.md`、`參考.md`。
+`chapter/` 才是現行章節腳本：`00-總則.md`、各章 `NN-章名.md`、`觀念核對.md` 與 `參考.md`。正文層的跨章事實與資訊邊界在 `../book-reader/book-v2/_continuity.md`。
 
-`chapter.md` **只是索引**，內容已分檔。流水線明文不讀它；引用篇幅或總則請指向 `chapter/00-總則.md`。
+[chapter.md](chapter.md) 只為舊連結保留相容索引，不承載設定或要求；流水線不讀它。
 
-## 流程腳本
+## 研究與決策
 
-[book-v2-pipeline.sh](book-v2-pipeline.sh)：`full`／`expand`／`review`／`audit` 四種模式，每步一個新的 `codex exec` session。用法與注意事項見 workflow 的「執行方式」與 handoff 的「流程」。
-
-## 素材與參考
-
-| 檔案 | 用途 |
+| 目錄／檔案 | 性質 |
 |---|---|
-| `my-story/` | 作者的原始敘述，改編的素材來源 |
-| [book-v2-titles.md](book-v2-titles.md) | 書名與篇章名的歷輪提案。**全部未採納**，第六輪為目前方向 |
-| [日劇金句脈絡-冬のなんかさ春のなんかね.md](日劇金句脈絡-冬のなんかさ春のなんかね.md) | 修稿偏好第 31 條「不放事後評價與主題句」的來源，含代價測試 |
-| [橘子-角色對話研究.md](橘子-角色對話研究.md) | 2026-09-23 以可驗證公開訪談為材料的對白研究。**第一版曾引用兩個不存在的試閱連結而撤回**，現行版附連結驗證紀錄 |
-| [認知升級百大書單.md](認知升級百大書單.md) | 網站「百冊」的書單來源，與 book-v2 無關 |
+| `my-story/` | 作者原始敘述，改編素材來源 |
+| [research/日劇金句脈絡-冬のなんかさ春のなんかね.md](research/日劇金句脈絡-冬のなんかさ春のなんかね.md) | 金句、命名與代價測試的研究來源；不是現行規格 |
+| [research/橘子-角色對話研究.md](research/橘子-角色對話研究.md) | 可驗證訪談的對白研究；不是仿寫指南 |
+| [decisions/book-v2-動筆前規範.md](decisions/book-v2-動筆前規範.md) | 正文直改門檻的失敗分析與設計理由 |
 
-## 分析與掃描在哪裡
+## 分析與回饋
 
-全書級的診斷與逐處清單不放這裡，放 `../book-reader/book-v2/_feedback/`，索引見該目錄的 `README.md`。目前有：因果與連續性、反駁型人格、對人的態度、親密對話、男主角人物覆蓋率、人物補寫清單、人物弧線、手改對照。
+全書級診斷、章級回饋與逐處清單放在 `../book-reader/book-v2/_feedback/`，索引見該目錄的 `README.md`。它們是工作證據，不是另一套高於 workflow 的規格。
+
+## 文件生命週期
+
+- `handoff` 只保留此刻仍成立的狀態；舊進度、舊字數與已結束工作交給 Git history，不往下堆日誌。
+- `workflow` 與 skill references 保存仍要執行的規則；規則改變時直接更新，不在研究檔複製第二份。
+- `research/` 保存材料、查證與推導；`decisions/` 保存一項機制為何存在。兩者都要在檔首標明不是現行操作規格。
+- 章節事實只在章卡與 `_continuity.md` 維護；`chapter.md`、handoff 與研究檔不再複製一份。

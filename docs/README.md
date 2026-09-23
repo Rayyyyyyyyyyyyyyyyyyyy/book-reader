@@ -6,8 +6,8 @@
 
 | 檔案 | 什麼時候讀 |
 |---|---|
-| [book-v2-動筆前規範.md](book-v2-動筆前規範.md) | **要改 `book-reader/book-v2/*.md` 正文之前，不論範圍大小。** 分層取材、引文門檻與三種已辨認的失效機制 |
-| [book-v2-workflow.md](book-v2-workflow.md) | 流程本身、五步分工、一致性清單、**使用者修稿偏好四十條**、作者校閱完成後六步、commit 規則 |
+| [.agents/skills/book-v2-direct-edit/SKILL.md](../.agents/skills/book-v2-direct-edit/SKILL.md) | **要直接修改 `book-reader/book-v2/*.md` 正文之前，不論範圍大小。** 同輪取材、逐字引文門檻、衝突停手與作者校閱後七步；門檻由來另見 [book-v2-動筆前規範.md](book-v2-動筆前規範.md) |
+| [book-v2-workflow.md](book-v2-workflow.md) | 流程本身、五步分工、一致性清單、**使用者修稿偏好四十條**、作者校閱完成後七步、commit 規則 |
 | [book-v2-handoff.md](book-v2-handoff.md) | 接手時先讀：repo 是什麼、各章字數與狀態、現在做到哪裡、不可違背的設定 |
 
 ## 章節腳本

@@ -15,9 +15,7 @@
 
 - 撰寫、改寫 Rui-Xuan 讀書心得與反思隨筆，或整理生命素材時，使用 [rui-xuan-book-v2](.agents/skills/rui-xuan-book-v2/SKILL.md)。先辨認使用者要整理素材、提供回饋，還是寫作；貼上隨筆不等於要求改寫。
 - 同一份 skill 也適用於 `book-reader/book-v2/` 的正文：不論是流水線產出的整章，還是只手改幾句，都要照它的聲音規則，並遵守 `docs/book-v2-workflow.md` 的「使用者修稿偏好」與「一致性清單」。
-- **動正文之前有一道強制門檻**，見 [book-v2-動筆前規範](docs/book-v2-動筆前規範.md)：先逐字引出該章章卡、該章 `_feedback/NN-audit.md` 的「作者手改保護」與 `NN-editor.md` 末尾的校閱紀錄、修稿偏好裡直接管到的條目，以及 `_feedback/全書-人物弧線.md` 的分層與「不能提早出現」；附行號、同一輪對話內實際開檔，不得引用稍早的摘要或印象。**貼不出引文就是沒讀，沒讀不動筆。** 只讀不改不觸發。
-- 這道門檻的由來：2026-09-23 Claude 在沒讀章卡、沒重讀偏好、沒讀該章手改保護的狀態下改了十三處正文，作者刪掉九處。用引文而非提醒當門檻，是因為摘要可以憑印象生成，引文不行；而且引文在對話裡缺席時看得出來。上一行「只手改幾句也適用」就是當時被跳過的規則。
-- 由 `codex exec` 執行的步驟不必重跑這道門檻，流水線的 prompt 已經把必讀檔案直接送進去；門檻是補給**不經流水線、直接動手**的那條路徑。
+- 直接修改 `book-reader/book-v2/*.md` 正文時，使用 [book-v2-direct-edit](.agents/skills/book-v2-direct-edit/SKILL.md)；只改幾句、依回饋補寫、套用作者裁定或潤飾也會觸發。它要求同一輪實際開原檔並先交出附行號的逐字引文；**貼不出引文就是沒讀，沒讀不動筆。** 只讀不改不觸發，由 `codex exec` 執行的流水線步驟不重跑。
 - 更新 `book-reader/is-me/Rui-Xuan-生命素材.md` 時，沿用「主題（真實的事）／可接到的概念／落地句範例」三欄表格。
 - **主題**只抓核心經歷、觀察或比喻，保留辨識所需的細節，不貼全文或寫成長摘要。
 - **可接到的概念**需思考素材背後的機制、矛盾與適用條件，不能只摘關鍵字，也不推定未提供的心理動機。
@@ -50,7 +48,7 @@ TypeScript、TSX 與 Astro 採兩格縮排、雙引號及分號，並維持現�
 
 ## Commit 與 Pull Request
 
-歷史提交採簡短、祈使語氣的英文主旨，例如 `Support searching books by catalog number`。每個 commit 聚焦一項變更，避免混入產生檔或無關重排。`book-reader/book-v2/` 的章節正文、`_continuity.md` 與該章回饋檔，要等作者人工校閱並明確同意後才 commit；未經同意的章節即使已寫完也留在工作區。提交書稿時逐一指定檔案，不要用 `git add -A`，以免把尚未校閱的章節一起帶進去。套用作者親手修改的書稿句子時，commit 主旨必須含 `hand edit`（如 `Apply the author's hand edit and approve chapter 6`）——`docs/book-v2-pipeline.sh` 以 `git log --grep="hand edit"` 抽出這些句子並要求後續步驟原樣保留，訊息漏字會讓下一輪把它們改掉；但一個章節檔**第一次進版控**時不要寫 `hand edit`，新檔案的 diff 每一行都是新增行，會把整章凍成不可改動，改用 `EXTRA_AUTHOR` 保護指定句子。作者說「第 N 章看完了／改好了」之後不是只有 commit：照 `docs/book-v2-workflow.md`「作者校閱完成後」六步做完，其中第 3 步（從本章手改迭代修稿偏好）與第 4 步（更新 `docs/book-v2-handoff.md` 的字數與狀態）最常被跳過。PR 應說明目的、影響範圍與驗證方式，連結相關 issue 或 OpenSpec change；若改動視覺或響應式行為，附上前後截圖。合併前確認 GitHub Pages 建置成功。
+歷史提交採簡短、祈使語氣的英文主旨，例如 `Support searching books by catalog number`。每個 commit 聚焦一項變更，避免混入產生檔或無關重排。`book-reader/book-v2/` 的章節正文、`_continuity.md` 與該章回饋檔，要等作者人工校閱並明確同意後才 commit；未經同意的章節即使已寫完也留在工作區。提交書稿時逐一指定檔案，不要用 `git add -A`，以免把尚未校閱的章節一起帶進去。套用作者親手修改的書稿句子時，commit 主旨必須含 `hand edit`（如 `Apply the author's hand edit and approve chapter 6`）——`docs/book-v2-pipeline.sh` 以 `git log --grep="hand edit"` 抽出這些句子並要求後續步驟原樣保留，訊息漏字會讓下一輪把它們改掉；但一個章節檔**第一次進版控**時不要寫 `hand edit`，新檔案的 diff 每一行都是新增行，會把整章凍成不可改動，改用 `EXTRA_AUTHOR` 保護指定句子。作者說「第 N 章看完了／改好了」之後不是只有 commit：照 `docs/book-v2-workflow.md`「作者校閱完成後」七步做完，其中第 3 步（從本章手改迭代修稿偏好）、第 4 步（重新產生 `_feedback/全書-作者手改句.md`）與第 5 步（更新 `docs/book-v2-handoff.md` 的字數與狀態）最常被跳過。PR 應說明目的、影響範圍與驗證方式，連結相關 issue 或 OpenSpec change；若改動視覺或響應式行為，附上前後截圖。合併前確認 GitHub Pages 建置成功。
 
 ## 設定與資產注意事項
 

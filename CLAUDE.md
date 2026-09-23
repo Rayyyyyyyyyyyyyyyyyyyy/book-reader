@@ -6,16 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 動 book-v2 正文之前（強制門檻）
 
-要修改 `book-reader/book-v2/*.md` 的正文——**不論是整章還是只改幾句**——先照 `docs/book-v2-動筆前規範.md` 執行，並在對話裡輸出**引文清單**：
-
-1. 該章章卡 `docs/chapter/NN-*.md`
-2. 該章 `_feedback/NN-audit.md` 的「作者手改保護」與 `NN-editor.md` 末尾的校閱紀錄
-3. `docs/book-v2-workflow.md` 的修稿偏好裡，直接管到這次改動的條目
-4. `_feedback/全書-人物弧線.md` 的分層與「不能提早出現」
-
-**逐字照抄，附行號，在同一輪對話內實際開檔**；不得引用 session 稍早的摘要或印象。**貼不出引文就是沒讀，沒讀不動筆。**
-
-只讀不改不觸發這道門檻。規範的設計理由、三種失效機制與分層細節見該檔。
+直接修改 `book-reader/book-v2/*.md` 正文——包括只改幾句、依回饋補寫、套用作者裁定或潤飾——必須使用 `.agents/skills/book-v2-direct-edit/SKILL.md`，在同一輪實際開原檔並先輸出附行號的逐字引文；**貼不出引文就是沒讀，沒讀不動筆。** 只讀不改不觸發，由 `codex exec` 執行的流水線步驟也不重跑這道門檻。
 
 ## 這個 repo 是兩個產品
 
@@ -67,6 +58,7 @@ skill 放在 `.agents/skills/<name>/SKILL.md`，不是 `.claude/skills/`，因�
 | Skill | 用在哪 |
 |---|---|
 | `rui-xuan-book-v2` | 寫作聲音的單一真實來源，含讀書心得／反思隨筆／改編敘事書稿三個分流。流水線的寫作、擴寫、潤飾三步都指定它 |
+| `book-v2-direct-edit` | 不經流水線直接修改 `book-reader/book-v2/` 正文時的強制流程：同輪取材、逐字引文門檻、衝突停手與作者校閱後七步 |
 | `ai-reader` | 流水線第 2 步，以「第一次讀到這章的讀者」回應。**刻意不讀 `docs/chapter/` 與場景表**，避免用作者意圖替原稿補完 |
 | `ai-editor` | 流水線第 3 步，判讀讀者回饋並分級、列修訂清單。只在明確要求時動筆 |
 | `openspec-{propose,apply-change,archive-change,explore}` | openspec 官方 skill，需要 `openspec` CLI |

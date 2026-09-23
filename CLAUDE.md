@@ -46,10 +46,10 @@ docs/book-v2-pipeline.sh audit  06 "這一次，我們真的在一起了" "第�
 - 五步：寫作 → 讀者 → 編輯 → 潤飾 → 稽核。每一步都是**全新的 `codex exec` session**（`gpt-5.6-sol`，reasoning effort high），刻意不共用上下文；每步限時 30 分鐘（`STEP_TIMEOUT`）。
 - `review` 模式用於作者已親手調整結構之後：正文現況優先於場景表與舊回饋，不得復原被刪場景，也不得把一句帶過的事展開成新場景。
 - log 在 `~/.cache/book-v2-logs/`（`BOOK_V2_LOG` 可改），**不進 repo**。
-- **作者手改句**由腳本從含 `hand edit` 的 commit 抽成 `~/.cache/book-v2-logs/NN-author-lines.md`，後續步驟只保留不改動（commit 訊息規則見 `AGENTS.md`）。作者剛手改、還沒 commit 時腳本抓不到，改用 `EXTRA_AUTHOR` 指向一個每行一句的檔案，腳本會把仍在正文裡的句子併進同一份清單，例如 `EXTRA_AUTHOR=~/.cache/book-v2-logs/05-extra-author.txt docs/book-v2-pipeline.sh review 05 ...`。
+- **作者手改來源候選**由腳本從含 `hand edit` 的 commit 抽成 `~/.cache/book-v2-logs/NN-author-lines.md`。這份清單可能混入首次入庫或模型撰寫的句子，只供核對，不再逐字鎖定；可信來源與本輪差異另記在 `_feedback/全書-手改對照.md` 及本輪紀錄。未 commit 的作者手改可用 `EXTRA_AUTHOR` 補入候選，但仍須核實來源。
 - 腳本若警告檔案被寫到 repo 根目錄的 `book-v2/`，代表該步走錯路徑（已被移到 log 的 `stray/`），要回頭確認產出位置。
-- 一章跑完由 Claude 整章讀過、核對後交作者校閱，作者同意才 commit；稽核碰到作者手改句不直接改，列進 `NN-audit.md` 的「留給作者決定」。
-- **作者校閱完成後不是只有 commit**：照 `docs/book-v2-workflow.md`「作者校閱完成後」**七步**做完。第 3 步（從本章手改迭代「使用者修稿偏好」）、第 4 步（重新產生 `_feedback/全書-作者手改句.md`）與第 5 步（更新 `docs/book-v2-handoff.md` 的字數與各章狀態）不會立刻產生可見產物，最常被跳過，收到核准時先把這三步排進去。
+- 一章跑完由 Claude 整章讀過、核對後交作者校閱，作者同意才 commit；稽核若須修改可確認的作者手改句，記錄原句、改後句與理由，不因來源而停手。
+- **作者校閱完成後不是只有 commit**：照 `docs/book-v2-workflow.md`「作者校閱完成後」**七步**做完。第 3 步（從本章手改迭代「使用者修稿偏好」）、第 4 步（核實作者手改與模型修稿的來源並更新紀錄）與第 5 步（更新 `docs/book-v2-handoff.md` 的字數與各章狀態）最常被跳過，收到核准時先把這三步排進去。
 
 ## Skills（`.agents/skills/`）
 

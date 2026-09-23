@@ -17,6 +17,7 @@
 - 同一份 skill 是聲音與 book-v2 直接修改流程的單一入口：流水線產出的整章與只手改幾句都要遵守它，並遵守 `docs/book-v2-workflow.md` 的「使用者修稿偏好」與「一致性清單」。
 - 討論 book-v2 人物時，以「男主角／女主角」代稱，不自行替人物取名字；正文仍依敘事視角使用原有人稱。
 - 直接修改 `book-reader/book-v2/*.md` 正文時，依該 skill 的 [正文直改分支](.agents/skills/rui-xuan-book-v2/references/book-v2-direct-edit.md) 執行；只改幾句、依回饋補寫、套用作者裁定或潤飾也會觸發。它要求同一輪實際開原檔並先交出附行號的逐字引文；**貼不出引文就是沒讀，沒讀不動筆。** 只讀不改不觸發，由 `codex exec` 執行的流水線步驟不重跑。
+- 作者自 2026-09-23 起取消「手改句一律不動」的限制。作者手改是重要的聲音與取捨證據，但可為整段閱讀體驗再修；改動時記錄可確認的原句、改後句、來源與理由，交作者人工校閱，不把未核准的修稿當定稿。
 - 更新 `book-reader/is-me/Rui-Xuan-生命素材.md` 時，沿用「主題（真實的事）／可接到的概念／落地句範例」三欄表格。
 - **主題**只抓核心經歷、觀察或比喻，保留辨識所需的細節，不貼全文或寫成長摘要。
 - **可接到的概念**需思考素材背後的機制、矛盾與適用條件，不能只摘關鍵字，也不推定未提供的心理動機。
@@ -49,7 +50,7 @@ TypeScript、TSX 與 Astro 採兩格縮排、雙引號及分號，並維持現�
 
 ## Commit 與 Pull Request
 
-歷史提交採簡短、祈使語氣的英文主旨，例如 `Support searching books by catalog number`。每個 commit 聚焦一項變更，避免混入產生檔或無關重排。`book-reader/book-v2/` 的章節正文、`_continuity.md` 與該章回饋檔，要等作者人工校閱並明確同意後才 commit；未經同意的章節即使已寫完也留在工作區。提交書稿時逐一指定檔案，不要用 `git add -A`，以免把尚未校閱的章節一起帶進去。套用作者親手修改的書稿句子時，commit 主旨必須含 `hand edit`（如 `Apply the author's hand edit and approve chapter 6`）——`docs/book-v2-pipeline.sh` 以 `git log --grep="hand edit"` 抽出這些句子並要求後續步驟原樣保留，訊息漏字會讓下一輪把它們改掉；但一個章節檔**第一次進版控**時不要寫 `hand edit`，新檔案的 diff 每一行都是新增行，會把整章凍成不可改動，改用 `EXTRA_AUTHOR` 保護指定句子。作者說「第 N 章看完了／改好了」之後不是只有 commit：照 `docs/book-v2-workflow.md`「作者校閱完成後」七步做完，其中第 3 步（從本章手改迭代修稿偏好）、第 4 步（重新產生 `_feedback/全書-作者手改句.md`）與第 5 步（更新 `docs/book-v2-handoff.md` 的字數與狀態）最常被跳過。PR 應說明目的、影響範圍與驗證方式，連結相關 issue 或 OpenSpec change；若改動視覺或響應式行為，附上前後截圖。合併前確認 GitHub Pages 建置成功。
+歷史提交採簡短、祈使語氣的英文主旨，例如 `Support searching books by catalog number`。每個 commit 聚焦一項變更，避免混入產生檔或無關重排。`book-reader/book-v2/` 的章節正文、`_continuity.md` 與該章回饋檔，要等作者人工校閱並明確同意後才 commit；未經同意的章節即使已寫完也留在工作區。提交書稿時逐一指定檔案，不要用 `git add -A`，以免把尚未校閱的章節一起帶進去。若 commit 含作者親手修改的書稿句子，主旨含 `hand edit`（如 `Apply the author's hand edit and approve chapter 6`），但 `git log --grep="hand edit"` 抽出的新增行只是來源候選，不是禁改名單，也不保證整個 diff 都由作者親筆寫成；以 `_feedback/全書-手改對照.md` 與本輪手改紀錄核實。章節檔第一次進版控時不要寫 `hand edit`，避免把整章誤標成作者親筆。作者說「第 N 章看完了／改好了」之後不是只有 commit：照 `docs/book-v2-workflow.md`「作者校閱完成後」七步做完，其中第 3 步（從本章手改迭代修稿偏好）、第 4 步（核對手改來源並更新紀錄）與第 5 步（更新 `docs/book-v2-handoff.md` 的字數與狀態）最常被跳過。PR 應說明目的、影響範圍與驗證方式，連結相關 issue 或 OpenSpec change；若改動視覺或響應式行為，附上前後截圖。合併前確認 GitHub Pages 建置成功。
 
 ## 設定與資產注意事項
 

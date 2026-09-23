@@ -67,7 +67,8 @@ LENGTH="篇幅：全書目標 10–12 萬字，本章目標 ${TARGET} 字。${CO
 - 摘要只用在真正需要跳過的時間；每次跳接後，盡快落回一個具體的時刻
 - 現在的我只短暫出現，不以說理灌字數"
 
-COMMON="新書《把自己的部分做完》是經使用者授權的改編敘事書稿。章節腳本已分檔：總則 ${GENERAL}（寫作總則、全書進程、篇幅），本章章卡 ${CARDFILE}；除非本步驟另外指定，不要讀 docs/chapter.md 或其他章卡。跨章已定的事實與資訊邊界記在 ${CONT}；本章場景表在 ${SCENES}；作者手改句清單在 ${AUTHOR}（清單內的句子原樣保留）。docs/book-v2-workflow.md 的「使用者修稿偏好」與「一致性清單」必須遵守。所有書稿與回饋檔都在 book-reader/book-v2/ 底下，寫檔時使用完整路徑；repo 根目錄沒有 book-v2/，不要在那裡建立檔案。不要修改 docs/、book-reader/book/、book-reader/is-me/ 以及其他章節檔。"
+COMMON="新書《把自己的部分做完》是經使用者授權的改編敘事書稿。章節腳本已分檔：總則 ${GENERAL}（寫作總則、全書進程、篇幅），本章章卡 ${CARDFILE}；除非本步驟另外指定，不要讀 docs/chapter.md 或其他章卡。跨章已定的事實與資訊邊界記在 ${CONT}；本章場景表在 ${SCENES}；作者手改句清單在 ${AUTHOR}（清單內的句子原樣保留）。docs/book-v2-workflow.md 的「使用者修稿偏好」與「一致性清單」必須遵守。所有書稿與回饋檔都在 book-reader/book-v2/ 底下，寫檔時使用完整路徑；repo 根目錄沒有 book-v2/，不要在那裡建立檔案。不要修改 docs/、book-reader/book/、book-reader/is-me/ 以及其他章節檔。
+【book-reader/is-me/ 的取用界線】Rui-Xuan.md 只讀開頭的十二面向人物分析（約第 13 至 88 行），那是跨所有紀錄對主角這個人的歸納，是本書人物的標準。第 89 行之後的 Round 1 到 71 嚴禁讀取與引用：它們逐段分析多個對話檔，其中「快樂的小寶貝」是作者的另外一段關係，不是本書寫的那一段，取用等於把別人的互動貼到女主角身上。Rui-Xuan-生命素材.md、story-base.txt 與 docs/my-story/ 可依各步驟指示取用。"
 REVIEWNOTE="本章的場景結構已由作者親自調整，正文現況優先於場景表 ${SCENES} 與舊回饋；不要恢復作者已刪除的場景或事件，也不要新增事件或把一兩句帶過的事展開成新場景（作者刻意只用一句帶過）。修改限於現有場景內的句子、銜接與事實；字數不足不是展開的理由。"
 # review 模式：編輯與潤飾都讀 LENGTH，把限制放進去，免得編輯照一般流程建議「摘要展開成場景」
 if [[ "$MODE" == "review" ]]; then
@@ -126,7 +127,7 @@ run expand "使用 \$rui-xuan-book-v2（.agents/skills/rui-xuan-book-v2/SKILL.md
 ${COMMON}
 ${LENGTH}
 ${CONSISTENCY}
-動筆前讀：${GENERAL}、${CARDFILE}、${CONT}、${AUTHOR}、相鄰章節（${NEIGHBORS}；擴寫不能與它們衝突），需要素材時再查 book-reader/is-me/story-base.txt、docs/my-story/ 中相關章稿。
+動筆前讀：${GENERAL}、${CARDFILE}、${CONT}、${AUTHOR}、相鄰章節（${NEIGHBORS}；擴寫不能與它們衝突），需要素材時再查 book-reader/is-me/story-base.txt、docs/my-story/ 中相關章稿、book-reader/is-me/Rui-Xuan.md 的十二面向人物分析（只讀第 13 至 88 行，界線見上）。展開的場景要讓人物在該章的安全程度下該有的檔位出現，不要只展開事件。
 要求：
 - 作者手改句清單 ${AUTHOR} 內的句子保留原樣，擴寫圍繞它們展開，不改回、不換句
 - 保留現稿所有事件、先後、已成立的事實與有效對白；不改變章卡事件與停點，也不新增會改變後續章節事實的情節
@@ -140,7 +141,8 @@ run write "使用 \$rui-xuan-book-v2（.agents/skills/rui-xuan-book-v2/SKILL.md�
 ${COMMON}
 ${LENGTH}
 ${CONSISTENCY}
-動筆前讀：${GENERAL}、${CARDFILE}、${CONT}、前一章 ${PREV}（需要時再往前查一章），以及素材 book-reader/is-me/story-base.txt、docs/my-story/ 中相關章稿、book-reader/is-me/Rui-Xuan-生命素材.md 的相關條目。
+動筆前讀：${GENERAL}、${CARDFILE}、${CONT}、前一章 ${PREV}（需要時再往前查一章），以及素材 book-reader/is-me/story-base.txt、docs/my-story/ 中相關章稿、book-reader/is-me/Rui-Xuan-生命素材.md 的相關條目，以及 book-reader/is-me/Rui-Xuan.md 的十二面向人物分析（只讀第 13 至 88 行，界線見上）。
+人物檔位：他不是只有一種樣子。安全時可愛、直接、黏人、會撒嬌、會照顧人；壓力大或被冒犯時尖銳、嘲諷、快速切割；面對荒謬、低效、失望或尷尬時會用幽默自保。關係越安全，他的需求量越會上升。本章屬於哪一種安全程度，就讓對應的檔位出現，不要讓他從頭到尾只會分析、等待與照顧。
 要求：
 - 先寫場景表 ${SCENES}：列出本章 3–5 個要完整展開的場景，每場記地點與場地配備、時間與天氣、在場人物、關鍵物件與其歸屬、兩人各自此時知道與不知道的事。正文照場景表寫
 - 依章卡的核心困境、場次、回看落點、停點與交接寫。回看欄是故事中短暫回看的暫定落點，不是配額

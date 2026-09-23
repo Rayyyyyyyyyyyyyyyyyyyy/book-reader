@@ -4,6 +4,19 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **與 `AGENTS.md` 的分工**：`AGENTS.md` 是 Claude 與 Codex 共用的規則層——目錄用途、npm 指令、程式風格與命名、測試與驗證、commit／PR 規範、寫作與生命素材規則，都以它為準，**先讀它**。本檔只補規則之外的架構與機制，不重複。
 
+## 動 book-v2 正文之前（強制門檻）
+
+要修改 `book-reader/book-v2/*.md` 的正文——**不論是整章還是只改幾句**——先照 `docs/book-v2-動筆前規範.md` 執行，並在對話裡輸出**引文清單**：
+
+1. 該章章卡 `docs/chapter/NN-*.md`
+2. 該章 `_feedback/NN-audit.md` 的「作者手改保護」與 `NN-editor.md` 末尾的校閱紀錄
+3. `docs/book-v2-workflow.md` 的修稿偏好裡，直接管到這次改動的條目
+4. `_feedback/全書-人物弧線.md` 的分層與「不能提早出現」
+
+**逐字照抄，附行號，在同一輪對話內實際開檔**；不得引用 session 稍早的摘要或印象。**貼不出引文就是沒讀，沒讀不動筆。**
+
+只讀不改不觸發這道門檻。規範的設計理由、三種失效機制與分層細節見該檔。
+
 ## 這個 repo 是兩個產品
 
 1. **`site/`**：Astro 5 靜態網站「百冊 · One Hundred」，部署到 GitHub Pages。

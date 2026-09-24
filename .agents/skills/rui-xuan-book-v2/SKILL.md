@@ -31,6 +31,8 @@ Rui-Xuan 決定聲音；敘事推進決定文章怎麼思考。推進可以來�
 | 改編敘事書稿 | [source-grounding.md](references/source-grounding.md)、[common-voice.md](references/common-voice.md)、[structure-and-revision.md](references/structure-and-revision.md)、[adapted-narrative.md](references/adapted-narrative.md) |
 | 只提供回饋、不動筆 | 讀對應文體 reference 與使用者指定材料；不自行改稿 |
 
+處理 book-v2 作者人工潤稿、整章「看完／改完」後的評讀，或「這章 OK」後的定稿時，另讀 [book-v2-direct-edit.md](references/book-v2-direct-edit.md) 的「交件與作者人工潤稿」及 `docs/book-v2-workflow.md` 的「作者人工潤稿與定稿確認」。前兩階段不等於定稿核准；只讀評讀不觸發下方正文直改引文門檻。
+
 ### 直接修改 book-v2 正文
 
 直接修改 `book-reader/book-v2/*.md` 正文時——包含只改幾句、依清單或回饋補寫、套用作者裁定、潤飾既有章節——除了「改編敘事書稿」的必讀檔，再完整讀取並執行 [book-v2-direct-edit.md](references/book-v2-direct-edit.md)。

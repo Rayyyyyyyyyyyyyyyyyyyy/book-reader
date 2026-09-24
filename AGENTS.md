@@ -50,7 +50,9 @@ TypeScript、TSX 與 Astro 採兩格縮排、雙引號及分號，並維持現�
 
 ## Commit 與 Pull Request
 
-歷史提交採簡短、祈使語氣的英文主旨，例如 `Support searching books by catalog number`。每個 commit 聚焦一項變更，避免混入產生檔或無關重排。`book-reader/book-v2/` 的章節正文、`_continuity.md` 與該章回饋檔，要等作者人工校閱並明確同意後才 commit；未經同意的章節即使已寫完也留在工作區。提交書稿時逐一指定檔案，不要用 `git add -A`，以免把尚未校閱的章節一起帶進去。若 commit 含作者親手修改的書稿句子，主旨含 `hand edit`（如 `Apply the author's hand edit and approve chapter 6`），但 `git log --grep="hand edit"` 抽出的新增行只是來源候選，不是禁改名單，也不保證整個 diff 都由作者親筆寫成；以 `_feedback/全書-手改對照.md` 與本輪手改紀錄核實。章節檔第一次進版控時不要寫 `hand edit`，避免把整章誤標成作者親筆。作者說「第 N 章看完了／改好了」之後不是只有 commit：照 `docs/book-v2-workflow.md`「作者校閱完成後」七步做完，其中第 3 步（從本章手改迭代修稿偏好）、第 4 步（核對手改來源並更新紀錄）與第 5 步（更新 `docs/book-v2-handoff.md` 的字數與狀態）最常被跳過。PR 應說明目的、影響範圍與驗證方式，連結相關 issue 或 OpenSpec change；若改動視覺或響應式行為，附上前後截圖。合併前確認 GitHub Pages 建置成功。
+歷史提交採簡短、祈使語氣的英文主旨，例如 `Support searching books by catalog number`。每個 commit 聚焦一項變更，避免混入產生檔或無關重排。`book-reader/book-v2/` 的章節正文、`_continuity.md` 與該章回饋檔，要等作者明確確認整章 OK 後才 commit；未經同意的章節即使已寫完也留在工作區。作者人工潤稿時，先理解手改用意並依上下文協助修稿；說「第 N 章看完了／改完了／改好了」只啟動整章與 diff 評讀，客觀列出好、不好與更佳建議，不等於定稿或提交。只有作者明確說「這章 OK／可以定稿／同意提交」，才照 `docs/book-v2-workflow.md`「作者確認這章 OK 後的七步」迭代正式紀錄並提交，其中第 3 步（修稿偏好）、第 4 步（手改來源）與第 5 步（交接字數與狀態）最常被跳過。
+
+提交書稿時逐一指定檔案，不要用 `git add -A`，以免把尚未校閱的章節一起帶進去。若 commit 含作者親手修改的書稿句子，主旨含 `hand edit`（如 `Apply the author's hand edit and approve chapter 6`），但 `git log --grep="hand edit"` 抽出的新增行只是來源候選，不是禁改名單，也不保證整個 diff 都由作者親筆寫成；以 `_feedback/全書-手改對照.md` 與本輪手改紀錄核實。章節檔第一次進版控時不要寫 `hand edit`，避免把整章誤標成作者親筆。PR 應說明目的、影響範圍與驗證方式，連結相關 issue 或 OpenSpec change；若改動視覺或響應式行為，附上前後截圖。合併前確認 GitHub Pages 建置成功。
 
 ## 設定與資產注意事項
 

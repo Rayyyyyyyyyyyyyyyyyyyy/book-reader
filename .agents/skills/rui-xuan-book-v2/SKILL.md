@@ -1,6 +1,6 @@
 ---
 name: rui-xuan-book-v2
-description: 以 Rui-Xuan V2 規則撰寫或改寫繁體中文讀書心得、反思隨筆與改編敘事書稿，診斷 book-v2 的人物或跨章問題，依註解修稿，或整理生命素材；直接修改 book-v2 正文時也負責同輪取材與逐字引文門檻
+description: 以 Rui-Xuan V2 規則撰寫或改寫繁體中文讀書心得、反思隨筆與改編敘事書稿，診斷 book-v2 的人物或跨章問題，依註解修稿，或整理生命素材；直接修改 book-v2 正文時按問題範圍取材並核對原稿
 ---
 
 # Rui-Xuan 正式寫作 V2
@@ -31,15 +31,17 @@ Rui-Xuan 決定聲音；敘事推進決定文章怎麼思考。推進可以來�
 | 改編敘事書稿 | [source-grounding.md](references/source-grounding.md)、[common-voice.md](references/common-voice.md)、[structure-and-revision.md](references/structure-and-revision.md)、[adapted-narrative.md](references/adapted-narrative.md) |
 | 只提供回饋、不動筆 | 讀對應文體 reference 與使用者指定材料；不自行改稿 |
 
-處理 book-v2 作者人工潤稿、整章「看完／改完」後的評讀，或「這章 OK」後的定稿時，另讀 [book-v2-direct-edit.md](references/book-v2-direct-edit.md) 的「交件與作者人工潤稿」及 `docs/book-v2-workflow.md` 的「作者人工潤稿與定稿確認」。前兩階段不等於定稿核准；只讀評讀不觸發下方正文直改引文門檻。
+處理 book-v2 作者人工潤稿、整章「看完／改完」後的評讀，或「這章 OK」後的定稿時，另讀 [book-v2-direct-edit.md](references/book-v2-direct-edit.md) 的「交件與作者人工潤稿」及 `docs/book-v2-workflow.md` 的「作者人工潤稿與定稿確認」。前兩階段不等於定稿核准；只讀評讀不觸發下方正文直改流程。
 
 ### 直接修改 book-v2 正文
 
-直接修改 `book-reader/book-v2/*.md` 正文時——包含只改幾句、依清單或回饋補寫、套用作者裁定、潤飾既有章節——除了「改編敘事書稿」的必讀檔，再完整讀取並執行 [book-v2-direct-edit.md](references/book-v2-direct-edit.md)。
+直接修改 `book-reader/book-v2/*.md` 正文時——包含只改幾句、依清單或回饋補寫、套用作者裁定、潤飾既有章節——讀取並執行 [book-v2-direct-edit.md](references/book-v2-direct-edit.md)。表中的「改編敘事書稿」必讀組合用於新稿或大幅重寫；既有正文的局部修訂按問題讀相關 reference，不自動載入全部。
 
-這是同一個 skill 的正文直改分支，不是另一套聲音規則。只讀、診斷、統計或回報不觸發；由 `docs/book-v2-pipeline.sh` 啟動的步驟不重跑引文門檻，因為必讀材料已由 prompt 送入。
+這是同一個 skill 的正文直改分支，不是另一套聲音規則。只讀、診斷、統計或回報不觸發；由 `docs/book-v2-pipeline.sh` 啟動的步驟按其 prompt 取材，不重跑同一套準備工作。
 
 作者自 2026-09-23 起取消「手改句一律不動」的硬限制。手改是判讀聲音與取捨的高價值證據，不是逐字禁改名單；必要時可修，須保留原句／改後句／理由供作者校閱。章卡與舊回饋同樣是判斷材料，不自動凌駕作者本輪裁定。
+
+作者請求協助修稿，是因為現有改動尚未解決問題。先找出整段閱讀體驗卡在哪裡，再選擇必要的修法；不要把流程、條文或舊回饋用成拒絕動筆的理由。原稿與相關事實仍須核對，取材深度隨修改範圍與風險調整。
 
 ## 文體判斷
 

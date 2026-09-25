@@ -13,7 +13,7 @@
 
 書稿有兩份，不互相覆蓋：
 
-- `book-reader/book/`：v1 完稿，保留作為既有版本。
+- v1 完稿與修訂規劃已移至獨立的 `book-v1` repo；本 repo 不再保存 v1 正文。
 - `book-reader/book-v2/`：目前持續修訂、也是網站 `/manuscript` 閱讀器實際取用的版本。`site/scripts/manuscript-reader.mjs` 的來源目錄指向這裡。
 
 book-v2 一章一檔，另有 `_continuity.md`（跨章事實與資訊邊界）及 `_feedback/`（場景表、讀者、編輯、潤飾與稽核證據）。

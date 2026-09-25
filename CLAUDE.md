@@ -28,11 +28,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **「有心得」是算出來的**：Markdown body 非空 → `hasNote`，否則前台顯示「整理中」。邏輯集中在 `src/lib/books.ts` 的 `entryToMeta()`，頁面（`index.astro`、`pages/book/[...slug].astro`）與 React island `BookGrid.tsx` 都吃它產出的 `BookMeta`。
 - **slug 就是檔名**：`entry.id` 直接當路由用，沒有另一層 slug 映射；封面依 `rank` 配對。
 - **書稿閱讀器是獨立頁**：不在網站導覽裡，也不走 Astro content collection，網址是 `/manuscript`。2026-09-22 起發布的是 **book-v2**（`book-reader/book-v2/`，序章至後記十五篇，只吃 `NN-*.md`，`_continuity.md` 與 `_feedback/` 自動略過）。**註解功能暫時關閉**：開關是模板裡的 `NOTES_ENABLED`，設回 `true` 即恢復，既有註解仍留在讀者的 localStorage。
-- **部署觸發有 path filter**：`.github/workflows/deploy.yml` 只在 `site/**`、`book-png/**`、`book-reader/book-v2/**`、workflow 本身變動時跑。改 `book-reader/book/`（v1）或 `docs/` 不會觸發部署。
+- **部署觸發有 path filter**：`.github/workflows/deploy.yml` 只在 `site/**`、`book-png/**`、`book-reader/book-v2/**`、workflow 本身變動時跑。改 `docs/` 不會觸發部署；v1 已在獨立 repo。
 
 ## book-v2 寫作流水線
 
-流程與理由見 `docs/book-v2-workflow.md`；章節腳本分檔在 `docs/chapter/`（`00-總則.md`、各章 `NN-章名.md`、`觀念核對.md`、`參考.md`），跨章事實與資訊邊界在 `book-reader/book-v2/_continuity.md`，每章回饋在 `_feedback/NN-{scenes,reader,editor,audit}.md`；臨時諮詢（例如把改寫提案送讀者與編輯判斷）另存成 `_feedback/NN-<議題>-{reader,editor}.md`。
+book-v1 的書稿與章卡已移至獨立 repo；`docs/chapter.md` 是 v2 的舊路徑相容索引，不作為章卡來源。
+
+流程與理由見 `docs/book-v2-workflow.md`；章節腳本分檔在 `docs/chapter-v2/`（`00-總則.md`、各章 `NN-章名.md`、`觀念核對.md`、`參考.md`），跨章事實與資訊邊界在 `book-reader/book-v2/_continuity.md`，每章回饋在 `_feedback/NN-{scenes,reader,editor,audit}.md`；臨時諮詢（例如把改寫提案送讀者與編輯判斷）另存成 `_feedback/NN-<議題>-{reader,editor}.md`。
 
 ```bash
 docs/book-v2-pipeline.sh full   07 "住在一起以後" "第七章｜住在一起以後" "<目標字數>"
@@ -41,7 +43,7 @@ docs/book-v2-pipeline.sh review 07 "住在一起以後" "第七章｜住在一�
 docs/book-v2-pipeline.sh audit  06 "這一次，我們真的在一起了" "第六章｜這一次，我們真的在一起了"
 ```
 
-目標字數以該章章卡（`docs/chapter/NN-*.md`）與 `00-總則.md` 的篇幅表為準，不沿用範例數字。
+目標字數以該章章卡（`docs/chapter-v2/NN-*.md`）與 `00-總則.md` 的篇幅表為準，不沿用範例數字。
 
 - 五步：寫作 → 讀者 → 編輯 → 潤飾 → 稽核。每一步都是**全新的 `codex exec` session**（`gpt-5.6-sol`，reasoning effort high），刻意不共用上下文；每步限時 30 分鐘（`STEP_TIMEOUT`）。
 - `review` 模式用於作者已親手調整結構之後：正文現況優先於場景表與舊回饋，不得復原被刪場景，也不得把一句帶過的事展開成新場景。
@@ -59,7 +61,7 @@ skill 放在 `.agents/skills/<name>/SKILL.md`，不是 `.claude/skills/`，因�
 | Skill | 用在哪 |
 |---|---|
 | `rui-xuan-book-v2` | 寫作聲音與 book-v2 直接修改流程的單一真實來源，含讀書心得／反思隨筆／改編敘事書稿三個分流；正文直改的同輪取材、逐字引文門檻、衝突停手與作者校閱後七步收在它的 `references/book-v2-direct-edit.md`。流水線的寫作、擴寫、潤飾三步都指定它 |
-| `ai-reader` | 流水線第 2 步，以「第一次讀到這章的讀者」回應。**刻意不讀 `docs/chapter/` 與場景表**，避免用作者意圖替原稿補完 |
+| `ai-reader` | 流水線第 2 步，以「第一次讀到這章的讀者」回應。**刻意不讀 `docs/chapter-v2/` 與場景表**，避免用作者意圖替原稿補完 |
 | `ai-editor` | 流水線第 3 步，判讀讀者回饋並分級、建立章級人物基準、列修訂清單。只在明確要求時動筆 |
 | `openspec-{propose,apply-change,archive-change,explore}` | openspec 官方 skill，需要 `openspec` CLI |
 | `source-command-opsx-*` | 上列 openspec skill 遷移成 slash command 的包裝，對應 `/opsx-propose`、`/opsx-apply`、`/opsx-archive`、`/opsx-explore` |

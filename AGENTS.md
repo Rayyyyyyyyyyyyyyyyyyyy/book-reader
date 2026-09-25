@@ -6,9 +6,9 @@
 
 - `site/` 是正式網站：Astro 頁面位於 `src/pages/`，React 互動元件位於 `src/components/`，共用邏輯放在 `src/lib/`，全域樣式放在 `src/styles/`。
 - `site/src/content/books/` 是網站書籍資料與已發布讀書心得的單一真實來源；每本書使用一個 Markdown 檔，frontmatter 存放書目資料，正文存放心得。
-- `book-png/` 保存原始封面；`site/scripts/covers.mjs` 依三位數排名產生網站封面。`book-reader/` 保存草稿與寫作材料，`docs/` 保存規格、章節腳本與流程腳本。
+- `book-png/` 保存原始封面；`site/scripts/covers.mjs` 依三位數排名產生網站封面。`book-reader/` 保存草稿與寫作材料，`docs/` 保存規格、v2 章節腳本與流程腳本。v1 書稿與章卡已移至獨立的 `book-v1` repo；本 repo 的 v2 章卡在 `docs/chapter-v2/`，`docs/chapter.md` 僅是舊路徑索引。
 - `book-reader/讀書心得/` 保存心得稿，檔名即書名；`book-reader/is-me/` 保存私人生命素材與寫作參考，不直接發布到網站。
-- 書稿有兩份：`book-reader/book/` 是保留的 v1 完稿；`book-reader/book-v2/` 是持續修訂、也是網站書稿閱讀器目前實際發布的正文，一章一檔，另有 `_continuity.md` 與 `_feedback/`。兩份不互相覆蓋，改動前先確認在哪一份。
+- 書稿分屬兩個 repo：v1 完稿與修訂規劃在獨立的 `book-v1` repo；此處的 `book-reader/book-v2/` 是持續修訂、也是網站書稿閱讀器目前實際發布的正文，一章一檔，另有 `_continuity.md` 與 `_feedback/`。不要把兩份稿件互相覆蓋。
 - `openspec/` 保存功能規格、設計與變更紀錄；較大的功能調整應同步更新相關 change。
 
 ## 寫作與生命素材

@@ -1,6 +1,6 @@
 # docs 索引
 
-這裡只放 book-v2 的現行入口、章節腳本，以及可追溯的研究與決策。Repo 架構與建置機制見 `../CLAUDE.md`，共用規則見 `../AGENTS.md`。
+這裡保存 book-v2 的章節資料、現行流程、研究與決策。book-v1 書稿與章卡已移至獨立 repo。Repo 架構與建置機制見 `../CLAUDE.md`，共用規則見 `../AGENTS.md`。
 
 ## 現行入口
 
@@ -16,7 +16,7 @@
 
 ## 章節腳本
 
-`chapter/` 才是現行章節腳本：`00-總則.md`、各章 `NN-章名.md`、`觀念核對.md` 與 `參考.md`。正文層的跨章事實與資訊邊界在 `../book-reader/book-v2/_continuity.md`。
+book-v2 的現行章節腳本在 [chapter-v2/](chapter-v2/00-總則.md)：`00-總則.md`、各章 `NN-章名.md`、`觀念核對.md` 與 `參考.md`。正文層的跨章事實與資訊邊界在 `../book-reader/book-v2/_continuity.md`。
 
 [chapter.md](chapter.md) 只為舊連結保留相容索引，不承載設定或要求；流水線不讀它。
 
@@ -27,6 +27,7 @@
 | `my-story/` | 作者原始敘述，改編素材來源 |
 | [research/日劇金句脈絡-冬のなんかさ春のなんかね.md](research/日劇金句脈絡-冬のなんかさ春のなんかね.md) | 金句、命名與代價測試的研究來源；不是現行規格 |
 | [research/橘子-角色對話研究.md](research/橘子-角色對話研究.md) | 可驗證訪談的對白研究；不是仿寫指南 |
+| [research/曖昧甜寵-寫作技法研究.md](research/曖昧甜寵-寫作技法研究.md) | 第五章曖昧與親密場景的修稿參考；不是現行寫作規格 |
 | [decisions/book-v2-動筆前規範.md](decisions/book-v2-動筆前規範.md) | 正文直改門檻的失敗分析與設計理由 |
 
 ## 分析與回饋
@@ -38,4 +39,4 @@
 - `handoff` 只保留此刻仍成立的狀態；舊進度、舊字數與已結束工作交給 Git history，不往下堆日誌。
 - `workflow` 與 skill references 保存仍要執行的規則；規則改變時直接更新，不在研究檔複製第二份。
 - `research/` 保存材料、查證與推導；`decisions/` 保存一項機制為何存在。兩者都要在檔首標明不是現行操作規格。
-- 章節事實只在章卡與 `_continuity.md` 維護；`chapter.md`、handoff 與研究檔不再複製一份。
+- book-v2 的章節事實只在 `chapter-v2/` 章卡與 `_continuity.md` 維護；`chapter.md`、handoff 與研究檔不再複製一份。

@@ -1,6 +1,8 @@
 # 撰寫《把自己的部分做完》全書初稿
 
-> 2026-09-18：本 change 已進入經授權的單一故事改編，保留初版觀念與 hook，現行內容標準以 `docs/chapter.md` 為準。下方 Why 保留初稿規劃背景；原字數配額、逐章五件事與核心句要求已取消。新任務與既有完成紀錄分開追蹤。
+> 2026-09-25 路徑更新：現行 book-v2 章節腳本在 `docs/chapter-v2/`；`docs/chapter.md` 保留為舊路徑索引。下方初稿架構及當時的目錄名稱屬歷史規劃。
+>
+> 2026-09-18：本 change 已進入經授權的單一故事改編，保留初版觀念與 hook。下方 Why 保留初稿規劃背景；原字數配額、逐章五件事與核心句要求已取消。新任務與既有完成紀錄分開追蹤。
 
 ## Why
 
@@ -10,13 +12,13 @@
 
 - 依 `docs/chapter.md` 的架構，按章節順序產出全書初稿：序章 → 第一部（1–3 章）→ 第二部（4–6 章）→ 第三部（7–9 章）→ 第四部（10–12 章）→ 結語 → 各部引言／練習／小結
 - 初稿檔案落在 `book-reader/book/` 目錄（新目錄，與讀書心得的最上層 `.md` 分開）
-- 本 change 刻意薄：**單一事實來源是 `docs/chapter.md`**，本 change 的 artifacts 不複製其內容，只指向它。書的架構若調整，改 `docs/chapter.md`，不改這裡
+- 本 change 刻意薄：**現行內容來源是 `docs/chapter-v2/`**，本 change 的 artifacts 不複製其內容，只指向它。書的架構若調整，改現行章卡，不改這裡
 
 ## Capabilities
 
 ### New Capabilities
 
-- `book-manuscript`: 全書稿件的驗收標準，以 `docs/chapter.md` 的現行故事進程、改編連續性、觀念承接、hook、篇幅、引用與原始現場檔規則驗收，聲音符合 `$rui-xuan-book-v2` skill
+- `book-manuscript`: 全書稿件的驗收標準，以 `docs/chapter-v2/` 的現行故事進程、改編連續性、觀念承接、hook、篇幅、引用與原始現場檔規則驗收，聲音符合 `$rui-xuan-book-v2` skill
 
 ### Modified Capabilities
 
@@ -26,4 +28,4 @@
 
 - 新增 `book-reader/book/` 目錄與各章 `.md` 初稿
 - 不動網站、不動讀書心得；本輪另依使用者授權迭代 skill，與正文完成紀錄分開追蹤
-- 寫作依據：`docs/chapter.md`；寫作聲音：`.agents/skills/rui-xuan-book-v2/SKILL.md`
+- 現行寫作依據：`docs/chapter-v2/`；寫作聲音：`.agents/skills/rui-xuan-book-v2/SKILL.md`

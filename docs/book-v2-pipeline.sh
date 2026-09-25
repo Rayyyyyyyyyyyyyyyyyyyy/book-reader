@@ -15,12 +15,12 @@ OUT="book-reader/book-v2/${NN}-${TITLE}.md"
 FB="book-reader/book-v2/_feedback"
 CONT="book-reader/book-v2/_continuity.md"
 SCENES="${FB}/${NN}-scenes.md"
-GENERAL="docs/chapter/00-總則.md"
-CONCEPTS="docs/chapter/觀念核對.md"
+GENERAL="docs/chapter-v2/00-總則.md"
+CONCEPTS="docs/chapter-v2/觀念核對.md"
 PROFILE="book-reader/is-me/Rui-Xuan.md"
 PERSONA_ARC="${FB}/全書-人物弧線.md"
 HAND_EXAMPLES="${FB}/全書-手改對照.md"
-CARDFILE=$(cd "$REPO" && ls docs/chapter/${NN}-*.md 2>/dev/null | grep -v 總則 | head -1)
+CARDFILE=$(cd "$REPO" && ls docs/chapter-v2/${NN}-*.md 2>/dev/null | grep -v 總則 | head -1)
 nb() { local n=$((10#$NN + $1)); (( n < 0 )) && return; (cd "$REPO" && ls book-reader/book-v2/$(printf %02d $n)-*.md 2>/dev/null | head -1); }
 PREV=$(nb -1); PREV2=$(nb -2); NEXT=$(nb 1)
 NEIGHBORS="${PREV:+前一章 ${PREV}}${NEXT:+、後一章 ${NEXT}}"
@@ -70,7 +70,7 @@ LENGTH="篇幅：全書目標 10–12 萬字，本章目標 ${TARGET} 字。${CO
 - 摘要只用在真正需要跳過的時間；每次跳接後，盡快落回一個具體的時刻
 - 現在的我只短暫出現，不以說理灌字數"
 
-COMMON="新書《把自己的部分做完》是經使用者授權的改編敘事書稿。章節腳本已分檔：總則 ${GENERAL}（寫作總則、全書進程、篇幅），本章章卡 ${CARDFILE}；除非本步驟另外指定，不要讀 docs/chapter.md 或其他章卡。跨章已定的事實與資訊邊界記在 ${CONT}；本章場景表在 ${SCENES}；手改來源候選在 ${AUTHOR}（不是禁改名單，須核實歸屬）。作者 2026-09-23 起允許修改真正手改句；若動到，記錄原句、改後句、來源與理由供校閱。docs/book-v2-workflow.md 的「使用者修稿偏好」與「一致性清單」是判斷材料，閱讀體驗與作者本輪裁定優先。所有書稿與回饋檔都在 book-reader/book-v2/ 底下，寫檔時使用完整路徑；repo 根目錄沒有 book-v2/，不要在那裡建立檔案。不要修改 docs/、book-reader/book/、book-reader/is-me/ 以及其他章節檔。
+COMMON="新書《把自己的部分做完》是經使用者授權的改編敘事書稿。章節腳本已分檔：總則 ${GENERAL}（寫作總則、全書進程、篇幅），本章章卡 ${CARDFILE}；除非本步驟另外指定，不要讀 docs/chapter.md 或其他章卡。跨章已定的事實與資訊邊界記在 ${CONT}；本章場景表在 ${SCENES}；手改來源候選在 ${AUTHOR}（不是禁改名單，須核實歸屬）。作者 2026-09-23 起允許修改真正手改句；若動到，記錄原句、改後句、來源與理由供校閱。docs/book-v2-workflow.md 的「使用者修稿偏好」與「一致性清單」是判斷材料，閱讀體驗與作者本輪裁定優先。所有書稿與回饋檔都在 book-reader/book-v2/ 底下，寫檔時使用完整路徑；repo 根目錄沒有 book-v2/，不要在那裡建立檔案。不要修改 docs/、book-reader/is-me/ 以及其他章節檔。
 【book-reader/is-me/ 的取用界線】Rui-Xuan.md 只讀開頭的十二面向人物分析（約第 13 至 88 行），那是跨所有紀錄對主角這個人的歸納，是本書人物的標準。第 89 行之後的 Round 1 到 71 嚴禁讀取與引用：它們逐段分析多個對話檔，其中「快樂的小寶貝」是作者的另外一段關係，不是本書寫的那一段，取用等於把別人的互動貼到女主角身上。Rui-Xuan-生命素材.md、story-base.txt 與 docs/my-story/ 可依各步驟指示取用。"
 REVIEWNOTE="本章的場景結構已由作者親自調整，正文現況優先於場景表 ${SCENES} 與舊回饋；不要恢復作者已刪除的場景或事件，也不要新增事件或把一兩句帶過的事展開成新場景（作者刻意只用一句帶過）。修改限於現有場景內的句子、銜接與事實；字數不足不是展開的理由。"
 # review 模式：編輯與潤飾都讀 LENGTH，把限制放進去，免得編輯照一般流程建議「摘要展開成場景」
@@ -156,7 +156,7 @@ ${CONSISTENCY}
 完成後簡短回報：字數、主要場景、新增的連續性設定、刻意未處理的問題。"
 fi
 
-run reader "使用 \$ai-reader（.agents/skills/ai-reader/SKILL.md）的判斷力，以一般讀者的身份讀 ${OUT}（新書正文，改編敘事）。必要時參考前一章 ${PREV} 了解脈絡，但以「第一次讀到這章的讀者」回應，不要讀 docs/chapter/ 與場景表，避免用作者意圖替原稿補完。
+run reader "使用 \$ai-reader（.agents/skills/ai-reader/SKILL.md）的判斷力，以一般讀者的身份讀 ${OUT}（新書正文，改編敘事）。必要時參考前一章 ${PREV} 了解脈絡，但以「第一次讀到這章的讀者」回應，不要讀 docs/chapter-v2/ 與場景表，避免用作者意圖替原稿補完。
 回饋寫到 ${FB}/${NN}-reader.md，只寫這個檔，不改正文。內容包含：
 - 逐段閱讀反應：哪裡被吸住、哪裡卡住、出戲、看不懂、覺得重複或說教；引用原句定位
 - 畫面感：哪些段落看得見、聽得見、身在現場；哪些段落像被告知的摘要，讓你想「停下來看這一幕」卻被帶過

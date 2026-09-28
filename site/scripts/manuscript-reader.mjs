@@ -64,7 +64,7 @@ async function buildReader() {
     });
   }
 
-  const required = ["00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14"];
+  const required = ["00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15"];
   const missing = required.filter((prefix) => !source.has(prefix));
   if (missing.length > 0) throw new Error(`缺少稿件：${missing.join(", ")}`);
 

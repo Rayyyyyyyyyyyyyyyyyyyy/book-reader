@@ -4,6 +4,8 @@
 
 > 2026-09-18 建立。記錄《把自己的部分做完》新版正文的逐章產出流程、分工與檢查。故事與章節功能依 `docs/chapter-v2/`（總則 `00-總則.md` 與各章章卡，`docs/chapter.md` 只是索引），聲音依 `.agents/skills/rui-xuan-book-v2/SKILL.md`。
 
+> 2026-09-25 起，原第 3 章拆成新第 3、4 章，原第 4 章以後順延一號。本檔下方以舊章號記載的歷史修稿例子保留原貌；實際執行時以現行 `docs/chapter-v2/`、`book-reader/book-v2/` 檔名為準。
+
 ## 檔案位置
 
 | 檔案 | 用途 |
@@ -14,7 +16,12 @@
 | `book-reader/book-v2/_feedback/NN-reader.md` | 讀者回饋 |
 | `book-reader/book-v2/_feedback/NN-editor.md` | 編輯判讀與修訂清單，末尾附潤飾紀錄 |
 | `book-reader/book-v2/_feedback/NN-audit.md` | 一致性稽核帳本與修正清單 |
+| `book-reader/book-v2/_feedback/author-review/` | 按日期保存作者校閱、確認範圍與手改來源 |
+| `book-reader/book-v2/_feedback/revisions/` | 按日期保存局部試改、修訂與採納狀態 |
+| `book-reader/book-v2/_feedback/history/` | 已被取代的回饋，保留原始內容與章號；查找見該目錄索引 |
 | `docs/book-v2-pipeline.sh` | 執行流程的腳本 |
+
+逐章檔案現況、跨章診斷及新舊章號對照見 [回饋索引](../book-reader/book-v2/_feedback/README.md)。流水線的固定產出仍在 `_feedback/` 本層，日期紀錄另存上述目錄。
 
 執行 log 預設寫在 `~/.cache/book-v2-logs/`，不進 repo。
 
@@ -27,9 +34,9 @@
 - 模型 `gpt-5.6-sol`，reasoning effort high（使用者也接受 `gpt-6-astra` high；同一本書盡量維持同一模型）
 
 ```bash
-docs/book-v2-pipeline.sh full   07 "住在一起以後" "第七章｜住在一起以後" "8,000–9,000"
+docs/book-v2-pipeline.sh full   08 "住在一起以後" "第八章｜住在一起以後" "8,000–9,000"
 docs/book-v2-pipeline.sh expand 01 "十一點的電話" "第一章｜十一點的電話" "6,000–7,000"
-docs/book-v2-pipeline.sh audit  06 "這一次，我們真的在一起了" "第六章｜這一次，我們真的在一起了"
+docs/book-v2-pipeline.sh audit  07 "這一次，我們真的在一起了" "第七章｜這一次，我們真的在一起了"
 ```
 
 - `full`：新章，寫作→讀者→編輯→潤飾→稽核

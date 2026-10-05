@@ -39,7 +39,7 @@
 - 模型 `gpt-5.6-sol`，reasoning effort high（使用者也接受 `gpt-6-astra` high；同一本書盡量維持同一模型）
 
 ```bash
-docs/book-v2-pipeline.sh full   08 "住在一起以後" "第八章｜住在一起以後" "8,000–9,000"
+docs/book-v2-pipeline.sh full   08 "想像之外" "第八章｜想像之外" "8,000–9,000"
 docs/book-v2-pipeline.sh expand 01 "十一點的電話" "第一章｜十一點的電話" "6,000–7,000"
 docs/book-v2-pipeline.sh audit  07 "這一次，我們真的在一起了" "第七章｜這一次，我們真的在一起了"
 ```

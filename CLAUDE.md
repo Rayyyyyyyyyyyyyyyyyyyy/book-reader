@@ -39,9 +39,9 @@ book-v2 正式書名為《喔！這裡還有一點》（2026-10-05 作者定案�
 2026-10-05 起，回饋材料依用途查找：[作者校閱](book-reader/book-v2/_feedback/author-review/README.md) 在 `author-review/`、[局部修訂](book-reader/book-v2/_feedback/revisions/README.md) 在 `revisions/`、[全書／跨章診斷](book-reader/book-v2/_feedback/diagnostics/README.md) 在 `diagnostics/`、[被取代或機制已取消的流程回饋](book-reader/book-v2/_feedback/history/README.md) 在 `history/`。流水線固定產出與五份人物、手改來源檔仍留在 `_feedback/` 本層，完整清單與使用邊界見 [回饋總索引](book-reader/book-v2/_feedback/README.md)。新增或搬移紀錄同步更新索引與引用；各輪原文和採納狀態保留，現稿核准另查作者校閱。
 
 ```bash
-docs/book-v2-pipeline.sh full   08 "住在一起以後" "第八章｜住在一起以後" "<目標字數>"
+docs/book-v2-pipeline.sh full   08 "想像之外" "第八章｜想像之外" "<目標字數>"
 docs/book-v2-pipeline.sh expand 01 "十一點的電話" "第一章｜十一點的電話" "<目標字數>"
-docs/book-v2-pipeline.sh review 08 "住在一起以後" "第八章｜住在一起以後" "<目標字數>"
+docs/book-v2-pipeline.sh review 08 "想像之外" "第八章｜想像之外" "<目標字數>"
 docs/book-v2-pipeline.sh audit  07 "這一次，我們真的在一起了" "第七章｜這一次，我們真的在一起了"
 ```
 

@@ -7,7 +7,7 @@
 #   docs/book-v2-pipeline.sh review <NN> <檔名標題> <章卡名稱> <目標字數>  不重寫，作者改過結構後重跑讀者→編輯→潤飾→稽核
 #   docs/book-v2-pipeline.sh audit <NN> <檔名標題> <章卡名稱>              只跑一致性稽核
 # 例：
-#   docs/book-v2-pipeline.sh full 08 "住在一起以後" "第八章｜住在一起以後" "8,000–9,000"
+#   docs/book-v2-pipeline.sh full 08 "想像之外" "第八章｜想像之外" "8,000–9,000"
 set -u
 MODE="$1"; NN="$2"; TITLE="$3"; CARD="$4"; TARGET="${5:-}"
 REPO=/Users/ray.shao/book-reader

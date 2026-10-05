@@ -53,7 +53,7 @@
 | 05 每年的七月三十一日 | [05-scenes](05-scenes.md) | 拆章前回饋見 history |
 | 06 第二順位 | [06-scenes](06-scenes.md) | 拆章前回饋見 history |
 | 07 這一次，我們真的在一起了 | 未建立 | 舊第 06 章僅有 reader／editor，當時尚未加入場景表與稽核步驟 |
-| 08 住在一起以後 | [08-scenes](08-scenes.md) | 拆章前回饋見 history |
+| 08 想像之外 | [08-scenes](08-scenes.md) | 拆章前回饋見 history |
 | 09 原定出發的時間 | [09-scenes](09-scenes.md) | 拆章前回饋見 history |
 | 10 搬進空屋 | [10-scenes](10-scenes.md) | 拆章前回饋見 history |
 | 11 白天有好消息，晚上沒有 | [11-scenes](11-scenes.md) | 拆章前回饋見 history |

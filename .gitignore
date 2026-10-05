@@ -1,6 +1,4 @@
 .DS_Store
 .idea/
-site/.offline-reader/
-site/public/manuscript/
 *.swp
 *.swo

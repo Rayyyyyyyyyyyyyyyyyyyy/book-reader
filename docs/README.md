@@ -1,6 +1,6 @@
 # docs 文件索引
 
-這裡保存 book-v2 的章卡、寫作流程、提案、研究與決策。book-v1 書稿與章卡已移至獨立 repo。共用規則見 [AGENTS.md](../AGENTS.md)，網站架構、建置與流水線機制見 [CLAUDE.md](../CLAUDE.md)。
+這裡保存《喔！這裡還有一點》book-v2 的章卡、寫作流程、提案、研究與決策。book-v1 書稿與章卡已移至獨立 repo。共用規則見 [AGENTS.md](../AGENTS.md)，網站架構、建置與流水線機制見 [CLAUDE.md](../CLAUDE.md)。
 
 ## 從任務找入口
 
@@ -11,7 +11,7 @@
 | 執行逐章流水線 | [book-v2-workflow.md](book-v2-workflow.md) 與 [book-v2-pipeline.sh](book-v2-pipeline.sh) |
 | 查某章設定、篇幅與跨章事實 | [chapter-v2 總則](chapter-v2/00-總則.md)、該章章卡與 [正文連續性](../book-reader/book-v2/_continuity.md) |
 | 查作者校閱、試改、人物診斷與舊回饋 | [回饋索引](../book-reader/book-v2/_feedback/README.md) |
-| 討論書名與篇章名 | [book-v2-titles.md](book-v2-titles.md)，依輪次辨認候選與作者回饋 |
+| 討論書名與篇章名 | [book-v2-titles.md](book-v2-titles.md)，先查正式書名定案，再依輪次辨認篇章名候選與作者回饋 |
 | 找原始素材、研究依據或機制由來 | 下方「素材、研究與決策」 |
 
 正文直改須同輪讀當前正文與相關 diff，按問題範圍補讀必要材料；現行流程不要求動筆前逐條貼引文。作者確認整章 OK 後，依 workflow 的「作者確認這章 OK 後的七步」更新紀錄並提交。一般評讀或局部採納的狀態另依各輪紀錄確認。

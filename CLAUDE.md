@@ -32,7 +32,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## book-v2 寫作流水線
 
-book-v1 的書稿與章卡已移至獨立 repo；`docs/chapter.md` 是 v2 的舊路徑相容索引，不作為章卡來源。
+book-v2 正式書名為《喔！這裡還有一點》（2026-10-05 作者定案，見 [命名紀錄](docs/book-v2-titles.md#正式書名定案2026-10-05)）。book-v1 的書稿與章卡已移至獨立 repo；`docs/chapter.md` 是 v2 的舊路徑相容索引，不作為章卡來源。
 
 流程與理由見 `docs/book-v2-workflow.md`；章節腳本分檔在 `docs/chapter-v2/`（`00-總則.md`、各章 `NN-章名.md`、`觀念核對.md`、`參考.md`），跨章事實與資訊邊界在 `book-reader/book-v2/_continuity.md`，每章回饋在 `_feedback/NN-{scenes,reader,editor,audit}.md`；臨時諮詢（例如把改寫提案送讀者與編輯判斷）另存成 `_feedback/NN-<議題>-{reader,editor}.md`。
 

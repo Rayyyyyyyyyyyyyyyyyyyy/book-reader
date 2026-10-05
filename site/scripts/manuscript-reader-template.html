@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="light" />
-    <title>把自己的部分做完｜離線校稿本</title>
+    <title>喔！這裡還有一點｜離線校稿本</title>
     <style>
       :root {
         --paper: #f4efe5;
@@ -162,7 +162,7 @@
   <body>
     <div class="reader-root" id="reader-root">
       <header class="reader-toolbar">
-        <div class="brand"><strong>把自己的部分做完</strong><span id="offline-status">offline proof · {{SECTION_COUNT}} sections</span></div>
+        <div class="brand"><strong>喔！這裡還有一點</strong><span id="offline-status">offline proof · {{SECTION_COUNT}} sections</span></div>
         <div class="progress-track" aria-hidden="true"><span class="progress-bar" id="progress-bar"></span></div>
         <div class="toolbar-actions">
           <button class="tool-button resume-button" id="resume-button" type="button">回到上次閱讀</button>
@@ -530,7 +530,7 @@
           return {
             format: "rui-xuan-manuscript-notes",
             version: 1,
-            manuscriptTitle: "把自己的部分做完",
+            manuscriptTitle: "喔！這裡還有一點",
             exportedAt: new Date().toISOString(),
             notes: [...notes].sort((a, b) => a.chapterTitle.localeCompare(b.chapterTitle, "zh-Hant")),
           };
@@ -552,7 +552,7 @@
               "",
             );
           }
-          lines.push("# 《把自己的部分做完》修改建議", "", `匯出時間：${payload.exportedAt}`, "", `共 ${notes.length} 則註解`, "");
+          lines.push("# 《喔！這裡還有一點》修改建議", "", `匯出時間：${payload.exportedAt}`, "", `共 ${notes.length} 則註解`, "");
           for (const [chapter, chapterNotes] of groups) {
             lines.push(`## ${chapter}`, "");
             chapterNotes.forEach((note, index) => {
@@ -579,12 +579,12 @@
         }
 
         document.getElementById("export-json").addEventListener("click", () => {
-          download("把自己的部分做完-註解.json", JSON.stringify(exportPayload(), null, 2), "application/json;charset=utf-8");
+          download("喔！這裡還有一點-註解.json", JSON.stringify(exportPayload(), null, 2), "application/json;charset=utf-8");
           showToast("JSON 備份已下載");
         });
 
         document.getElementById("export-markdown").addEventListener("click", () => {
-          download("把自己的部分做完-修改建議.md", markdownExport(false), "text/markdown;charset=utf-8");
+          download("喔！這裡還有一點-修改建議.md", markdownExport(false), "text/markdown;charset=utf-8");
           showToast("Markdown 修改建議已下載");
         });
 
@@ -594,7 +594,7 @@
             await navigator.clipboard.writeText(content);
             showToast("已複製，可直接貼到網頁版 ChatGPT");
           } catch {
-            download("把自己的部分做完-給ChatGPT的修改建議.md", content, "text/markdown;charset=utf-8");
+            download("喔！這裡還有一點-給ChatGPT的修改建議.md", content, "text/markdown;charset=utf-8");
             showToast("瀏覽器未允許複製，已改為下載 Markdown");
           }
         });

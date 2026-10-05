@@ -51,16 +51,16 @@
 | 03 藍白拖 | [03-scenes](03-scenes.md) | 拆章前回饋見 history |
 | 04 等妳考完 | [04-scenes](04-scenes.md) | 拆章前回饋見 history |
 | 05 每年的七月三十一日 | [05-scenes](05-scenes.md) | 拆章前回饋見 history |
-| 06 第二順位 | [06-scenes](06-scenes.md) | 拆章前回饋見 history |
-| 07 這一次，我們真的在一起了 | 未建立 | 舊第 06 章僅有 reader／editor，當時尚未加入場景表與稽核步驟 |
+| 06 還好有你 | [06-scenes](06-scenes.md) | 拆章前回饋見 history |
+| 07 澎湖的早晨 | 未建立 | 舊第 06 章僅有 reader／editor，當時尚未加入場景表與稽核步驟 |
 | 08 想像之外 | [08-scenes](08-scenes.md) | 拆章前回饋見 history |
 | 09 原定出發的時間 | [09-scenes](09-scenes.md) | 拆章前回饋見 history |
 | 10 搬進空屋 | [10-scenes](10-scenes.md) | 拆章前回饋見 history |
 | 11 白天有好消息，晚上沒有 | [11-scenes](11-scenes.md) | 拆章前回饋見 history |
 | 12 空下來的衣櫃 | [12-scenes](12-scenes.md) | 拆章前回饋見 history |
-| 13 一個人也能出發 | [13-scenes](13-scenes.md) | [reader](13-reader.md)／[editor](13-editor.md)／[audit](13-audit.md)（2026-10-01 review，後續已整章核准） |
-| 14 結語｜把自己的部分做完 | [14-scenes](14-scenes.md) | 第一、二輪結語回饋分別保存在 history 的兩個批次 |
-| 15 後記 | 依章卡不設場景表 | 拆章前回饋見 history 的舊 `14-*` |
+| 13 乘客一位 | [13-scenes](13-scenes.md) | [reader](13-reader.md)／[editor](13-editor.md)／[audit](13-audit.md)（2026-10-01 review，後續已整章核准） |
+| 14 結語｜太陽還很高 | [14-scenes](14-scenes.md) | 第一、二輪結語回饋分別保存在 history 的兩個批次 |
+| 15 後記｜還住在這裡 | 依章卡不設場景表 | 拆章前回饋見 history 的舊 `14-*` |
 
 00、01 的流程回饋也是既有輪次快照；之後的作者修改與確認以 [作者校閱紀錄](author-review/README.md) 為準。各篇是否已定稿、現稿是否又有修改，須另查交接文件、正文與 diff。
 

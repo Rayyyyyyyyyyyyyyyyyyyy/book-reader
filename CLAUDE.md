@@ -42,7 +42,7 @@ book-v2 正式書名為《喔！這裡還有一點》（2026-10-05 作者定案�
 docs/book-v2-pipeline.sh full   08 "想像之外" "第八章｜想像之外" "<目標字數>"
 docs/book-v2-pipeline.sh expand 01 "十一點的電話" "第一章｜十一點的電話" "<目標字數>"
 docs/book-v2-pipeline.sh review 08 "想像之外" "第八章｜想像之外" "<目標字數>"
-docs/book-v2-pipeline.sh audit  07 "這一次，我們真的在一起了" "第七章｜這一次，我們真的在一起了"
+docs/book-v2-pipeline.sh audit  07 "澎湖的早晨" "第七章｜澎湖的早晨"
 ```
 
 目標字數以該章章卡（`docs/chapter-v2/NN-*.md`）與 `00-總則.md` 的篇幅表為準，不沿用範例數字。

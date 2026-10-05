@@ -41,7 +41,7 @@
 ```bash
 docs/book-v2-pipeline.sh full   08 "想像之外" "第八章｜想像之外" "8,000–9,000"
 docs/book-v2-pipeline.sh expand 01 "十一點的電話" "第一章｜十一點的電話" "6,000–7,000"
-docs/book-v2-pipeline.sh audit  07 "這一次，我們真的在一起了" "第七章｜這一次，我們真的在一起了"
+docs/book-v2-pipeline.sh audit  07 "澎湖的早晨" "第七章｜澎湖的早晨"
 ```
 
 - `full`：新章，寫作→讀者→編輯→潤飾→稽核

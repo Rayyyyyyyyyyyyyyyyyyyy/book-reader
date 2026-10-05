@@ -13,7 +13,7 @@ Astro + React island rebuild of the 百冊 reading-list site. Deploys to GitHub 
 ```bash
 cd site
 npm install
-npm run dev        # prebuild regenerates covers from ../book-png, then astro dev
+npm run dev        # predev regenerates covers from ../book-png, then astro dev
 ```
 
 ## Build

@@ -1,6 +1,6 @@
 # 交接｜book-reader repo 與 book-v2 現況
 
-更新：2026-10-01（第十三至十五篇現稿已獲作者「好喔都ok」整章核准；全書十六篇目前正文均已核准）。
+文件更新：2026-10-05（回饋目錄分類與文件入口同步）。最新正文核准紀錄：2026-10-01，第十三至十五篇現稿已獲作者「好喔都ok」整章核准；全書十六篇目前正文均已核准。
 
 本檔只回答「現在是什麼、已知風險是什麼、下一步是什麼」。逐輪處理過程看 Git history；規則原因看 `docs/decisions/`；研究材料看 `docs/research/`。接手時仍先讀 `AGENTS.md`、`CLAUDE.md` 與 [book-v2-workflow.md](book-v2-workflow.md)。
 
@@ -14,6 +14,21 @@
 本 repo 的書稿正文位於 `book-reader/book-v2/`，也是網站 `/manuscript` 閱讀器實際取用的來源；`site/scripts/manuscript-reader.mjs` 指向這個目錄。以下稿件狀態與待辦都只針對 book-v2。
 
 book-v2 一章一檔，另有 `_continuity.md`（跨章事實與資訊邊界）及 `_feedback/`（場景表、讀者、編輯、潤飾與稽核證據）。
+
+## 回饋目錄與取材入口
+
+2026-10-05 完成目錄整理，原有紀錄保留，11 份全書／跨章報告移入 `diagnostics/`，作者校閱與局部修訂各補完整索引。查找從 [回饋總索引](../book-reader/book-v2/_feedback/README.md) 進入：
+
+| 材料 | 位置與用途 |
+|---|---|
+| 場景表與逐章流程回饋 | `_feedback/NN-{scenes,reader,editor,audit}.md`，流水線固定產出路徑 |
+| 作者校閱 | [author-review 索引](../book-reader/book-v2/_feedback/author-review/README.md)，18 份日期紀錄，查核准範圍與來源 |
+| 局部／跨章修訂 | [revisions 索引](../book-reader/book-v2/_feedback/revisions/README.md)，43 份紀錄，查原句、改後句與後續取捨 |
+| 全書／跨章診斷 | [diagnostics 索引](../book-reader/book-v2/_feedback/diagnostics/README.md)，11 份掃描、研究與諮詢報告 |
+| 歷史流程批次 | [history 索引](../book-reader/book-v2/_feedback/history/README.md)，按原章號查找，含拆章前後對照 |
+| 人物與手改來源 | [固定來源檔](../book-reader/book-v2/_feedback/README.md#固定來源檔)，五份檔案仍在本層，既有 skill 與腳本引用不變 |
+
+報告中的「待校閱」、行號與字數保留產出當時狀態；現稿核准以 [最新核准入口](../book-reader/book-v2/_feedback/README.md#最新核准入口)、正文與 diff 核對。目錄整理沒有新增正文核准，也不把中間稿或未採納候選當成定稿。
 
 ## 書稿定位
 
@@ -113,7 +128,7 @@ book-v2 一章一檔，另有 `_continuity.md`（跨章事實與資訊邊界）�
 
 ## 下一步
 
-目前十六篇正文均已整章核准，三篇末段的來源、事實、偏好與字數已同步。作者另要求所有未追蹤 feedback 一併提交並清理工作樹：歷輪回饋只保存證據，不重跑寫作或重新套用歷史建議；既有讀書心得刪除另筆提交。本輪沒有待作者決定的正文問題。書名及篇章名仍保留在原提案狀態，不由此次核准推定選名。
+目前十六篇正文均已整章核准，三篇末段的來源、事實、偏好與字數已同步；2026-10-01 補收歷輪 feedback 的資料已列入各目錄索引。2026-10-05 回饋目錄整理與相關文件同步完成，沒有修改正文。後續新增材料按用途存放並維護所屬索引；歷輪回饋保存證據，不重跑寫作或重新套用歷史建議。目前沒有待作者決定的正文問題。書名及篇章名仍保留在原提案狀態，不由此次核准推定選名。
 
 ## 過去校閱沿革
 

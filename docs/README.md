@@ -29,9 +29,15 @@
 | [book-reader/book-v2/](../book-reader/book-v2/) | 持續修訂的正文，也是網站 `/manuscript` 閱讀器的建置來源 |
 | [book-v2/_continuity.md](../book-reader/book-v2/_continuity.md) | 跨章事實、時序、物件歸屬與資訊邊界 |
 | [book-v2/_feedback/README.md](../book-reader/book-v2/_feedback/README.md) | 場景表、流程回饋、作者校閱、局部修訂與全書診斷的導航 |
+| [author-review/README.md](../book-reader/book-v2/_feedback/author-review/README.md) | 按日期查作者核准範圍、字數、指紋與親筆來源 |
+| [revisions/README.md](../book-reader/book-v2/_feedback/revisions/README.md) | 按單章或跨章查原句、改後句、取捨與採納過程 |
+| [diagnostics/README.md](../book-reader/book-v2/_feedback/diagnostics/README.md) | 全書／跨章掃描、通讀研究與讀者、編輯諮詢 |
+| [history/README.md](../book-reader/book-v2/_feedback/history/README.md) | 被取代或機制已取消的流程回饋，以及新舊章號對照 |
 | [chapter.md](chapter.md) | 舊連結相容索引；現行流水線從 `chapter-v2/` 取章卡 |
 
-回饋目錄的 `author-review/` 保存作者校閱與來源，`revisions/` 保存局部修訂，`history/` 保存被取代的輪次；流水線的固定產出與人物、手改來源庫留在 `_feedback/` 本層。
+2026-10-05 回饋目錄依用途整理：日期紀錄分存 `author-review/`、`revisions/`，11 份全書／跨章報告集中於 `diagnostics/`，歷史流程批次仍在 `history/`。流水線的 `NN-{scenes,reader,editor,audit}.md` 與五份人物、手改固定來源檔留在 `_feedback/` 本層，名稱與使用邊界見 [固定來源檔](../book-reader/book-v2/_feedback/README.md#固定來源檔)。
+
+整理日期不等於稿件核准日期。報告與修訂中的行號、字數及待校閱狀態按產出當時版本解讀；現稿核准查 [最新核准入口](../book-reader/book-v2/_feedback/README.md#最新核准入口)，不因存檔或分類而推定所有建議均已採納。
 
 ## 素材、研究與決策
 
@@ -53,4 +59,4 @@
 - `workflow` 與 skill references 維護現行規則；規則改變時同步修正索引，避免舊決策文字被當成現行要求。
 - `chapter-v2/` 與 `_continuity.md` 維護章節設定及事實；handoff、研究、提案與相容索引只導航與引用。
 - `research/` 保存來源、查證與推導；`decisions/` 保存機制理由，檔首標示文件性質。
-- 日期回饋保留當輪確認範圍與來源；被取代的版本歸檔時保留內容與舊章號，更新引用路徑及回饋索引。
+- 日期回饋保留當輪確認範圍與來源；新增紀錄更新所屬目錄 README，總索引保留現況與導航。搬移時搜尋並更新相關文件的引用；被取代的版本歸檔時保留內容與舊章號。

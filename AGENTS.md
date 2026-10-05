@@ -9,6 +9,7 @@
 - `book-png/` 保存原始封面；`site/scripts/covers.mjs` 依三位數排名產生網站封面。`book-reader/` 保存草稿與寫作材料，`docs/` 保存規格、v2 章節腳本與流程腳本。v1 書稿與章卡已移至獨立的 `book-v1` repo；本 repo 的 v2 章卡在 `docs/chapter-v2/`，`docs/chapter.md` 僅是舊路徑索引。
 - `book-reader/讀書心得/` 保存心得稿，檔名即書名；`book-reader/is-me/` 保存私人生命素材與寫作參考，不直接發布到網站。
 - 書稿分屬兩個 repo：v1 完稿與修訂規劃在獨立的 `book-v1` repo；此處的 `book-reader/book-v2/` 是持續修訂、也是網站書稿閱讀器目前實際發布的正文，一章一檔，另有 `_continuity.md` 與 `_feedback/`。不要把兩份稿件互相覆蓋。
+- 回饋與修稿材料從 [`_feedback/README.md`](book-reader/book-v2/_feedback/README.md) 查找；作者校閱、局部修訂、跨章診斷與歷史流程回饋各有目錄索引。新增或搬移紀錄時同步更新所屬索引及引用路徑，分類與固定來源檔的位置見 `CLAUDE.md` 與 `docs/book-v2-workflow.md`。
 - `openspec/` 保存功能規格、設計與變更紀錄；較大的功能調整應同步更新相關 change。
 
 ## 寫作與生命素材

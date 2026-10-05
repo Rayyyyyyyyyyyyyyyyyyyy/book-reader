@@ -27,7 +27,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 - **「有心得」是算出來的**：Markdown body 非空 → `hasNote`，否則前台顯示「整理中」。邏輯集中在 `src/lib/books.ts` 的 `entryToMeta()`，頁面（`index.astro`、`pages/book/[...slug].astro`）與 React island `BookGrid.tsx` 都吃它產出的 `BookMeta`。
 - **slug 就是檔名**：`entry.id` 直接當路由用，沒有另一層 slug 映射；封面依 `rank` 配對。
-- **書稿閱讀器是獨立頁**：不在網站導覽裡，也不走 Astro content collection，網址是 `/manuscript`。2026-09-22 起發布的是 **book-v2**（`book-reader/book-v2/`，序章至後記十五篇，只吃 `NN-*.md`，`_continuity.md` 與 `_feedback/` 自動略過）。**註解功能暫時關閉**：開關是模板裡的 `NOTES_ENABLED`，設回 `true` 即恢復，既有註解仍留在讀者的 localStorage。
+- **書稿閱讀器是獨立頁**：不在網站導覽裡，也不走 Astro content collection，網址是 `/manuscript`。2026-09-22 起發布的是 **book-v2**（`book-reader/book-v2/`，現行序章、第一至十三章、結語與後記共十六篇，只吃 `NN-*.md`，`_continuity.md` 與 `_feedback/` 自動略過）。**註解功能暫時關閉**：開關是模板裡的 `NOTES_ENABLED`，設回 `true` 即恢復，既有註解仍留在讀者的 localStorage。
 - **部署觸發有 path filter**：`.github/workflows/deploy.yml` 只在 `site/**`、`book-png/**`、`book-reader/book-v2/**`、workflow 本身變動時跑。改 `docs/` 不會觸發部署；v1 已在獨立 repo。
 
 ## book-v2 寫作流水線
@@ -36,11 +36,13 @@ book-v1 的書稿與章卡已移至獨立 repo；`docs/chapter.md` 是 v2 的舊
 
 流程與理由見 `docs/book-v2-workflow.md`；章節腳本分檔在 `docs/chapter-v2/`（`00-總則.md`、各章 `NN-章名.md`、`觀念核對.md`、`參考.md`），跨章事實與資訊邊界在 `book-reader/book-v2/_continuity.md`，每章回饋在 `_feedback/NN-{scenes,reader,editor,audit}.md`；臨時諮詢（例如把改寫提案送讀者與編輯判斷）另存成 `_feedback/NN-<議題>-{reader,editor}.md`。
 
+2026-10-05 起，回饋材料依用途查找：[作者校閱](book-reader/book-v2/_feedback/author-review/README.md) 在 `author-review/`、[局部修訂](book-reader/book-v2/_feedback/revisions/README.md) 在 `revisions/`、[全書／跨章診斷](book-reader/book-v2/_feedback/diagnostics/README.md) 在 `diagnostics/`、[被取代或機制已取消的流程回饋](book-reader/book-v2/_feedback/history/README.md) 在 `history/`。流水線固定產出與五份人物、手改來源檔仍留在 `_feedback/` 本層，完整清單與使用邊界見 [回饋總索引](book-reader/book-v2/_feedback/README.md)。新增或搬移紀錄同步更新索引與引用；各輪原文和採納狀態保留，現稿核准另查作者校閱。
+
 ```bash
-docs/book-v2-pipeline.sh full   07 "住在一起以後" "第七章｜住在一起以後" "<目標字數>"
+docs/book-v2-pipeline.sh full   08 "住在一起以後" "第八章｜住在一起以後" "<目標字數>"
 docs/book-v2-pipeline.sh expand 01 "十一點的電話" "第一章｜十一點的電話" "<目標字數>"
-docs/book-v2-pipeline.sh review 07 "住在一起以後" "第七章｜住在一起以後" "<目標字數>"
-docs/book-v2-pipeline.sh audit  06 "這一次，我們真的在一起了" "第六章｜這一次，我們真的在一起了"
+docs/book-v2-pipeline.sh review 08 "住在一起以後" "第八章｜住在一起以後" "<目標字數>"
+docs/book-v2-pipeline.sh audit  07 "這一次，我們真的在一起了" "第七章｜這一次，我們真的在一起了"
 ```
 
 目標字數以該章章卡（`docs/chapter-v2/NN-*.md`）與 `00-總則.md` 的篇幅表為準，不沿用範例數字。

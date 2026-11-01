@@ -11,6 +11,7 @@ export type BookMeta = {
   desc: string;
   slug: string;
   cover: string; // optimized cover URL (filled by the page)
+  coverColor: string; // dominant cover colour "#rrggbb", "" without a cover
   hasNote: boolean;
   dCover: string; // display title
   dCaption: string; // display caption
@@ -20,7 +21,7 @@ export type BookMeta = {
 
 const pad = (n: number) => String(n).padStart(3, "0");
 
-export function entryToMeta(entry: CollectionEntry<"books">, cover = ""): BookMeta {
+export function entryToMeta(entry: CollectionEntry<"books">, cover = "", coverColor = ""): BookMeta {
   const d = entry.data;
   const cat = d.cat as CategoryKey;
   const hasNote = (entry.body ?? "").trim().length > 0;
@@ -34,6 +35,7 @@ export function entryToMeta(entry: CollectionEntry<"books">, cover = ""): BookMe
     desc: d.desc,
     slug: entry.id,
     cover,
+    coverColor,
     hasNote,
     dCover: d.zh || d.en,
     dCaption: d.zh ? d.en : "台灣尚未出版",

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import type { BookMeta } from "../../lib/books";
-import { spineLook } from "../../lib/spine";
+import { spineColors, spineLook } from "../../lib/spine";
 import { SpineFace } from "./BookSpine";
 
 gsap.registerPlugin(useGSAP);
@@ -167,8 +167,8 @@ export default function BookStage({ book, origin, base, onClosed }: Props) {
           </div>
 
           <div className="b-front">
-            {/* Typeset cover in the spine's tone: the source covers are publisher 3D mockup photos, so they go inside. */}
-            <div className={`face face-out tone-${spineLook(book).tone}`} aria-hidden="true">
+            {/* Typeset cover in the spine's colour: the source covers are publisher 3D mockup photos, so they go inside. */}
+            <div className={`face face-out tone-${spineLook(book).tone}`} style={spineColors(book.coverColor)} aria-hidden="true">
               <div className="tc-frame">
                 <span className="tc-num">{book.numStr}</span>
                 <span className="tc-title">{book.dCover}</span>

@@ -3,12 +3,12 @@ import Base from "../layouts/Base.astro";
 import BookGrid from "../components/BookGrid";
 import { CATEGORIES } from "../data/categories";
 import { getBooksSorted, entryToMeta } from "../lib/books";
-import { coverUrl } from "../lib/covers";
+import { coverColor, coverUrl } from "../lib/covers";
 
 const entries = await getBooksSorted();
 
 const books = await Promise.all(
-  entries.map(async (e) => entryToMeta(e, await coverUrl(e.data.cover))),
+  entries.map(async (e) => entryToMeta(e, await coverUrl(e.data.cover), await coverColor(e.data.cover))),
 );
 
 const cats = CATEGORIES.map((c) => ({ key: c.key, zh: c.zh, en: c.en }));

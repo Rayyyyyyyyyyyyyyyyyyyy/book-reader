@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import type { BookMeta } from "../../lib/books";
+import { SHELF_ROW, spineLook } from "../../lib/spine";
 import { BookSpine } from "./BookSpine";
 import BookStage from "./BookStage";
 import "../../styles/bookshelf.css";
@@ -10,6 +11,10 @@ export type ShelfSection = { key: string; zh: string; en: string; books: BookMet
 type Props = { sections: ShelfSection[]; base: string };
 
 type Selection = { book: BookMeta; button: HTMLButtonElement; face: HTMLElement };
+
+// Tallest first, like books stood on a real shelf; rank breaks ties so the order is stable.
+const byHeight = (books: BookMeta[]) =>
+  [...books].sort((a, b) => spineLook(b).height - spineLook(a).height || a.rank - b.rank);
 
 function lockScroll(on: boolean) {
   const html = document.documentElement;
@@ -59,8 +64,8 @@ export default function ImmersiveShelf({ sections, base }: Props) {
             <span className="shelf-en">{sec.en}</span>
             {sec.countLabel && <span className="shelf-count">{sec.countLabel}</span>}
           </div>
-          <div className="shelf">
-            {sec.books.map((b) => (
+          <div className="shelf" style={{ "--row": `${SHELF_ROW}px` } as React.CSSProperties}>
+            {byHeight(sec.books).map((b) => (
               <BookSpine key={b.slug} book={b} out={selected?.book.slug === b.slug} onSelect={select} />
             ))}
           </div>

@@ -11,7 +11,7 @@
 .shelf-count { margin-left: auto; font-family: var(--serif-en); font-style: italic; font-size: 15px; color: #9a9183; }
 
 .shelf {
-  --row: 228px;
+  --row: 228px; /* overridden from SHELF_ROW in lib/spine.ts */
   --board: 18px;
   display: flex;
   flex-wrap: wrap;
@@ -77,14 +77,13 @@
   margin-top: 30px;
   writing-mode: vertical-rl;
   font-weight: 600;
-  font-size: 13.5px;
   letter-spacing: .12em;
   line-height: 1;
-  max-height: calc(100% - 64px);
+  max-height: calc(100% - 44px); /* + 24px face padding = TITLE_SPACE in lib/spine.ts, where the font is fitted */
   overflow: hidden;
-  text-overflow: ellipsis;
   white-space: nowrap;
 }
+.spine-title[data-cols] { height: calc(100% - 44px); line-height: 1.25; white-space: normal; overflow-wrap: anywhere; }
 .spine-num { position: relative; font-family: var(--serif-en); font-size: 11px; letter-spacing: .04em; opacity: .75; }
 
 @media (hover: hover) {

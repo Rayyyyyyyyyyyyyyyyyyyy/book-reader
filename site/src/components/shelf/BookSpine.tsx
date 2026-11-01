@@ -1,13 +1,15 @@
 import type { BookMeta } from "../../lib/books";
-import { spineLook } from "../../lib/spine";
+import { spineColors, spineLook } from "../../lib/spine";
 
 // Pure visual spine, shared by the shelf button and the 3D book so the extracted
 // book is visibly the same object that left the shelf.
 export function SpineFace({ book, style }: { book: BookMeta; style?: React.CSSProperties }) {
   const look = spineLook(book);
   return (
-    <div className={`spine-face cat-${book.cat} tone-${look.tone}`} style={style} aria-hidden="true">
-      <span className="spine-title">{book.dCover}</span>
+    <div className={`spine-face cat-${book.cat} tone-${look.tone}`} style={{ ...spineColors(book.coverColor), ...style }} aria-hidden="true">
+      <span className="spine-title" style={{ fontSize: look.fontSize }} data-cols={look.cols > 1 || undefined}>
+        {book.dCover}
+      </span>
       <span className="spine-num">{String(book.rank).padStart(3, "0")}</span>
     </div>
   );

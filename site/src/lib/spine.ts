@@ -48,16 +48,23 @@ export function fitTitle(title: string, broken: string, width: number, height: n
   return { fontSize: fits(cols, em, MIN_FONT) ?? MIN_FONT, cols };
 }
 
+// Spines set Chinese titles vertically, where half-width punctuation lies on its side;
+// the full-width forms stand upright. Latin-only titles keep theirs.
+const FULL_WIDTH: Record<string, string> = { "?": "？", "!": "！", ":": "：", ",": "，", ";": "；" };
+export const spineText = (title: string) =>
+  /[一-鿿]/.test(title) ? title.replace(/[?!:,;]/g, (c) => FULL_WIDTH[c]) : title;
+
 export function spineLook(book: Pick<BookMeta, "rank" | "dCover">): SpineLook {
-  const broken = coverTitle(book);
-  const long = titleEm(book.dCover) > 10 || broken.split("\n").length > 2;
+  const title = spineText(book.dCover);
+  const broken = spineText(coverTitle(book));
+  const long = titleEm(title) > 10 || broken.split("\n").length > 2;
   let width = (long ? 34 : 28) + (hash(book.rank, 1) % 14);
   const height = 0.8 + (hash(book.rank, 2) % 9) / 50;
-  let fit = fitTitle(book.dCover, broken, width, SHELF_ROW * height);
+  let fit = fitTitle(title, broken, width, SHELF_ROW * height);
   // a title that needs several columns gets a thicker book, so each column keeps at least 12px type
   if (fit.cols > 1 && fit.fontSize < 12) {
     width = Math.max(width, Math.ceil(fit.cols * 12 * 1.3 + 6));
-    fit = fitTitle(book.dCover, broken, width, SHELF_ROW * height);
+    fit = fitTitle(title, broken, width, SHELF_ROW * height);
   }
   return { width, height, tone: TONES[hash(book.rank, 3) % TONES.length], ...fit };
 }

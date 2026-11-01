@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { BookMeta } from "../lib/books";
+import ImmersiveShelf from "./shelf/ImmersiveShelf";
 
 type Cat = { key: string; zh: string; en: string };
 
@@ -21,6 +22,7 @@ export default function BookGrid({ books, cats, base }: Props) {
   const [query, setQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("all");
   const [notesOnly, setNotesOnly] = useState(false);
+  const [view, setView] = useState<"shelf" | "grid">("shelf");
   const [selected, setSelected] = useState<BookMeta | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
 
@@ -233,6 +235,14 @@ export default function BookGrid({ books, cats, base }: Props) {
           >
             {noteTotal} 篇讀書筆記
           </button>
+          <span role="group" aria-label="檢視方式" style={{ display: "inline-flex", gap: 6, fontStyle: "normal" }}>
+            <button type="button" className={"chip " + (view === "shelf" ? "on" : "")} aria-pressed={view === "shelf"} onClick={() => setView("shelf")}>
+              書架
+            </button>
+            <button type="button" className={"chip " + (view === "grid" ? "on" : "")} aria-pressed={view === "grid"} onClick={() => setView("grid")}>
+              列表
+            </button>
+          </span>
         </div>
       </section>
 
@@ -248,7 +258,9 @@ export default function BookGrid({ books, cats, base }: Props) {
           </div>
         )}
 
-        {hasResults ? (
+        {hasResults && view === "shelf" ? (
+          <ImmersiveShelf sections={sections} base={base} />
+        ) : hasResults ? (
           sections.map((sec) => (
             <section key={sec.key} className={"cat-" + sec.key} style={{ marginBottom: 72 }}>
               <div data-reveal="1" style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 18, flexWrap: "wrap", borderBottom: "1px solid #d6cbb8", paddingBottom: 14, marginBottom: 34 }}>

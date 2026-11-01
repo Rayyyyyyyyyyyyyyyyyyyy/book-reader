@@ -19,12 +19,14 @@ const UI_SPACE = 76; // room kept under the book for the control bar
 
 // Book size for this viewport. Pivot (transform-origin) is the spine plane, so
 // x/y below place the spine; at rotateY(90°) the spine face lies flat on screen
-// and, scaled by s, exactly covers the shelf spine.
+// and, scaled by s, exactly covers the shelf spine. Phones show a single page:
+// the book fills the width and the opened cover swings off-screen to the left.
 function stageSize() {
   const vw = window.innerWidth;
   const vh = window.innerHeight;
-  const H = Math.min((vh - UI_SPACE) * 0.78, 520, (vw * 0.92) / (4 / 3));
-  return { vw, vh, W: (H * 2) / 3, H };
+  const single = vw < 640;
+  const H = Math.min((vh - UI_SPACE) * 0.78, 520, single ? vw * 0.84 * 1.5 : (vw * 0.92) / (4 / 3));
+  return { vw, vh, W: (H * 2) / 3, H, single };
 }
 
 function shelfPose(origin: HTMLElement, H: number) {
@@ -48,7 +50,8 @@ export default function BookStage({ book, origin, base, onClosed }: Props) {
 
   const center = () => {
     const { vw, vh } = stageSize();
-    return { xc: vw / 2 - geo.W / 2, xo: vw / 2, y: (vh - UI_SPACE) / 2 - geo.H / 2 };
+    const xc = vw / 2 - geo.W / 2;
+    return { xc, xo: geo.single ? xc : vw / 2, y: (vh - UI_SPACE) / 2 - geo.H / 2 };
   };
 
   const reduce = () => matchMedia("(prefers-reduced-motion: reduce)").matches;

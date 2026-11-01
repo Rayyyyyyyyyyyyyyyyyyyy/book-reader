@@ -17,6 +17,7 @@ type Props = {
 };
 
 const UI_SPACE = 76; // room kept under the book for the control bar
+const LEAVES = 2; // turnable sheets → LEAVES + 1 spreads
 
 // Book size for this viewport. Pivot (transform-origin) is the spine plane, so
 // x/y below place the spine; at rotateY(90°) the spine face lies flat on screen
@@ -41,6 +42,11 @@ export default function BookStage({ book, origin, base, onClosed }: Props) {
   const closeRef = useRef<HTMLButtonElement>(null);
   const phase = useRef<"opening" | "opened" | "closing">("opening");
   const timeline = useRef<gsap.core.Timeline | null>(null);
+  const leafRefs = useRef<HTMLDivElement[]>([]);
+  const spreadRef = useRef(0); // sheets turned; the state copy only drives the label
+  const [spread, setSpread] = useState(0);
+  const turning = useRef(false);
+  const swipe = useRef<{ x: number; moved: boolean } | null>(null);
 
   // Geometry is fixed for the life of the stage; only the on-screen position follows resizes.
   const [geo] = useState(() => {
@@ -63,7 +69,12 @@ export default function BookStage({ book, origin, base, onClosed }: Props) {
       const { start } = geo;
       const c = center();
       gsap.set(el, { "--x": start.x, "--y": start.y, "--z": 0, "--s": start.s, "--ry": 90, "--open": 0 });
-      const tl = gsap.timeline({ onComplete: () => void (phase.current = "opened") });
+      const tl = gsap.timeline({
+        onComplete: () => {
+          phase.current = "opened";
+          gsap.set(el, { "--x": center().xo, "--y": center().y }); // the viewport may have changed mid-flight
+        },
+      });
       tl.to(".stage-backdrop", { opacity: 1, duration: 0.5, ease: "power1.out" }, 0)
         // pull the book off the shelf toward the viewer first…
         .to(el, { "--z": 140, "--y": start.y - 12, duration: 0.26, ease: "power2.out" }, 0)
@@ -82,15 +93,16 @@ export default function BookStage({ book, origin, base, onClosed }: Props) {
     if (phase.current === "closing") return;
     phase.current = "closing";
     timeline.current?.kill();
+    gsap.killTweensOf(leafRefs.current);
     const el = bookRef.current!;
     const c = center();
     const openDeg = Math.abs(parseFloat(el.style.getPropertyValue("--open")) || 0);
+    // turned sheets fall back first (last turned first), then the cover closes over them
+    const turned = leafRefs.current.filter((l) => parseFloat(l.style.getPropertyValue("--f")) > 0).reverse();
     const tl = gsap.timeline({ onComplete: onClosed });
-    tl.to(".stage-ui", { opacity: 0, duration: 0.15 }, 0).to(
-      el,
-      { "--open": 0, "--x": c.xc, duration: 0.05 + (0.55 * openDeg) / 180, ease: "power2.inOut" },
-      0,
-    );
+    tl.to(".stage-ui", { opacity: 0, duration: 0.15 }, 0);
+    if (turned.length) tl.to(turned, { "--f": 0, duration: 0.4, stagger: 0.1, ease: "power2.inOut" }, 0);
+    tl.to(el, { "--open": 0, "--x": c.xc, duration: 0.05 + (0.55 * openDeg) / 180, ease: "power2.inOut" }, turned.length ? ">-0.1" : 0);
     if (origin.isConnected) {
       // re-measure: the shelf may have moved since we opened (resize)
       const back = shelfPose(origin, geo.H);
@@ -108,10 +120,42 @@ export default function BookStage({ book, origin, base, onClosed }: Props) {
     if (reduce()) tl.progress(1);
   });
 
-  // Escape closes; resize keeps the opened book centred.
+  // Turn one sheet forward (+1) or back (-1); ignored mid-animation so a flip always completes.
+  const turn = contextSafe((dir: 1 | -1) => {
+    const target = spreadRef.current + dir;
+    if (phase.current !== "opened" || turning.current || target < 0 || target > LEAVES) return;
+    turning.current = true;
+    gsap.to(leafRefs.current[dir > 0 ? spreadRef.current : target], {
+      "--f": dir > 0 ? 1 : 0,
+      duration: reduce() ? 0 : 0.7,
+      ease: "power2.inOut",
+      onComplete: () => {
+        turning.current = false;
+        spreadRef.current = target;
+        setSpread(target);
+      },
+    });
+  });
+
+  // Horizontal swipe on the backdrop turns pages; a swipe must not also count as a click that closes.
+  const onPointerDown = (e: React.PointerEvent) => void (swipe.current = { x: e.clientX, moved: false });
+  const onPointerUp = (e: React.PointerEvent) => {
+    const dx = e.clientX - (swipe.current?.x ?? e.clientX);
+    if (Math.abs(dx) < 40) return;
+    swipe.current = { x: e.clientX, moved: true };
+    turn(dx < 0 ? 1 : -1);
+  };
+  const onBackdropClick = () => {
+    if (swipe.current?.moved) return void (swipe.current = null);
+    close();
+  };
+
+  // Escape closes, arrows turn pages; resize keeps the opened book centred.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") close();
+      else if (e.key === "ArrowRight") turn(1);
+      else if (e.key === "ArrowLeft") turn(-1);
     };
     const onResize = () => {
       if (phase.current !== "opened") return;
@@ -124,7 +168,7 @@ export default function BookStage({ book, origin, base, onClosed }: Props) {
       document.removeEventListener("keydown", onKey);
       window.removeEventListener("resize", onResize);
     };
-  }, [close]);
+  }, [close, turn]);
 
   // Modal: everything else on the page is inert while the book is out.
   useEffect(() => {
@@ -141,7 +185,7 @@ export default function BookStage({ book, origin, base, onClosed }: Props) {
 
   return (
     <div ref={rootRef} className="stage" role="dialog" aria-modal="true" aria-label={`${book.dCover} 預覽`}>
-      <div className="stage-backdrop" onClick={close} />
+      <div className="stage-backdrop" onClick={onBackdropClick} onPointerDown={onPointerDown} onPointerUp={onPointerUp} />
       <div className="stage-scene">
         <div
           ref={bookRef}
@@ -159,17 +203,73 @@ export default function BookStage({ book, origin, base, onClosed }: Props) {
             />
           </div>
 
-          <div className="b-page b-page-right">
+          {/* last right-hand page: where the note lives */}
+          <div className="b-page b-base" aria-hidden={spread !== LEAVES || undefined}>
             <div className="pg-meta">
               <span>{book.numStr}</span>
-              <span>{book.catZh}</span>
+              <span>讀書心得</span>
             </div>
-            <h2 className="pg-title">{coverTitle(book)}</h2>
-            <div className="pg-caption">{book.dCaption}</div>
-            <div className="pg-author">{book.author}</div>
-            <p className="pg-desc">{book.desc}</p>
-            <div className="pg-note">{book.hasNote ? "已收錄讀書心得" : "心得整理中"}</div>
+            <h3 className="pg-head">{book.hasNote ? "我的讀書心得" : "心得整理中"}</h3>
+            <p className="pg-desc">
+              {book.hasNote ? "這本書的心得已收錄在書頁，點下方按鈕閱讀全文。" : "書頁已建立，心得完成後會發布在那裡。"}
+            </p>
+            <div className="pg-foot">百冊 · One Hundred</div>
           </div>
+
+          {/* turnable sheets, top first; every fact sits on a right-hand page so phones (single page) see it all */}
+          {[
+            [
+              <>
+                <div className="pg-meta">
+                  <span>{book.numStr}</span>
+                  <span>{book.catZh}</span>
+                </div>
+                <h2 className="pg-title">{coverTitle(book)}</h2>
+                <div className="pg-caption">{book.dCaption}</div>
+                <div className="pg-author">{book.author}</div>
+                <div className="pg-foot">{book.hasNote ? "已收錄讀書心得" : "心得整理中"}</div>
+              </>,
+              <dl className="pg-card">
+                <dt>編號</dt>
+                <dd>{book.numStr}</dd>
+                <dt>分類</dt>
+                <dd>{book.catZh}</dd>
+                <dt>作者</dt>
+                <dd>{book.author}</dd>
+                {book.zh && book.en && (
+                  <>
+                    <dt>原文書名</dt>
+                    <dd>{book.en}</dd>
+                  </>
+                )}
+              </dl>,
+            ],
+            [
+              <>
+                <div className="pg-meta">
+                  <span>{book.numStr}</span>
+                  <span>關於這本書</span>
+                </div>
+                <h3 className="pg-head">{book.dCover}</h3>
+                <p className="pg-desc">{book.desc}</p>
+              </>,
+              <div className="pg-ornament">❦</div>,
+            ],
+          ].map(([front, back], i) => (
+            <div
+              key={i}
+              className="b-leaf"
+              style={{ "--i": i } as React.CSSProperties}
+              ref={(n) => void (n && (leafRefs.current[i] = n))}
+            >
+              <div className="b-page leaf-face" aria-hidden={i !== spread || undefined}>
+                {front}
+              </div>
+              <div className="b-page leaf-face leaf-back" aria-hidden="true">
+                {back}
+              </div>
+            </div>
+          ))}
 
           <div className="b-front">
             {/* Typeset cover in the spine's colour: the source covers are publisher 3D mockup photos, so they go inside. */}
@@ -196,8 +296,18 @@ export default function BookStage({ book, origin, base, onClosed }: Props) {
       </div>
 
       <div className="stage-ui">
-        <button ref={closeRef} type="button" className="stage-btn" onClick={close}>
-          收回書架 <span aria-hidden="true">×</span>
+        <button ref={closeRef} type="button" className="stage-btn" onClick={close} aria-label="收回書架">
+          <span className="stage-lbl">收回書架 </span>
+          <span aria-hidden="true">×</span>
+        </button>
+        <button type="button" className="stage-btn stage-arrow" onClick={() => turn(-1)} disabled={spread === 0} aria-label="上一頁">
+          ‹
+        </button>
+        <span className="stage-page" aria-live="polite">
+          {spread + 1} / {LEAVES + 1}
+        </span>
+        <button type="button" className="stage-btn stage-arrow" onClick={() => turn(1)} disabled={spread === LEAVES} aria-label="下一頁">
+          ›
         </button>
         <a className={"stage-cta" + (book.hasNote ? " has-note" : "")} href={href}>
           {book.hasNote ? "閱讀我的讀書心得" : "查看書頁 · 整理中"} <span aria-hidden="true">→</span>

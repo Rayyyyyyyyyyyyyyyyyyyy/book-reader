@@ -10,7 +10,8 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "covers": "node scripts/covers.mjs"
+    "covers": "node scripts/covers.mjs",
+    "test:e2e": "npm run build && playwright test"
   },
   "dependencies": {
     "@astrojs/react": "^4.2.0",
@@ -28,6 +29,7 @@
     "@astrojs/check": "^0.9.12",
     "@fontsource/cormorant-garamond": "^5.1.0",
     "@fontsource/noto-serif-tc": "^5.1.1",
+    "@playwright/test": "^1.62.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "typescript": "^5.9.3"

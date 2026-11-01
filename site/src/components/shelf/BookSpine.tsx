@@ -1,4 +1,5 @@
 import type { BookMeta } from "../../lib/books";
+import { coverTitle } from "../../data/title-breaks";
 import { spineColors, spineLook } from "../../lib/spine";
 
 // Pure visual spine, shared by the shelf button and the 3D book so the extracted
@@ -8,7 +9,7 @@ export function SpineFace({ book, style }: { book: BookMeta; style?: React.CSSPr
   return (
     <div className={`spine-face cat-${book.cat} tone-${look.tone}`} style={{ ...spineColors(book.coverColor), ...style }} aria-hidden="true">
       <span className="spine-title" style={{ fontSize: look.fontSize }} data-cols={look.cols > 1 || undefined}>
-        {book.dCover}
+        {look.cols > 1 ? coverTitle(book) : book.dCover}
       </span>
       <span className="spine-num">{String(book.rank).padStart(3, "0")}</span>
     </div>

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import type { BookMeta } from "../../lib/books";
+import { coverTitle } from "../../data/title-breaks";
 import { spineColors, spineLook } from "../../lib/spine";
 import { SpineFace } from "./BookSpine";
 
@@ -159,7 +160,7 @@ export default function BookStage({ book, origin, base, onClosed }: Props) {
               <span>{book.numStr}</span>
               <span>{book.catZh}</span>
             </div>
-            <h2 className="pg-title">{book.dCover}</h2>
+            <h2 className="pg-title">{coverTitle(book)}</h2>
             <div className="pg-caption">{book.dCaption}</div>
             <div className="pg-author">{book.author}</div>
             <p className="pg-desc">{book.desc}</p>
@@ -171,7 +172,7 @@ export default function BookStage({ book, origin, base, onClosed }: Props) {
             <div className={`face face-out tone-${spineLook(book).tone}`} style={spineColors(book.coverColor)} aria-hidden="true">
               <div className="tc-frame">
                 <span className="tc-num">{book.numStr}</span>
-                <span className="tc-title">{book.dCover}</span>
+                <span className="tc-title">{coverTitle(book)}</span>
                 {book.zh && <span className="tc-en">{book.en}</span>}
                 <span className="tc-author">{book.author}</span>
                 <span className="tc-brand">百冊 · One Hundred</span>

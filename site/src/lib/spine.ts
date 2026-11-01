@@ -1,4 +1,5 @@
 import type { BookMeta } from "./books";
+import { coverTitle } from "../data/title-breaks";
 
 export type SpineTone = "deep" | "accent" | "light" | "cream";
 
@@ -32,26 +33,33 @@ export function titleEm(title: string): number {
   return em;
 }
 
-// Largest font that shows the whole title: one column first, then two columns if the spine is wide enough.
-export function fitTitle(title: string, width: number, height: number): { fontSize: number; cols: number } {
+// Largest font that shows the whole title: one column first; otherwise one column per cover line
+// (`broken` holds the cover's "\n" breaks), or two wrapped columns when the cover has no breaks.
+export function fitTitle(title: string, broken: string, width: number, height: number): { fontSize: number; cols: number } {
   const room = height - TITLE_SPACE;
-  const em = titleEm(title);
-  for (const cols of [1, 2])
-    for (let f = MAX_FONT; f >= (cols === 1 ? 11 : MIN_FONT); f -= 0.5)
-      if (cols * f * 1.3 <= width - 6 && em * f <= room * cols * 0.92) return { fontSize: f, cols };
-  return { fontSize: MIN_FONT, cols: 2 };
+  const fits = (cols: number, em: number, min: number) => {
+    for (let f = MAX_FONT; f >= min; f -= 0.5) if (cols * f * 1.3 <= width - 6 && em * f <= room * 0.92) return f;
+  };
+  const single = fits(1, titleEm(title), 11);
+  if (single) return { fontSize: single, cols: 1 };
+  const lines = broken.split("\n");
+  const cols = lines.length > 1 ? lines.length : 2;
+  const em = lines.length > 1 ? Math.max(...lines.map(titleEm)) : titleEm(title) / 2;
+  return { fontSize: fits(cols, em, MIN_FONT) ?? MIN_FONT, cols };
 }
 
 export function spineLook(book: Pick<BookMeta, "rank" | "dCover">): SpineLook {
-  const long = titleEm(book.dCover) > 10;
-  const width = (long ? 34 : 28) + (hash(book.rank, 1) % 14);
+  const broken = coverTitle(book);
+  const long = titleEm(book.dCover) > 10 || broken.split("\n").length > 2;
+  let width = (long ? 34 : 28) + (hash(book.rank, 1) % 14);
   const height = 0.8 + (hash(book.rank, 2) % 9) / 50;
-  return {
-    width,
-    height,
-    tone: TONES[hash(book.rank, 3) % TONES.length],
-    ...fitTitle(book.dCover, width, SHELF_ROW * height),
-  };
+  let fit = fitTitle(book.dCover, broken, width, SHELF_ROW * height);
+  // a title that needs several columns gets a thicker book, so each column keeps at least 12px type
+  if (fit.cols > 1 && fit.fontSize < 12) {
+    width = Math.max(width, Math.ceil(fit.cols * 12 * 1.3 + 6));
+    fit = fitTitle(book.dCover, broken, width, SHELF_ROW * height);
+  }
+  return { width, height, tone: TONES[hash(book.rank, 3) % TONES.length], ...fit };
 }
 
 // Spine/cover colours from the cover's dominant colour; dark ink on light covers, paper ink on dark ones.

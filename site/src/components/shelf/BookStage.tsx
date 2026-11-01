@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import type { BookMeta } from "../../lib/books";
+import { spineLook } from "../../lib/spine";
 import { SpineFace } from "./BookSpine";
 
 gsap.registerPlugin(useGSAP);
@@ -166,20 +167,24 @@ export default function BookStage({ book, origin, base, onClosed }: Props) {
           </div>
 
           <div className="b-front">
-            <div className="face face-out" aria-hidden="true">
-              {book.cover ? (
-                <img src={book.cover} alt="" />
-              ) : (
-                <div className="cover-fallback">{book.dCover}</div>
-              )}
+            {/* Typeset cover in the spine's tone: the source covers are publisher 3D mockup photos, so they go inside. */}
+            <div className={`face face-out tone-${spineLook(book).tone}`} aria-hidden="true">
+              <div className="tc-frame">
+                <span className="tc-num">{book.numStr}</span>
+                <span className="tc-title">{book.dCover}</span>
+                {book.zh && <span className="tc-en">{book.en}</span>}
+                <span className="tc-author">{book.author}</span>
+                <span className="tc-brand">百冊 · One Hundred</span>
+              </div>
             </div>
             <div className="face face-in" aria-hidden="true">
-              <div className="ex-libris">
-                <span className="ex-small">EX LIBRIS</span>
-                <span className="ex-name">百冊</span>
-                <span className="ex-en">One Hundred</span>
-                <span className="ex-small">{book.numStr}</span>
-              </div>
+              <span className="ex-small">EX LIBRIS · 百冊</span>
+              {book.cover ? (
+                <img className="in-photo" src={book.cover} alt="" />
+              ) : (
+                <span className="ex-name">{book.dCover}</span>
+              )}
+              <span className="ex-small">{book.numStr}</span>
             </div>
           </div>
         </div>

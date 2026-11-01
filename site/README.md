@@ -4,7 +4,8 @@ Astro + React island rebuild of the 百冊 reading-list site. Deploys to GitHub 
 
 ## Stack
 
-- **Astro 5** (static output) + **React island** for the interactive grid/search/modal
+- **Astro 5** (static output) + **React island** for search, filters and the two views: the bookshelf (default) and the original grid/modal
+- **Bookshelf** (`src/components/shelf/`): CSS spines; picking one mounts a single CSS-3D book animated with GSAP (extract, open, turn pages, return)
 - **Content collection** `src/content/books/` — one Markdown file per book, frontmatter = metadata, body = reading note. This is the single source of truth.
 - Self-hosted, subset fonts (`@fontsource`), Astro image optimization, sitemap, RSS, per-page OG images.
 
@@ -21,6 +22,7 @@ npm run dev        # predev regenerates covers from ../book-png, then astro dev
 ```bash
 npm run build      # regenerates covers, then astro build → dist/
 npm run preview
+npm run test:e2e   # build, then Playwright (Chromium) over the shelf; first run: npx playwright install chromium
 ```
 
 `base` is `/book-reader` and `site` is the GitHub Pages URL. Override per-environment:
@@ -38,6 +40,7 @@ SITE_URL=https://example.com BASE_PATH=/ npm run build
 
 - A book "has a note" when its Markdown body is non-empty (empty → 「整理中」).
 - Cover matched by rank; missing cover → typographic placeholder.
+- Spine/3D-cover colour = dominant colour of the cover centre (`src/lib/covers.ts`, build time). Cover line breaks live in `src/data/title-breaks.ts`.
 - Slug = `rank`-`english-slug` (e.g. `055-atomic-habits`); no English title → bare rank (e.g. `103`).
 
 ## OG images

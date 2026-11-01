@@ -42,7 +42,7 @@ const TITLE_BREAKS: Record<number, string> = {
   107: "死過一次\n才學會愛",
   108: "當呼吸\n化為空氣",
   109: "Rewire－\n神經可塑性",
-  111: "蛤蟆先生\n去看心理醫生",
+  111: "蛤蟆先生\n去看心理師",
 };
 
 // Display title with the cover's line breaks, or the plain title when none are recorded.

@@ -1,7 +1,7 @@
 ---
 rank: 111
 cat: psych
-zh: "蛤蟆先生去看心理醫生"
+zh: "蛤蟆先生去看心理師"
 en: "Counselling for Toads"
 author: "Robert de Board"
 desc: "陪蛤蟆先生走一趟心理諮商的自我探索。"

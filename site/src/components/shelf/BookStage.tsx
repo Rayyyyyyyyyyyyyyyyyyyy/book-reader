@@ -5,6 +5,7 @@ import type { BookMeta } from "../../lib/books";
 import { coverTitle } from "../../data/title-breaks";
 import { spineColors, spineLook } from "../../lib/spine";
 import { SpineFace } from "./BookSpine";
+import "../../styles/stage.css";
 
 gsap.registerPlugin(useGSAP);
 

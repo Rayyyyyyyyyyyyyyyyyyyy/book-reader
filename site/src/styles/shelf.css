@@ -1,0 +1,107 @@
+/* 百冊 — bookshelf: CSS spines on wooden shelves (the 3D book is in stage.css) */
+
+/* ---------- shelf ---------- */
+.shelf-section { margin-bottom: 64px; }
+.shelf-head {
+  display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap;
+  border-bottom: 1px solid #d6cbb8; padding-bottom: 12px; margin-bottom: 22px;
+}
+.shelf-head h2 { font-weight: 600; font-size: clamp(22px, 3vw, 28px); margin: 0; letter-spacing: .02em; color: var(--ink); }
+.shelf-en { font-family: var(--serif-en); font-style: italic; font-size: 17px; color: var(--accent); }
+.shelf-count { margin-left: auto; font-family: var(--serif-en); font-style: italic; font-size: 15px; color: #9a9183; }
+
+.shelf {
+  --row: 228px; /* overridden from SHELF_ROW in lib/spine.ts */
+  --board: 18px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--board) 3px;
+  padding: 16px 20px var(--board);
+  border-radius: 4px;
+  /* back panel + one wooden board under every row (rows are all --row tall) */
+  background:
+    repeating-linear-gradient(180deg,
+      transparent 0 var(--row),
+      #b4875c var(--row) calc(var(--row) + 3px),
+      #94673f calc(var(--row) + 3px) calc(var(--row) + var(--board) - 4px),
+      #6c4a2d calc(var(--row) + var(--board) - 4px) calc(var(--row) + var(--board))) 0 16px / 100% calc(var(--row) + var(--board)),
+    linear-gradient(180deg, #5a3f2b, #4a3423);
+  box-shadow: inset 0 0 0 6px #7a5537, inset 0 14px 30px rgba(0, 0, 0, .35), 0 18px 40px rgba(60, 40, 20, .18);
+}
+/* phones: one row per shelf, swiped sideways (native scroll, no hijack) */
+@media (max-width: 639px) {
+  .shelf {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+  }
+  .shelf::-webkit-scrollbar { display: none; }
+}
+
+.spine-slot {
+  height: var(--row);
+  display: flex;
+  align-items: flex-end;
+  flex: 0 0 auto;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.spine-slot:focus { outline: none; }
+
+.spine-face {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 0 10px;
+  overflow: hidden;
+  border-radius: 2px 2px 1px 1px;
+  background: var(--sp-bg);
+  color: var(--sp-ink);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .12), 2px 0 4px rgba(0, 0, 0, .25);
+  transition: transform .22s cubic-bezier(.2, .7, .3, 1), box-shadow .22s ease;
+}
+/* rounded-spine shading and head/tail bands */
+.spine-face::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(90deg, rgba(0,0,0,.22), rgba(255,255,255,.14) 28%, rgba(255,255,255,0) 55%, rgba(0,0,0,.24));
+}
+.spine-face::after {
+  content: ""; position: absolute; left: 0; right: 0; top: 7px; height: 26px; pointer-events: none;
+  border-top: 2px solid var(--sp-band); border-bottom: 1px solid var(--sp-band); opacity: .7;
+}
+.tone-deep   { --sp-bg: color-mix(in oklab, var(--accent) 55%, #1e1914); --sp-ink: #f1e8d8; --sp-band: #c9a86a; }
+.tone-accent { --sp-bg: var(--accent); --sp-ink: #fbf7ee; --sp-band: rgba(251, 247, 238, .6); }
+.tone-light  { --sp-bg: color-mix(in oklab, var(--accent) 32%, #f6f0e4); --sp-ink: var(--ink); --sp-band: var(--accent); }
+.tone-cream  { --sp-bg: #eee5d2; --sp-ink: var(--ink); --sp-band: var(--accent); }
+
+.spine-title {
+  position: relative;
+  margin-top: 30px;
+  writing-mode: vertical-rl;
+  font-weight: 600;
+  letter-spacing: .12em;
+  line-height: 1;
+  max-height: calc(100% - 44px); /* + 24px face padding = TITLE_SPACE in lib/spine.ts, where the font is fitted */
+  overflow: hidden;
+  white-space: nowrap;
+}
+.spine-title[data-cols] { height: calc(100% - 44px); line-height: 1.25; white-space: pre-line; overflow-wrap: anywhere; }
+.spine-num { position: relative; font-family: var(--serif-en); font-size: 11px; letter-spacing: .04em; opacity: .75; }
+
+@media (hover: hover) {
+  .spine-slot:hover .spine-face { transform: translateY(-10px); box-shadow: inset 0 0 0 1px rgba(0,0,0,.12), 4px 6px 12px rgba(0,0,0,.35); }
+}
+.spine-slot:focus-visible .spine-face {
+  transform: translateY(-10px);
+  outline: 2px solid #f3ede1; outline-offset: 2px;
+}
+/* the picked book keeps its slot so the shelf never reflows */
+.spine-slot[data-out] .spine-face { visibility: hidden; transition: none; }

@@ -4,7 +4,7 @@ import type { BookMeta } from "../../lib/books";
 import { SHELF_ROW, spineLook } from "../../lib/spine";
 import { BookSpine } from "./BookSpine";
 import BookStage from "./BookStage";
-import "../../styles/bookshelf.css";
+import "../../styles/shelf.css";
 
 export type ShelfSection = { key: string; zh: string; en: string; books: BookMeta[]; countLabel?: string };
 

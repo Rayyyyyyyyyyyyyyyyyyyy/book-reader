@@ -8,7 +8,8 @@
 
 ## 資料與網站
 
-- Astro 5 靜態網站位於 `site/`，React island 負責搜尋、分類與互動。
+- Astro 5 靜態網站位於 `site/`，React island 負責搜尋、分類與互動。首頁預設書架（`components/shelf/`）：書架是 CSS 書脊，選中後才掛載唯一一本 CSS 3D 書（GSAP）；`BookGrid` 保留篩選與列表檢視。
+- 書脊幾何、字級與配色在 `src/lib/spine.ts`，封面主色由 `src/lib/covers.ts` 建置時計算，封面斷句在 `src/data/title-breaks.ts`。
 - `site/src/content/books/` 是書目與發布心得的單一真實來源。`src/lib/books.ts` 的 `entryToMeta()` 依 Markdown body 是否非空計算 `hasNote`，空正文顯示「整理中」。
 - `entry.id` 即路由 slug，封面按 `rank` 對應；不另維護 slug 映射。
 - GitHub Actions 只在 `site/**`、`book-png/**` 或 workflow 本身變動時建置發布；只改心得草稿、文件與 skills 不會觸發。
@@ -29,4 +30,4 @@ Skills 位於 `.agents/skills/`，供 Claude 與 Codex 共用。不要把其他�
 
 ## OpenSpec
 
-現行規格是 `book-catalog`、`book-content-model`、`book-detail`、`site-delivery`。網站變更在 `openspec/changes/`，完成後放入 `archive/<YYYY-MM-DD>-<id>/`。
+現行規格是 `book-catalog`、`book-content-model`、`book-detail`、`site-delivery`。進行中的 change：`immersive-bookshelf`。網站變更在 `openspec/changes/`，完成後放入 `archive/<YYYY-MM-DD>-<id>/`。

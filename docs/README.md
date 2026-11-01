@@ -12,5 +12,6 @@
 | 心得與隨筆寫作 | [rui-xuan-reading](../.agents/skills/rui-xuan-reading/SKILL.md) |
 | 陪讀、試讀與編輯判讀 | [ai-reader](../.agents/skills/ai-reader/SKILL.md)、[ai-editor](../.agents/skills/ai-editor/SKILL.md) |
 | 現行網站規格 | [openspec/specs/](../openspec/specs/) |
+| 沉浸式書架交接規格與分鏡 | [immersive-bookshelf/](immersive-bookshelf/)、change [immersive-bookshelf](../openspec/changes/immersive-bookshelf/) |
 
 2026-10-05 完成 repo 分拆。出版作品的正文、流程、回饋、章卡、閱讀器及專用技能移入獨立 repo；目前網站建置只取書目、心得與封面。原 Git 歷史保留，供查核搬移前紀錄。

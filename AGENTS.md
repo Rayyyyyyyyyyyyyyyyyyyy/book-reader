@@ -34,13 +34,13 @@ npm run preview
 npm run covers
 ```
 
-`dev` 與 `build` 前自動產生封面。提交前至少跑 `npm run build`；介面變更再檢查首頁搜尋、分類、書籍詳情、RSS 與行動版。尚未配置自動化測試框架，新增測試與來源相鄰，使用 `*.test.ts` 或 `*.test.tsx`。
+`dev` 與 `build` 前自動產生封面。提交前至少跑 `npm run build`；動到書架、書脊或 3D 書時再跑 `npm run test:e2e`（Playwright，`site/tests/`）。介面變更再檢查首頁搜尋、分類、書籍詳情、RSS 與行動版。Playwright 的 WebKit 不渲染 CSS 3D，Safari 須以真實瀏覽器檢查。單元測試與來源相鄰，使用 `*.test.ts` 或 `*.test.tsx`。
 
 ## 程式與內容格式
 
 TypeScript、TSX、Astro 使用兩格縮排、雙引號及分號，保持 strict TypeScript。React 元件 PascalCase，函式與變數 camelCase。
 
-書籍檔名為 `NNN-english-slug.md`，沒有英文名時可只用排名。Frontmatter 的 `rank`、`cat`、`zh`、`en`、`author`、`desc` 遵守 `src/content.config.ts`；`cat` 使用 `src/data/categories.ts` 的 key。
+書籍檔名為 `NNN-english-slug.md`，沒有英文名時可只用排名。Frontmatter 的 `rank`、`cat`、`zh`、`en`、`author`、`desc` 遵守 `src/content.config.ts`；`cat` 使用 `src/data/categories.ts` 的 key。封面斷句記在 `src/data/title-breaks.ts`，不寫入書目 frontmatter。
 
 ## Git 與資產
 

@@ -6,6 +6,7 @@
 
 ## 網站功能
 
+- 首頁預設為書架：點選書脊，同一本書會從書架抽出、翻開並可翻頁，關閉時放回原位；也可切換成列表檢視。
 - 依七個主題分類瀏覽書籍，搜尋中文／英文書名、作者或書籍編號。
 - 篩選已有心得的書籍，透過快速預覽或獨立書頁閱讀書目與心得。
 - 提供心得 RSS、sitemap 與首頁／書頁的 OG 分享圖。
@@ -47,6 +48,7 @@ npm run dev
 | `npm run build` | 自動產生封面並建置靜態網站至 `dist/` |
 | `npm run preview` | 預覽已建置的網站，需先執行 build |
 | `npm run covers` | 單獨從原始封面產生網站封面資產 |
+| `npm run test:e2e` | 建置後以 Playwright（Chromium）測試書架互動；首次使用需 `npx playwright install chromium` |
 
 ## 更新書目與心得
 
@@ -54,7 +56,8 @@ npm run dev
 2. 準備發布時，更新 `site/src/content/books/` 中對應書籍的 Markdown；frontmatter 保存書目，正文保存心得。草稿不會自動同步至網站。
 3. 新增書籍時，使用 `NNN-english-slug.md` 檔名；沒有英文名時可只用三位數排名，例如 `103.md`。檔名去除副檔名後即為書頁路由 `/book/<slug>`。
 4. 有封面時，將原圖放入 `book-png/NNN_書名.jpg`，並將書籍的 `cover` 設為 `NNN.jpg`。建置腳本依三位數排名複製至 `site/src/assets/covers/`；缺圖時顯示排版式替代封面。
-5. 執行 `npm run build`，並以 `npm run preview` 確認結果。
+5. 書名在封面上有換行時，可在 `site/src/data/title-breaks.ts` 記錄斷句，書架、3D 封面與書頁標題會照此換行；書脊與 3D 封面顏色由封面主色自動計算。
+6. 執行 `npm run build`，並以 `npm run preview` 確認結果。
 
 書籍 frontmatter 範例：
 

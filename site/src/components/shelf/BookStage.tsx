@@ -147,13 +147,26 @@ export default function BookStage({ book, origin, base, onClosed }: Props) {
     swipe.current = { x: e.clientX, moved: true };
     turn(dx < 0 ? 1 : -1);
   };
-  // On the open book a click turns the page (right page forward, left page back); outside it closes.
-  const onBackdropClick = (e: React.MouseEvent) => {
-    if (swipe.current?.moved) return void (swipe.current = null);
+  // Where a pointer is over the open book: 1 = right page, -1 = left page, 0 = off the book (or not open yet).
+  const pageAt = (e: React.MouseEvent) => {
     const r = bookRef.current!.getBoundingClientRect(); // the right-hand page; the open cover mirrors it on the left
     const onBook = e.clientY >= r.top && e.clientY <= r.bottom && e.clientX >= r.left - r.width && e.clientX <= r.right;
-    if (phase.current === "opened" && onBook) return turn(e.clientX >= r.left ? 1 : -1);
+    return phase.current === "opened" && onBook ? (e.clientX >= r.left ? 1 : -1) : 0;
+  };
+  // A click on the book turns the page (right forward, left back); outside it closes.
+  const onBackdropClick = (e: React.MouseEvent) => {
+    if (swipe.current?.moved) return void (swipe.current = null);
+    const side = pageAt(e);
+    if (side) return turn(side);
     close();
+  };
+  // The cursor shows which way a click would turn, or that the page cannot turn further.
+  const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (e.pointerType !== "mouse") return;
+    const side = pageAt(e);
+    const target = spreadRef.current + side;
+    const canTurn = side !== 0 && target >= 0 && target <= leafRefs.current.length;
+    e.currentTarget.dataset.turn = canTurn ? (side > 0 ? "next" : "prev") : side ? "none" : "";
   };
 
   // Escape closes, arrows turn pages; resize keeps the opened book centred.
@@ -264,7 +277,7 @@ export default function BookStage({ book, origin, base, onClosed }: Props) {
 
   return (
     <div ref={rootRef} className="stage" role="dialog" aria-modal="true" aria-label={`${book.dCover} 預覽`}>
-      <div className="stage-backdrop" onClick={onBackdropClick} onPointerDown={onPointerDown} onPointerUp={onPointerUp} />
+      <div className="stage-backdrop" onClick={onBackdropClick} onPointerDown={onPointerDown} onPointerUp={onPointerUp} onPointerMove={onPointerMove} />
       <div className="stage-scene">
         <div
           ref={bookRef}

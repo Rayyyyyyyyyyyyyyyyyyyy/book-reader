@@ -61,6 +61,15 @@ test("pages turn by arrows, buttons and clicks on the book, and fall back when i
   await spine(page, "001").click();
   await page.waitForTimeout(OPENED);
   const spreads = Number((await pageLabel(page))!.split("/")[1]);
+  // the cursor tells which way a click turns: forward on the right page, nothing back on the first spread
+  const book = (await page.locator(".book3d").evaluate((e) => e.getBoundingClientRect().toJSON())) as DOMRect;
+  const turnCursor = () => page.locator(".stage-backdrop").getAttribute("data-turn");
+  await page.mouse.move(book.x + book.width / 2, book.y + book.height / 2);
+  expect(await turnCursor()).toBe("next");
+  await page.mouse.move(book.x - book.width / 2, book.y + book.height / 2);
+  expect(await turnCursor()).toBe("none");
+  await page.mouse.move(5, 5);
+  expect(await turnCursor()).toBe("");
   await page.keyboard.press("ArrowRight");
   await page.waitForTimeout(250);
   await page.keyboard.press("ArrowRight"); // ignored while the sheet is still turning

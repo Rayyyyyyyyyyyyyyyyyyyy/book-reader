@@ -6,7 +6,8 @@ const CLOSED = 1700;
 const TURNED = 900;
 
 const spine = (page: Page, rank: string) => page.locator(`.spine-slot[data-slug^="${rank}"]`);
-const pageLabel = async (page: Page) => (await page.locator(".stage-page").textContent())?.replace(/\s/g, "");
+// spread position "n/N" (the visible counter shows pages: 書名頁, "3–4 / 11", 完)
+const pageLabel = (page: Page) => page.locator(".stage-page").getAttribute("data-spread");
 const focusedRank = (page: Page) => page.evaluate(() => document.activeElement?.getAttribute("data-slug")?.slice(0, 3));
 
 test.beforeEach(async ({ page }) => {
@@ -100,8 +101,14 @@ test("a book without a note has a title page and a note-pending page", async ({ 
   await page.keyboard.press("ArrowRight");
   await page.waitForTimeout(TURNED);
   expect(await pageLabel(page)).toBe("2/2");
-  await expect(page.getByRole("button", { name: "下一頁" })).toBeDisabled();
+  await expect(page.locator(".stage-page")).toHaveText("整理中");
   await expect(page.locator(".b-base")).toContainText("心得整理中");
+  // the end offers the next book that has a note, and going on opens it
+  const next = (await page.locator(".pg-next strong").textContent())!;
+  await page.getByRole("button", { name: `下一本有心得的書：${next}` }).click();
+  await page.waitForTimeout(CLOSED + OPENED);
+  await expect(page.locator(".stage[role=dialog]")).toHaveAttribute("aria-label", `${next} 預覽`);
+  await expect(page.locator(".stage-page")).toHaveText("書名頁");
 });
 
 test("a note is read page by page inside the book", async ({ page }) => {
@@ -111,6 +118,7 @@ test("a note is read page by page inside the book", async ({ page }) => {
   const spreads = Number(label.split("/")[1]);
   expect(label).toBe(`1/${spreads}`);
   expect(spreads).toBeGreaterThan(2);
+  await expect(page.locator(".stage-page")).toHaveText("書名頁");
   // every page shows its own column of the note, and together they cover all of it
   const r = await page.evaluate(() => {
     const cols = [...document.querySelectorAll<HTMLElement>(".b-leaf .note-cols")];
@@ -126,6 +134,8 @@ test("a note is read page by page inside the book", async ({ page }) => {
   }
   expect(await pageLabel(page)).toBe(`${spreads}/${spreads}`);
   await expect(page.locator(".pg-end")).toHaveText("完");
+  // an odd page count ends with the last page on the left, opposite 完
+  await expect(page.locator(".stage-page")).toHaveText(/^(完|(\d+) \/ \2)$/);
 });
 
 test("a note that fails to load points to the book page", async ({ page }) => {
@@ -144,7 +154,8 @@ test("search, categories, notes-only and the grid toggle drive the shelf", async
     await search.fill(q);
     expect(await count(), `search ${q}`).toBe(n);
   }
-  await expect(page.getByText("Nothing here yet.")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "找不到符合「zzzz」的書" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "清除搜尋" }).last()).toBeVisible();
   await search.fill("");
   await page.getByRole("button", { name: /財經與投資/ }).click();
   expect(await count()).toBe(19);

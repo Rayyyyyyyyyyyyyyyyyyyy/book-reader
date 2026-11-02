@@ -13,7 +13,8 @@ type Props = {
   book: BookMeta;
   origin: HTMLElement; // the spine face on the shelf
   base: string;
-  onClosed: () => void;
+  next: BookMeta | null; // the next book with a note, offered at the end
+  onClosed: (next?: BookMeta) => void; // with `next` when the reader asked to go on to it
 };
 
 const UI_SPACE = 76; // room kept under the book for the control bar
@@ -35,7 +36,7 @@ function shelfPose(origin: HTMLElement, H: number) {
   return { x: r.left + r.width / 2, y: r.top + r.height / 2 - H / 2, s: r.height / H, rw: r.width, rh: r.height };
 }
 
-export default function BookStage({ book, origin, base, onClosed }: Props) {
+export default function BookStage({ book, origin, base, next, onClosed }: Props) {
   const rootRef = useRef<HTMLDivElement>(null);
   const bookRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
@@ -91,7 +92,7 @@ export default function BookStage({ book, origin, base, onClosed }: Props) {
     { scope: rootRef },
   );
 
-  const close = contextSafe(() => {
+  const close = contextSafe((then?: BookMeta) => {
     if (phase.current === "closing") return;
     phase.current = "closing";
     timeline.current?.kill();
@@ -101,7 +102,7 @@ export default function BookStage({ book, origin, base, onClosed }: Props) {
     const openDeg = Math.abs(parseFloat(el.style.getPropertyValue("--open")) || 0);
     // turned sheets fall back first (last turned first), then the cover closes over them
     const turned = leafRefs.current.filter((l) => parseFloat(l.style.getPropertyValue("--f")) > 0).reverse();
-    const tl = gsap.timeline({ onComplete: onClosed });
+    const tl = gsap.timeline({ onComplete: () => onClosed(then) });
     tl.to(".stage-ui", { opacity: 0, duration: 0.15 }, 0);
     if (turned.length) tl.to(turned, { "--f": 0, duration: 0.4, stagger: Math.min(0.1, 0.4 / turned.length), ease: "power2.inOut" }, 0);
     tl.to(el, { "--open": 0, "--x": c.xc, duration: 0.05 + (0.55 * openDeg) / 180, ease: "power2.inOut" }, turned.length ? ">-0.1" : 0);
@@ -125,7 +126,8 @@ export default function BookStage({ book, origin, base, onClosed }: Props) {
   // Turn one sheet forward (+1) or back (-1); ignored mid-animation so a flip always completes.
   const turn = contextSafe((dir: 1 | -1) => {
     const target = spreadRef.current + dir;
-    if (phase.current !== "opened" || turning.current || target < 0 || target > leafRefs.current.length) return;
+    if (phase.current !== "opened" || turning.current || target < 0) return;
+    if (target > leafRefs.current.length) return void (next && close(next)); // past the last page: on to the next note
     turning.current = true;
     gsap.to(leafRefs.current[dir > 0 ? spreadRef.current : target], {
       "--f": dir > 0 ? 1 : 0,
@@ -165,7 +167,7 @@ export default function BookStage({ book, origin, base, onClosed }: Props) {
     if (e.pointerType !== "mouse") return;
     const side = pageAt(e);
     const target = spreadRef.current + side;
-    const canTurn = side !== 0 && target >= 0 && target <= leafRefs.current.length;
+    const canTurn = side !== 0 && target >= 0 && (target <= leafRefs.current.length || !!next);
     e.currentTarget.dataset.turn = canTurn ? (side > 0 ? "next" : "prev") : side ? "none" : "";
   };
 
@@ -273,6 +275,21 @@ export default function BookStage({ book, origin, base, onClosed }: Props) {
         ...Array.from({ length: Math.ceil((notes.length - 1) / 2) }, (_, k) => [notes[2 * k + 1], notes[2 * k + 2] ?? null]),
       ];
 
+  // Where the reader is, in pages: the title page, note pages a–b of N, or the end.
+  const atEnd = spread === sheets.length;
+  const first = geo.single ? spread : 2 * spread - 1;
+  const last = Math.min(geo.single ? spread : 2 * spread, pages);
+  const where =
+    spread === 0
+      ? { short: "書名頁", long: "書名頁" }
+      : first <= last
+        ? { short: `${first === last ? first : `${first}–${last}`} / ${pages}`, long: `第 ${first === last ? first : `${first} 到 ${last}`} 頁，共 ${pages} 頁` }
+        : pages
+          ? { short: "完", long: "心得結束" }
+          : book.hasNote
+            ? { short: note === "failed" ? "載入失敗" : "載入中", long: note === "failed" ? "心得載入失敗" : "心得載入中" }
+            : { short: "整理中", long: "心得整理中" };
+
   const { W, H, T, start } = geo;
 
   return (
@@ -315,7 +332,14 @@ export default function BookStage({ book, origin, base, onClosed }: Props) {
                 </p>
               </>
             )}
-            <div className="pg-foot">百冊 · One Hundred</div>
+            {next ? (
+              <div className="pg-next">
+                <span>下一本有心得的書</span>
+                <strong>{next.dCover}</strong>
+              </div>
+            ) : (
+              <div className="pg-foot">百冊 · One Hundred</div>
+            )}
           </div>
           {html && !pages && (
             <div className="b-page b-base note-measure" aria-hidden="true">
@@ -365,19 +389,28 @@ export default function BookStage({ book, origin, base, onClosed }: Props) {
 
       {html && <div className="sr-only" dangerouslySetInnerHTML={{ __html: html }} />}
       <div className="stage-ui">
-        <button ref={closeRef} type="button" className="stage-btn" onClick={close} aria-label="收回書架">
+        <button ref={closeRef} type="button" className="stage-btn" onClick={() => close()} aria-label="收回書架">
           <span className="stage-lbl">收回書架 </span>
           <span aria-hidden="true">×</span>
         </button>
         <button type="button" className="stage-btn stage-arrow" onClick={() => turn(-1)} disabled={spread === 0} aria-label="上一頁">
           ‹
         </button>
-        <span className="stage-page" aria-live="polite">
-          {spread + 1} / {sheets.length + 1}
+        <span className="stage-page" aria-hidden="true" data-spread={`${spread + 1}/${sheets.length + 1}`}>
+          {where.short}
         </span>
-        <button type="button" className="stage-btn stage-arrow" onClick={() => turn(1)} disabled={spread === sheets.length} aria-label="下一頁">
-          ›
-        </button>
+        <span className="sr-only" aria-live="polite">
+          {where.long}
+        </span>
+        {atEnd && next ? (
+          <button type="button" className="stage-btn stage-next" onClick={() => turn(1)} aria-label={`下一本有心得的書：${next.dCover}`}>
+            下一本 <span aria-hidden="true">›</span>
+          </button>
+        ) : (
+          <button type="button" className="stage-btn stage-arrow" onClick={() => turn(1)} disabled={atEnd} aria-label="下一頁">
+            ›
+          </button>
+        )}
         <a className="stage-cta" href={href}>
           完整書頁 <span aria-hidden="true">→</span>
         </a>

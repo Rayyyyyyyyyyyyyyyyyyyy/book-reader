@@ -52,7 +52,7 @@ export default function BookGrid({ books, cats, base }: Props) {
         return {
           ...c,
           books: bs,
-          countLabel: bs.length + (c.key === "soul" ? " 篇筆記" : " 本"),
+          countLabel: bs.length + " 本",
         };
       })
       .filter((s) => s.books.length > 0);
@@ -280,9 +280,26 @@ export default function BookGrid({ books, cats, base }: Props) {
             </section>
           ))
         ) : (
-          <div style={{ textAlign: "center", padding: "90px 20px" }}>
-            <div style={{ fontFamily: "var(--serif-en)", fontStyle: "italic", fontSize: 30, color: "#bcb19c", marginBottom: 14 }}>Nothing here yet.</div>
-            <div style={{ fontSize: 15, color: "#8a8175" }}>找不到符合「{query}」的書，試試其他關鍵字。</div>
+          <div className="empty" role="status">
+            <h2>{hasQuery ? `找不到符合「${query}」的書` : "這個分類還沒有讀書心得"}</h2>
+            <p>{hasQuery ? "試試書名的一部分、作者英文名，或編號（例如 109）。" : "其他分類裡有已完成的心得。"}</p>
+            <div className="empty-actions">
+              {hasQuery && (
+                <button type="button" className="chip" onClick={() => setQuery("")}>
+                  清除搜尋
+                </button>
+              )}
+              {activeCategory !== "all" && (
+                <button type="button" className="chip" onClick={() => setActiveCategory("all")}>
+                  看全部分類
+                </button>
+              )}
+              {notesOnly && (
+                <button type="button" className="chip" onClick={() => setNotesOnly(false)}>
+                  顯示沒有心得的書
+                </button>
+              )}
+            </div>
           </div>
         )}
       </main>

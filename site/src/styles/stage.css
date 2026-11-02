@@ -154,6 +154,9 @@
 .note-cols ul, .note-cols ol { margin: 0 0 .8em; padding-left: 1.3em; }
 .note-cols hr { border: 0; border-top: 1px solid #e3d9c6; margin: 1.2em 0; }
 .pg-folio { margin-top: .8em; text-align: center; font-family: var(--serif-en); font-size: .8em; letter-spacing: .12em; color: #9a9183; }
+.pg-next { margin-top: auto; display: flex; flex-direction: column; gap: .3em; padding-top: 1em; border-top: 1px solid #e3d9c6; }
+.pg-next span { font-size: .8em; letter-spacing: .12em; color: var(--accent); }
+.pg-next strong { font-weight: 600; color: var(--ink); }
 .pg-end { margin: auto; font-size: 1.6em; letter-spacing: .3em; color: var(--accent); }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
@@ -174,6 +177,7 @@
   border: 1px solid #cdc2ad; background: transparent; color: #5c544a;
 }
 .stage-arrow { padding: 8px 14px; font-size: 18px; line-height: 1; }
+.stage-next { background: var(--ink); border-color: var(--ink); color: var(--paper); }
 .stage-arrow:disabled { opacity: .35; cursor: default; }
 .stage-page { font-family: var(--serif-en); font-size: 15px; color: #6f675b; min-width: 3.2em; text-align: center; }
 @media (max-width: 639px) {

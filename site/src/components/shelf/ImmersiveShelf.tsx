@@ -41,7 +41,21 @@ export default function ImmersiveShelf({ sections, base }: Props) {
     setSelected({ book, button, face });
   };
 
-  const closed = () => {
+  // The end of a book offers the next book with a note, in the order they stand on the shelves.
+  const order = sections.flatMap((sec) => byHeight(sec.books));
+  const nextNote = (book: BookMeta) => {
+    const at = order.findIndex((b) => b.slug === book.slug);
+    return [...order.slice(at + 1), ...order.slice(0, at)].find((b) => b.hasNote) ?? null;
+  };
+
+  const closed = (next?: BookMeta) => {
+    const button = next && document.querySelector<HTMLButtonElement>(`.spine-slot[data-slug="${next.slug}"]`);
+    const face = button?.querySelector<HTMLElement>(".spine-face");
+    if (button && face && next) {
+      // straight on to the next book: bring its spine into view, then pull it out
+      button.scrollIntoView({ block: "center", inline: "center" });
+      return setSelected({ book: next, button, face });
+    }
     returnFocus.current = selected?.button ?? null;
     lockScroll(false);
     setSelected(null);
@@ -73,7 +87,14 @@ export default function ImmersiveShelf({ sections, base }: Props) {
       ))}
       {selected &&
         createPortal(
-          <BookStage key={selected.book.slug} book={selected.book} origin={selected.face} base={base} onClosed={closed} />,
+          <BookStage
+            key={selected.book.slug}
+            book={selected.book}
+            origin={selected.face}
+            base={base}
+            next={nextNote(selected.book)}
+            onClosed={closed}
+          />,
           document.body,
         )}
     </>

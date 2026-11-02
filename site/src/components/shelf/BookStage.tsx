@@ -36,6 +36,13 @@ function shelfPose(origin: HTMLElement, H: number) {
   return { x: r.left + r.width / 2, y: r.top + r.height / 2 - H / 2, s: r.height / H, rw: r.width, rh: r.height };
 }
 
+// One stroke icon set for the stage controls (drawn, not font glyphs).
+const Icon = ({ d }: { d: string }) => (
+  <svg className="stage-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d={d} />
+  </svg>
+);
+
 export default function BookStage({ book, origin, base, next, onClosed }: Props) {
   const rootRef = useRef<HTMLDivElement>(null);
   const bookRef = useRef<HTMLDivElement>(null);
@@ -438,10 +445,10 @@ export default function BookStage({ book, origin, base, next, onClosed }: Props)
       <div className="stage-ui">
         <button ref={closeRef} type="button" className="stage-btn" onClick={() => close()} aria-label="收回書架">
           <span className="stage-lbl">收回書架 </span>
-          <span aria-hidden="true">×</span>
+          <Icon d="M4 4l8 8M12 4l-8 8" />
         </button>
         <button type="button" className="stage-btn stage-arrow" onClick={() => turn(-1)} disabled={spread === 0} aria-label="上一頁">
-          ‹
+          <Icon d="M10 3.5L5.5 8 10 12.5" />
         </button>
         <span className="stage-page" aria-hidden="true" data-spread={`${spread + 1}/${sheets.length + 1}`}>
           {where.short}
@@ -451,15 +458,15 @@ export default function BookStage({ book, origin, base, next, onClosed }: Props)
         </span>
         {atEnd && next ? (
           <button type="button" className="stage-btn stage-next" onClick={() => turn(1)} aria-label={`下一本有心得的書：${next.dCover}`}>
-            下一本 <span aria-hidden="true">›</span>
+            下一本 <Icon d="M6 3.5L10.5 8 6 12.5" />
           </button>
         ) : (
           <button type="button" className="stage-btn stage-arrow" onClick={() => turn(1)} disabled={atEnd} aria-label="下一頁">
-            ›
+            <Icon d="M6 3.5L10.5 8 6 12.5" />
           </button>
         )}
         <a className="stage-cta" href={href}>
-          完整書頁 <span aria-hidden="true">→</span>
+          完整書頁 <Icon d="M3 8h10M9 4l4 4-4 4" />
         </a>
       </div>
     </div>

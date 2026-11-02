@@ -23,6 +23,8 @@ body {
 #hundred-root.density-compact { --cardmin: 152px; }
 
 /* category accents */
+/* accent used as small text: darkened so it clears WCAG AA on the paper in every category */
+[class*="cat-"] { --accent-ink: color-mix(in oklab, var(--accent) 72%, #1e1914); }
 .cat-psych     { --accent: #586b8f; --wash: #e9edf3; }
 .cat-biz       { --accent: #5a7a63; --wash: #e9f1ea; }
 .cat-finance   { --accent: #9a7b3e; --wash: #f3ecdc; }
@@ -79,12 +81,17 @@ body {
   .hero p { font-size: 14.5px; line-height: 1.8; }
 }
 
+/* browser surfaces in the house palette */
+::selection { background: #e4d3b0; color: #2c2620; }
+input { caret-color: #2c2620; }
+input::placeholder { color: #6f675b; opacity: 1; }
+
 .empty { text-align: center; padding: 72px 20px; }
 .empty h2 { font-weight: 600; font-size: 22px; color: var(--ink); margin: 0 0 10px; }
 .empty p { font-size: 15px; color: #6f675b; margin: 0 0 22px; }
 .empty-actions { display: flex; gap: 9px; justify-content: center; flex-wrap: wrap; }
 .book-card:focus-visible { outline: 2px solid var(--accent, #a5623f); outline-offset: 6px; }
-.chip .ct { font-family: var(--serif-en); font-style: italic; font-size: 12.5px; opacity: .65; }
+.chip .ct { font-family: var(--serif-en); font-style: italic; font-size: 12.5px; opacity: .9; }
 
 /* reveal-on-scroll (driven by reveal.ts). Honour reduced motion. */
 @media (prefers-reduced-motion: reduce) {

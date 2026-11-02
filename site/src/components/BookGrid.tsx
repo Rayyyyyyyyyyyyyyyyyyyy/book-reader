@@ -170,7 +170,7 @@ export default function BookGrid({ books, cats, base }: Props) {
         <div className="masthead">
           <a href={base} style={{ display: "flex", flexDirection: "column", gap: 1, flex: "0 0 auto", textDecoration: "none", color: "inherit" }}>
             <div style={{ fontWeight: 700, fontSize: 21, letterSpacing: ".14em", color: "var(--ink)" }}>百冊</div>
-            <div style={{ fontFamily: "var(--serif-en)", fontStyle: "italic", fontSize: 11.5, letterSpacing: ".2em", color: "#a59b89" }}>ONE HUNDRED · 選書</div>
+            <div style={{ fontFamily: "var(--serif-en)", fontStyle: "italic", fontSize: 11.5, letterSpacing: ".2em", color: "#6f675b" }}>ONE HUNDRED · 選書</div>
           </a>
           <span className="view-toggle" role="group" aria-label="檢視方式">
             <button type="button" className={"chip " + (view === "shelf" ? "on" : "")} aria-pressed={view === "shelf"} onClick={() => chooseView("shelf")}>
@@ -181,7 +181,7 @@ export default function BookGrid({ books, cats, base }: Props) {
             </button>
           </span>
           <div className="search" style={{ display: "flex", alignItems: "center", gap: 10, flex: "0 1 340px", borderBottom: "1px solid #c9bda6", paddingBottom: 5 }}>
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#b3a892" strokeWidth="1.3">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#8a8070" strokeWidth="1.3">
               <circle cx="6" cy="6" r="4.2" />
               <line x1="9.4" y1="9.4" x2="12.6" y2="12.6" strokeLinecap="round" />
             </svg>
@@ -255,7 +255,7 @@ export default function BookGrid({ books, cats, base }: Props) {
               <div data-reveal="1" style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 18, flexWrap: "wrap", borderBottom: "1px solid #d6cbb8", paddingBottom: 14, marginBottom: 34 }}>
                 <div style={{ display: "flex", alignItems: "baseline", gap: 16, flexWrap: "wrap" }}>
                   <h2 style={{ fontWeight: 600, fontSize: "clamp(22px,3vw,30px)", color: "var(--ink)", margin: 0, letterSpacing: ".02em" }}>{sec.zh}</h2>
-                  <span style={{ fontFamily: "var(--serif-en)", fontStyle: "italic", fontSize: 18, color: "var(--accent)" }}>{sec.en}</span>
+                  <span style={{ fontFamily: "var(--serif-en)", fontStyle: "italic", fontSize: 18, color: "var(--accent-ink)" }}>{sec.en}</span>
                 </div>
                 <span style={{ fontFamily: "var(--serif-en)", fontStyle: "italic", fontSize: 15, color: "#9a9183", letterSpacing: ".06em" }}>{sec.countLabel}</span>
               </div>
@@ -275,11 +275,11 @@ export default function BookGrid({ books, cats, base }: Props) {
                     <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
                       <div style={{ fontFamily: "var(--serif-en)", fontStyle: "italic", fontSize: 15, color: "#6f675b", lineHeight: 1.35 }}>{book.dCaption}</div>
                       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
-                        <span style={{ fontSize: 12, color: "#9a9183", letterSpacing: ".02em" }}>
+                        <span style={{ fontSize: 12.5, color: "#6f675b", letterSpacing: ".02em" }}>
                           {book.hasNote && <span className="ribbon-mark" role="img" aria-label="有讀書心得" />}
                           {book.author}
                         </span>
-                        <span style={{ fontFamily: "var(--serif-en)", fontSize: 14, color: "var(--accent)", letterSpacing: ".04em" }}>{book.tagStr}</span>
+                        <span style={{ fontFamily: "var(--serif-en)", fontSize: 14, color: "var(--accent-ink)", letterSpacing: ".04em" }}>{book.tagStr}</span>
                       </div>
                     </div>
                   </a>

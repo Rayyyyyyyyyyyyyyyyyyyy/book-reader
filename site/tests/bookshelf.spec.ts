@@ -160,9 +160,9 @@ test("search, categories, notes-only and the grid toggle drive the shelf", async
   await page.getByRole("button", { name: /財經與投資/ }).click();
   expect(await count()).toBe(19);
   await page.getByRole("button", { name: /^全部/ }).click();
-  await page.getByRole("button", { name: /篇讀書筆記/ }).click();
+  await page.getByRole("button", { name: /讀書筆記/ }).click();
   expect(await count()).toBe(14);
-  await page.getByRole("button", { name: /篇讀書筆記/ }).click();
+  await page.getByRole("button", { name: /讀書筆記/ }).click();
   await page.getByRole("button", { name: "列表" }).click();
   expect(await count()).toBe(0);
   // list cards are plain links to the book page (no second, different "open a book" modal)

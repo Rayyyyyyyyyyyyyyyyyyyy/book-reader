@@ -153,7 +153,7 @@ export default function BookGrid({ books, cats, base }: Props) {
           borderBottom: "1px solid #e1d8c7",
         }}
       >
-        <div style={{ maxWidth: 1200, margin: "0 auto", padding: "13px 28px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 24 }}>
+        <div className="masthead">
           <a href={base} style={{ display: "flex", flexDirection: "column", gap: 1, flex: "0 0 auto", textDecoration: "none", color: "inherit" }}>
             <div style={{ fontWeight: 700, fontSize: 21, letterSpacing: ".14em", color: "var(--ink)" }}>百冊</div>
             <div style={{ fontFamily: "var(--serif-en)", fontStyle: "italic", fontSize: 11.5, letterSpacing: ".2em", color: "#a59b89" }}>ONE HUNDRED · 選書</div>
@@ -171,56 +171,32 @@ export default function BookGrid({ books, cats, base }: Props) {
             />
           </div>
         </div>
-        <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 28px 13px" }}>
-          <div className="chips" style={{ display: "flex", gap: 9, overflowX: "auto", paddingBottom: 2 }}>
-            <button className={"chip " + (activeCategory === "all" ? "on" : "")} onClick={() => setActiveCategory("all")}>
+        <div className="filters">
+          <div className="chips" role="group" aria-label="篩選">
+            <button
+              type="button"
+              className={"chip chip-notes " + (notesOnly ? "on" : "")}
+              aria-pressed={notesOnly}
+              title={notesOnly ? "顯示全部書籍" : "只看有讀書心得的書"}
+              onClick={() => setNotesOnly((v) => !v)}
+            >
+              <span className="ribbon-mark" aria-hidden="true" />
+              <span>讀書筆記</span>
+              <span className="ct">{noteTotal}</span>
+            </button>
+            <span className="chips-rule" aria-hidden="true" />
+            <button className={"chip " + (activeCategory === "all" ? "on" : "")} aria-pressed={activeCategory === "all"} onClick={() => setActiveCategory("all")}>
               <span>全部</span>
               <span className="ct">{books.length}</span>
             </button>
             {cats.map((c) => (
-              <button key={c.key} className={"chip " + (activeCategory === c.key ? "on" : "")} onClick={() => setActiveCategory(c.key)}>
+              <button key={c.key} className={"chip " + (activeCategory === c.key ? "on" : "")} aria-pressed={activeCategory === c.key} onClick={() => setActiveCategory(c.key)}>
                 <span>{c.zh}</span>
                 <span className="ct">{counts[c.key]}</span>
               </button>
             ))}
           </div>
-        </div>
-      </header>
-
-      <section style={{ maxWidth: 1200, margin: "0 auto", padding: "88px 28px 64px" }}>
-        <div data-reveal="1" style={{ fontFamily: "var(--serif-en)", fontStyle: "italic", letterSpacing: ".32em", fontSize: 13, color: "#a5623f", textTransform: "uppercase", marginBottom: 26 }}>
-          A Reading List · 選書清單
-        </div>
-        <h1 data-reveal="1" style={{ fontWeight: 600, fontSize: "clamp(40px,7vw,82px)", lineHeight: 1.12, letterSpacing: ".01em", color: "var(--ink)", margin: "0 0 26px" }}>
-          影響一個世代的<br />一百本書。
-        </h1>
-        <div data-reveal="1" style={{ fontFamily: "var(--serif-en)", fontStyle: "italic", fontSize: "clamp(18px,2.4vw,25px)", color: "#6f675b", marginBottom: 30 }}>
-          One hundred books that shape the way a generation thinks.
-        </div>
-        <p data-reveal="1" style={{ maxWidth: 560, fontSize: 16, lineHeight: 1.95, color: "#5c544a", fontWeight: 300, margin: "0 0 38px" }}>
-          從心理學、商業、投資到腦神經科學——這是我的選書清單，收藏那些真正改變我們思考方式的好書。每本書的背後，連結著我自己的讀書心得；封面與內容，將陸續補上。
-        </p>
-        <div data-reveal="1" style={{ display: "flex", alignItems: "center", gap: 18, flexWrap: "wrap", fontFamily: "var(--serif-en)", fontStyle: "italic", fontSize: 15, color: "#9a9183", letterSpacing: ".04em" }}>
-          <button
-            type="button"
-            onClick={() => setNotesOnly((v) => !v)}
-            title={notesOnly ? "顯示全部書籍" : "只看有讀書心得的書"}
-            style={{
-              font: "inherit",
-              fontSize: 17,
-              color: notesOnly ? "#a5623f" : "var(--ink)",
-              background: "transparent",
-              border: "none",
-              padding: 0,
-              cursor: "pointer",
-              borderBottom: "1px solid",
-              borderColor: notesOnly ? "#a5623f" : "transparent",
-            }}
-          >
-            <span className="ribbon-mark" aria-hidden="true" />
-            {noteTotal} 篇讀書筆記
-          </button>
-          <span role="group" aria-label="檢視方式" style={{ display: "inline-flex", gap: 6, fontStyle: "normal" }}>
+          <span className="view-toggle" role="group" aria-label="檢視方式">
             <button type="button" className={"chip " + (view === "shelf" ? "on" : "")} aria-pressed={view === "shelf"} onClick={() => setView("shelf")}>
               書架
             </button>
@@ -229,9 +205,21 @@ export default function BookGrid({ books, cats, base }: Props) {
             </button>
           </span>
         </div>
+      </header>
+
+      <section className="hero">
+        <h1 data-reveal="1">
+          影響一個世代的<br />一百本書。
+        </h1>
+        <div className="hero-en" data-reveal="1">
+          One hundred books that shape the way a generation thinks.
+        </div>
+        <p data-reveal="1">
+          從心理學、商業、投資到腦神經科學——這是我的選書清單，收藏那些真正改變我們思考方式的好書。每本書的背後，連結著我自己的讀書心得；封面與內容，將陸續補上。
+        </p>
       </section>
 
-      <main style={{ maxWidth: 1200, margin: "0 auto", padding: "8px 28px 110px" }}>
+      <main className="catalog">
         {hasQuery && (
           <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 36, flexWrap: "wrap", borderBottom: "1px solid #e1d8c7", paddingBottom: 18 }}>
             <span style={{ fontSize: 14, color: "#5c544a" }}>
@@ -244,7 +232,7 @@ export default function BookGrid({ books, cats, base }: Props) {
         )}
 
         {hasResults && view === "shelf" ? (
-          <ImmersiveShelf sections={sections} base={base} />
+          <ImmersiveShelf sections={sections} base={base} fit={notesOnly} />
         ) : hasResults ? (
           sections.map((sec) => (
             <section key={sec.key} className={"cat-" + sec.key} style={{ marginBottom: 72 }}>

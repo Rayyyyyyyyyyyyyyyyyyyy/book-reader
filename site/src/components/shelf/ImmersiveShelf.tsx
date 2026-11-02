@@ -8,7 +8,7 @@ import "../../styles/shelf.css";
 
 export type ShelfSection = { key: string; zh: string; en: string; books: BookMeta[]; countLabel?: string };
 
-type Props = { sections: ShelfSection[]; base: string };
+type Props = { sections: ShelfSection[]; base: string; fit?: boolean };
 
 type Selection = { book: BookMeta; button: HTMLButtonElement; face: HTMLElement };
 
@@ -29,7 +29,7 @@ function lockScroll(on: boolean) {
   }
 }
 
-export default function ImmersiveShelf({ sections, base }: Props) {
+export default function ImmersiveShelf({ sections, base, fit }: Props) {
   const [selected, setSelected] = useState<Selection | null>(null);
   const returnFocus = useRef<HTMLButtonElement | null>(null);
 
@@ -73,7 +73,7 @@ export default function ImmersiveShelf({ sections, base }: Props) {
   return (
     <>
       {sections.map((sec) => (
-        <section key={sec.key} className={`shelf-section cat-${sec.key}`} aria-label={sec.zh}>
+        <section key={sec.key} className={`shelf-section cat-${sec.key}${fit ? " shelf-fit" : ""}`} aria-label={sec.zh}>
           <div className="shelf-head">
             <h2>{sec.zh}</h2>
             <span className="shelf-en">{sec.en}</span>

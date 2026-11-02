@@ -58,7 +58,9 @@
   top: 3px; left: 0;
   width: calc(var(--w) - 3px); height: calc(var(--h) - 6px);
 }
-.b-base { transform: translateZ(calc(var(--t) / 2 - 3px)); }
+/* the last page sits under every unturned sheet (sheet i rests at t/2 - (i+1)px) */
+.b-base { transform: translateZ(calc(var(--t) / 2 - (var(--n) + 2) * 1px)); }
+.note-measure { visibility: hidden; }
 
 /* a sheet turns on the spine hinge (--f: 0 → 1). Unturned sheets stack under the cover, top sheet highest;
    turned ones lie over the open cover, latest highest — so z moves from below t/2 to above it. */
@@ -134,6 +136,25 @@
 .pg-card { margin: auto 0; display: grid; grid-template-columns: auto 1fr; gap: .9em 1.2em; font-size: .95em; }
 .pg-card dt { color: var(--accent); letter-spacing: .1em; }
 .pg-card dd { margin: 0; color: #5c544a; }
+/* note pages: the whole note flows into one-column-wide columns that overflow sideways;
+   page i shifts column i into the clipped window (JS only counts the columns) */
+.note-flow { flex: 1; min-height: 0; overflow: hidden; margin-top: 1.2em; }
+.note-cols {
+  height: 100%;
+  columns: 1; column-gap: 40px; column-fill: auto;
+  transform: translateX(calc(var(--pi) * -1 * (100% + 40px)));
+  line-height: 1.85; color: #4a4339; font-weight: 300;
+}
+.note-cols > :first-child { margin-top: 0; }
+.note-cols h2, .note-cols h3 { font-weight: 600; color: var(--ink); line-height: 1.4; margin: 1.1em 0 .5em; break-after: avoid; }
+.note-cols h2 { font-size: 1.25em; }
+.note-cols h3 { font-size: 1.1em; }
+.note-cols p { margin: 0 0 .8em; }
+.note-cols ul, .note-cols ol { margin: 0 0 .8em; padding-left: 1.3em; }
+.note-cols hr { border: 0; border-top: 1px solid #e3d9c6; margin: 1.2em 0; }
+.pg-folio { margin-top: .8em; text-align: center; font-family: var(--serif-en); font-size: .8em; letter-spacing: .12em; color: #9a9183; }
+.pg-end { margin: auto; font-size: 1.6em; letter-spacing: .3em; color: var(--accent); }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .pg-ornament { margin: auto; font-size: 2.4em; color: #c9b993; }
 
 /* ---------- stage controls (2D, so links stay clickable on every engine) ---------- */

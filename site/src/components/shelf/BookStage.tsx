@@ -17,7 +17,6 @@ type Props = {
 };
 
 const UI_SPACE = 76; // room kept under the book for the control bar
-const LEAVES = 2; // turnable sheets → LEAVES + 1 spreads
 
 // Book size for this viewport. Pivot (transform-origin) is the spine plane, so
 // x/y below place the spine; at rotateY(90°) the spine face lies flat on screen
@@ -47,6 +46,9 @@ export default function BookStage({ book, origin, base, onClosed }: Props) {
   const [spread, setSpread] = useState(0);
   const turning = useRef(false);
   const swipe = useRef<{ x: number; moved: boolean } | null>(null);
+  // The note is fetched from the book's own page, then cut into pages by CSS columns (see .note-cols).
+  const [note, setNote] = useState<{ html: string; pages: number } | "failed" | null>(null);
+  const measureRef = useRef<HTMLDivElement>(null);
 
   // Geometry is fixed for the life of the stage; only the on-screen position follows resizes.
   const [geo] = useState(() => {
@@ -101,7 +103,7 @@ export default function BookStage({ book, origin, base, onClosed }: Props) {
     const turned = leafRefs.current.filter((l) => parseFloat(l.style.getPropertyValue("--f")) > 0).reverse();
     const tl = gsap.timeline({ onComplete: onClosed });
     tl.to(".stage-ui", { opacity: 0, duration: 0.15 }, 0);
-    if (turned.length) tl.to(turned, { "--f": 0, duration: 0.4, stagger: 0.1, ease: "power2.inOut" }, 0);
+    if (turned.length) tl.to(turned, { "--f": 0, duration: 0.4, stagger: Math.min(0.1, 0.4 / turned.length), ease: "power2.inOut" }, 0);
     tl.to(el, { "--open": 0, "--x": c.xc, duration: 0.05 + (0.55 * openDeg) / 180, ease: "power2.inOut" }, turned.length ? ">-0.1" : 0);
     if (origin.isConnected) {
       // re-measure: the shelf may have moved since we opened (resize)
@@ -123,7 +125,7 @@ export default function BookStage({ book, origin, base, onClosed }: Props) {
   // Turn one sheet forward (+1) or back (-1); ignored mid-animation so a flip always completes.
   const turn = contextSafe((dir: 1 | -1) => {
     const target = spreadRef.current + dir;
-    if (phase.current !== "opened" || turning.current || target < 0 || target > LEAVES) return;
+    if (phase.current !== "opened" || turning.current || target < 0 || target > leafRefs.current.length) return;
     turning.current = true;
     gsap.to(leafRefs.current[dir > 0 ? spreadRef.current : target], {
       "--f": dir > 0 ? 1 : 0,
@@ -181,6 +183,104 @@ export default function BookStage({ book, origin, base, onClosed }: Props) {
   }, []);
 
   const href = `${base}book/${book.slug}`;
+
+  useEffect(() => {
+    if (!book.hasNote) return;
+    const ctl = new AbortController();
+    fetch(href, { signal: ctl.signal })
+      .then((r) => (r.ok ? r.text() : Promise.reject(new Error(`HTTP ${r.status}`))))
+      .then((text) => {
+        // our own built page (same origin), so its HTML is trusted
+        const el = new DOMParser().parseFromString(text, "text/html").querySelector("#note.note");
+        if (!el) throw new Error("note missing");
+        el.querySelector(".note-label")?.remove();
+        setNote({ html: el.innerHTML, pages: 0 });
+      })
+      .catch((e) => e.name !== "AbortError" && setNote("failed"));
+    return () => ctl.abort();
+  }, []);
+
+  // Count pages once fonts are in: the columns overflow sideways, one column per page.
+  useEffect(() => {
+    if (typeof note !== "object" || !note || note.pages) return;
+    let live = true;
+    document.fonts.ready.then(() => {
+      const c = measureRef.current;
+      if (!live || !c) return;
+      const gap = parseFloat(getComputedStyle(c).columnGap);
+      setNote({ ...note, pages: Math.max(1, Math.round((c.scrollWidth + gap) / (c.clientWidth + gap))) });
+    });
+    return () => void (live = false);
+  }, [note]);
+
+  const html = typeof note === "object" && note ? note.html : "";
+  const pages = typeof note === "object" && note ? note.pages : 0;
+  // i < 0 is the hidden copy that gets measured
+  const notePage = (i: number) => (
+    <>
+      <div className="pg-meta">
+        <span>{book.numStr}</span>
+        <span>讀書心得</span>
+      </div>
+      <div className="note-flow" aria-hidden="true">
+        <div
+          className="note-cols"
+          ref={i < 0 ? measureRef : undefined}
+          style={{ "--pi": Math.max(i, 0) } as React.CSSProperties}
+          dangerouslySetInnerHTML={{ __html: html }}
+        />
+      </div>
+      <div className="pg-folio">{i < 0 ? "" : i + 1}</div>
+    </>
+  );
+  const notes = Array.from({ length: pages }, (_, i) => notePage(i));
+  // Desktop reads a spread (back = left page, front = right page); phones only ever see fronts.
+  const noteSheets = geo.single
+    ? notes.map((p) => [p, null])
+    : Array.from({ length: Math.ceil(notes.length / 2) }, (_, k) => [notes[2 * k], notes[2 * k + 1] ?? null]);
+
+  // turnable sheets, top first; the intro keeps every fact on a right-hand page so phones see it all
+  const sheets: React.ReactNode[][] = [
+      [
+        <>
+          <div className="pg-meta">
+            <span>{book.numStr}</span>
+            <span>{book.catZh}</span>
+          </div>
+          <h2 className="pg-title">{coverTitle(book)}</h2>
+          <div className="pg-caption">{book.dCaption}</div>
+          <div className="pg-author">{book.author}</div>
+          <div className="pg-foot">{book.hasNote ? "已收錄讀書心得" : "心得整理中"}</div>
+        </>,
+        <dl className="pg-card">
+          <dt>編號</dt>
+          <dd>{book.numStr}</dd>
+          <dt>分類</dt>
+          <dd>{book.catZh}</dd>
+          <dt>作者</dt>
+          <dd>{book.author}</dd>
+          {book.zh && book.en && (
+            <>
+              <dt>原文書名</dt>
+              <dd>{book.en}</dd>
+            </>
+          )}
+        </dl>,
+      ],
+      [
+        <>
+          <div className="pg-meta">
+            <span>{book.numStr}</span>
+            <span>關於這本書</span>
+          </div>
+          <h3 className="pg-head">{book.dCover}</h3>
+          <p className="pg-desc">{book.desc}</p>
+        </>,
+        <div className="pg-ornament">❦</div>,
+      ],
+    ...noteSheets,
+  ];
+
   const { W, H, T, start } = geo;
 
   return (
@@ -190,7 +290,7 @@ export default function BookStage({ book, origin, base, onClosed }: Props) {
         <div
           ref={bookRef}
           className={`book3d cat-${book.cat}`}
-          style={{ "--w": `${W}px`, "--h": `${H}px`, "--t": `${T}px` } as React.CSSProperties}
+          style={{ "--w": `${W}px`, "--h": `${H}px`, "--t": `${T}px`, "--n": sheets.length } as React.CSSProperties}
         >
           <div className="b-back" />
           <div className="b-edge b-edge-fore" />
@@ -203,59 +303,35 @@ export default function BookStage({ book, origin, base, onClosed }: Props) {
             />
           </div>
 
-          {/* last right-hand page: where the note lives */}
-          <div className="b-page b-base" aria-hidden={spread !== LEAVES || undefined}>
+          {/* last right-hand page: the end of the note, or where it would be */}
+          <div className="b-page b-base" aria-hidden={spread !== sheets.length || undefined}>
             <div className="pg-meta">
               <span>{book.numStr}</span>
               <span>讀書心得</span>
             </div>
-            <h3 className="pg-head">{book.hasNote ? "我的讀書心得" : "心得整理中"}</h3>
-            <p className="pg-desc">
-              {book.hasNote ? "這本書的心得已收錄在書頁，點下方按鈕閱讀全文。" : "書頁已建立，心得完成後會發布在那裡。"}
-            </p>
+            {pages ? (
+              <div className="pg-end">完</div>
+            ) : (
+              <>
+                <h3 className="pg-head">{book.hasNote ? "我的讀書心得" : "心得整理中"}</h3>
+                <p className="pg-desc">
+                  {!book.hasNote
+                    ? "書頁已建立，心得完成後會發布在那裡。"
+                    : note === "failed"
+                      ? "心得載入失敗，點下方按鈕到書頁閱讀全文。"
+                      : "心得載入中…"}
+                </p>
+              </>
+            )}
             <div className="pg-foot">百冊 · One Hundred</div>
           </div>
+          {html && !pages && (
+            <div className="b-page b-base note-measure" aria-hidden="true">
+              {notePage(-1)}
+            </div>
+          )}
 
-          {/* turnable sheets, top first; every fact sits on a right-hand page so phones (single page) see it all */}
-          {[
-            [
-              <>
-                <div className="pg-meta">
-                  <span>{book.numStr}</span>
-                  <span>{book.catZh}</span>
-                </div>
-                <h2 className="pg-title">{coverTitle(book)}</h2>
-                <div className="pg-caption">{book.dCaption}</div>
-                <div className="pg-author">{book.author}</div>
-                <div className="pg-foot">{book.hasNote ? "已收錄讀書心得" : "心得整理中"}</div>
-              </>,
-              <dl className="pg-card">
-                <dt>編號</dt>
-                <dd>{book.numStr}</dd>
-                <dt>分類</dt>
-                <dd>{book.catZh}</dd>
-                <dt>作者</dt>
-                <dd>{book.author}</dd>
-                {book.zh && book.en && (
-                  <>
-                    <dt>原文書名</dt>
-                    <dd>{book.en}</dd>
-                  </>
-                )}
-              </dl>,
-            ],
-            [
-              <>
-                <div className="pg-meta">
-                  <span>{book.numStr}</span>
-                  <span>關於這本書</span>
-                </div>
-                <h3 className="pg-head">{book.dCover}</h3>
-                <p className="pg-desc">{book.desc}</p>
-              </>,
-              <div className="pg-ornament">❦</div>,
-            ],
-          ].map(([front, back], i) => (
+          {sheets.map(([front, back], i) => (
             <div
               key={i}
               className="b-leaf"
@@ -265,7 +341,7 @@ export default function BookStage({ book, origin, base, onClosed }: Props) {
               <div className="b-page leaf-face" aria-hidden={i !== spread || undefined}>
                 {front}
               </div>
-              <div className="b-page leaf-face leaf-back" aria-hidden="true">
+              <div className="b-page leaf-face leaf-back" aria-hidden={geo.single || i + 1 !== spread || undefined}>
                 {back}
               </div>
             </div>
@@ -295,6 +371,7 @@ export default function BookStage({ book, origin, base, onClosed }: Props) {
         </div>
       </div>
 
+      {html && <div className="sr-only" dangerouslySetInnerHTML={{ __html: html }} />}
       <div className="stage-ui">
         <button ref={closeRef} type="button" className="stage-btn" onClick={close} aria-label="收回書架">
           <span className="stage-lbl">收回書架 </span>
@@ -304,9 +381,9 @@ export default function BookStage({ book, origin, base, onClosed }: Props) {
           ‹
         </button>
         <span className="stage-page" aria-live="polite">
-          {spread + 1} / {LEAVES + 1}
+          {spread + 1} / {sheets.length + 1}
         </span>
-        <button type="button" className="stage-btn stage-arrow" onClick={() => turn(1)} disabled={spread === LEAVES} aria-label="下一頁">
+        <button type="button" className="stage-btn stage-arrow" onClick={() => turn(1)} disabled={spread === sheets.length} aria-label="下一頁">
           ›
         </button>
         <a className={"stage-cta" + (book.hasNote ? " has-note" : "")} href={href}>

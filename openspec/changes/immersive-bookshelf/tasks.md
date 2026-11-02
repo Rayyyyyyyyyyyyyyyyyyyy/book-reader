@@ -19,3 +19,10 @@
 - [x] 3.3 `npm run test:e2e`（Playwright，Chromium）
 - [ ] 3.4 真實 Safari（macOS / iOS）與實機觸控驗收
 - [ ] 3.5 合併後同步主規格並歸檔本 change
+
+## 4. 在書中閱讀心得（Phase D）
+
+- [x] 4.1 開書時抓取書頁的心得 HTML，以 CSS columns 分頁；桌機對頁、手機單頁
+- [x] 4.2 載入中／失敗狀態、結尾頁、螢幕閱讀器用的完整全文
+- [x] 4.3 e2e：逐頁讀完心得、載入失敗
+- [ ] 4.4 真實 Safari 驗收心得分頁（overflow columns）

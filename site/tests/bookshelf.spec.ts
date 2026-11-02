@@ -58,7 +58,7 @@ test("closing mid-extraction cleans up, and a spine opens from the keyboard", as
 });
 
 test("pages turn one sheet at a time and fall back when the book closes", async ({ page }) => {
-  await spine(page, "001").click();
+  await spine(page, "060").click(); // no note yet: just the three intro spreads
   await page.waitForTimeout(OPENED);
   expect(await pageLabel(page)).toBe("1/3");
   await page.keyboard.press("ArrowRight");
@@ -76,7 +76,39 @@ test("pages turn one sheet at a time and fall back when the book closes", async 
   await page.keyboard.press("Escape");
   await page.waitForTimeout(CLOSED + 500);
   await expect(page.locator(".stage")).toHaveCount(0);
-  expect(await focusedRank(page)).toBe("001");
+  expect(await focusedRank(page)).toBe("060");
+});
+
+test("a note is read page by page inside the book", async ({ page }) => {
+  await spine(page, "001").click();
+  await page.waitForTimeout(OPENED);
+  const label = (await pageLabel(page))!;
+  const spreads = Number(label.split("/")[1]);
+  expect(label).toBe(`1/${spreads}`);
+  expect(spreads).toBeGreaterThan(3);
+  // every page shows its own column of the note, and together they cover all of it
+  const r = await page.evaluate(() => {
+    const cols = [...document.querySelectorAll<HTMLElement>(".b-leaf .note-cols")];
+    const c = cols[0];
+    const step = c.clientWidth + parseFloat(getComputedStyle(c).columnGap);
+    return { pages: cols.length, needed: Math.round((c.scrollWidth + step - c.clientWidth) / step), sr: document.querySelector(".sr-only")!.textContent };
+  });
+  expect(r.pages).toBe(r.needed);
+  expect(r.sr).toContain("讀書心得");
+  for (let k = 1; k < spreads; k++) {
+    await page.keyboard.press("ArrowRight");
+    await page.waitForTimeout(TURNED);
+  }
+  expect(await pageLabel(page)).toBe(`${spreads}/${spreads}`);
+  await expect(page.locator(".pg-end")).toHaveText("完");
+});
+
+test("a note that fails to load points to the book page", async ({ page }) => {
+  await page.route("**/book/001-*", (r) => r.abort());
+  await spine(page, "001").click();
+  await page.waitForTimeout(OPENED);
+  expect(await pageLabel(page)).toBe("1/3");
+  await expect(page.locator(".b-base")).toContainText("心得載入失敗");
 });
 
 test("search, categories, notes-only and the grid toggle drive the shelf", async ({ page }) => {

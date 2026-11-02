@@ -38,6 +38,9 @@
     overflow-x: auto;
     overscroll-behavior-x: contain;
     scrollbar-width: none;
+    padding-right: 40px; /* the last book clears the fade */
+    /* the far end fades out: there are more books to swipe to */
+    mask-image: linear-gradient(90deg, #000 calc(100% - 36px), transparent);
   }
   .shelf::-webkit-scrollbar { display: none; }
 }
@@ -101,10 +104,12 @@
 @media (hover: hover) {
   .spine-slot:hover .spine-face { transform: translateY(-10px); box-shadow: inset 0 0 0 1px rgba(0,0,0,.12), 4px 6px 12px rgba(0,0,0,.35); }
 }
+/* dark ring against the spine, light ring against the wood: visible on any spine colour */
 .spine-slot:focus-visible .spine-face {
   transform: translateY(-10px);
-  outline: 2px solid #f3ede1; outline-offset: 2px;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.12), 0 0 0 2px #1e1914, 0 0 0 5px #f3ede1;
 }
+.spine-slot:focus-visible { z-index: 1; }
 /* the picked book keeps its slot so the shelf never reflows */
 .spine-slot[data-out] .spine-face, .spine-slot[data-out] .ribbon { visibility: hidden; transition: none; }
 

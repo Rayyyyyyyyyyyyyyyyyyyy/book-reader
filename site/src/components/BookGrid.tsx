@@ -24,6 +24,20 @@ export default function BookGrid({ books, cats, base }: Props) {
   const [notesOnly, setNotesOnly] = useState(false);
   const [view, setView] = useState<"shelf" | "grid">("shelf");
   const rootRef = useRef<HTMLDivElement>(null);
+  const searchRef = useRef<HTMLInputElement>(null);
+
+  // Remember the list view for this tab, so Back from a book page returns to the list.
+  useEffect(() => {
+    try {
+      if (sessionStorage.getItem("view") === "grid") setView("grid");
+    } catch {}
+  }, []);
+  const chooseView = (v: "shelf" | "grid") => {
+    setView(v);
+    try {
+      sessionStorage.setItem("view", v);
+    } catch {}
+  };
 
   const q = query.trim().toLowerCase();
   const hasQuery = q.length > 0;
@@ -158,12 +172,22 @@ export default function BookGrid({ books, cats, base }: Props) {
             <div style={{ fontWeight: 700, fontSize: 21, letterSpacing: ".14em", color: "var(--ink)" }}>百冊</div>
             <div style={{ fontFamily: "var(--serif-en)", fontStyle: "italic", fontSize: 11.5, letterSpacing: ".2em", color: "#a59b89" }}>ONE HUNDRED · 選書</div>
           </a>
-          <div style={{ display: "flex", alignItems: "center", gap: 10, flex: "0 1 340px", borderBottom: "1px solid #c9bda6", paddingBottom: 5 }}>
+          <span className="view-toggle" role="group" aria-label="檢視方式">
+            <button type="button" className={"chip " + (view === "shelf" ? "on" : "")} aria-pressed={view === "shelf"} onClick={() => chooseView("shelf")}>
+              書架
+            </button>
+            <button type="button" className={"chip " + (view === "grid" ? "on" : "")} aria-pressed={view === "grid"} onClick={() => chooseView("grid")}>
+              列表
+            </button>
+          </span>
+          <div className="search" style={{ display: "flex", alignItems: "center", gap: 10, flex: "0 1 340px", borderBottom: "1px solid #c9bda6", paddingBottom: 5 }}>
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#b3a892" strokeWidth="1.3">
               <circle cx="6" cy="6" r="4.2" />
               <line x1="9.4" y1="9.4" x2="12.6" y2="12.6" strokeLinecap="round" />
             </svg>
             <input
+              ref={searchRef}
+              aria-label="搜尋書籍"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="搜尋書名、作者或編號…"
@@ -196,14 +220,6 @@ export default function BookGrid({ books, cats, base }: Props) {
               </button>
             ))}
           </div>
-          <span className="view-toggle" role="group" aria-label="檢視方式">
-            <button type="button" className={"chip " + (view === "shelf" ? "on" : "")} aria-pressed={view === "shelf"} onClick={() => setView("shelf")}>
-              書架
-            </button>
-            <button type="button" className={"chip " + (view === "grid" ? "on" : "")} aria-pressed={view === "grid"} onClick={() => setView("grid")}>
-              列表
-            </button>
-          </span>
         </div>
       </header>
 
@@ -277,17 +293,17 @@ export default function BookGrid({ books, cats, base }: Props) {
             <p>{hasQuery ? "試試書名的一部分、作者英文名，或編號（例如 109）。" : "其他分類裡有已完成的心得。"}</p>
             <div className="empty-actions">
               {hasQuery && (
-                <button type="button" className="chip" onClick={() => setQuery("")}>
+                <button type="button" className="chip" onClick={() => (setQuery(""), searchRef.current?.focus())}>
                   清除搜尋
                 </button>
               )}
               {activeCategory !== "all" && (
-                <button type="button" className="chip" onClick={() => setActiveCategory("all")}>
+                <button type="button" className="chip" onClick={() => (setActiveCategory("all"), searchRef.current?.focus())}>
                   看全部分類
                 </button>
               )}
               {notesOnly && (
-                <button type="button" className="chip" onClick={() => setNotesOnly(false)}>
+                <button type="button" className="chip" onClick={() => (setNotesOnly(false), searchRef.current?.focus())}>
                   顯示沒有心得的書
                 </button>
               )}

@@ -95,6 +95,8 @@ export default function BookStage({ book, origin, base, next, onClosed }: Props)
   const close = contextSafe((then?: BookMeta) => {
     if (phase.current === "closing") return;
     phase.current = "closing";
+    // drop the history entry pushed on open, unless Back closed us or the next book takes it over
+    if (!then && !popped.current && history.state?.bookStage === book.slug) history.back();
     timeline.current?.kill();
     gsap.killTweensOf(leafRefs.current);
     const el = bookRef.current!;
@@ -149,18 +151,21 @@ export default function BookStage({ book, origin, base, next, onClosed }: Props)
     swipe.current = { x: e.clientX, moved: true };
     turn(dx < 0 ? 1 : -1);
   };
-  // Where a pointer is over the open book: 1 = right page, -1 = left page, 0 = off the book (or not open yet).
+  // Where a pointer is over the open book: 1 = forward, -1 = back, 0 = off the book (or not open yet).
+  // Desktop: right page forward, left page back. Phones show one page: its left third goes back.
   const pageAt = (e: React.MouseEvent) => {
     const r = bookRef.current!.getBoundingClientRect(); // the right-hand page; the open cover mirrors it on the left
     const onBook = e.clientY >= r.top && e.clientY <= r.bottom && e.clientX >= r.left - r.width && e.clientX <= r.right;
-    return phase.current === "opened" && onBook ? (e.clientX >= r.left ? 1 : -1) : 0;
+    const split = geo.single ? r.left + r.width / 3 : r.left;
+    return phase.current === "opened" && onBook ? (e.clientX >= split ? 1 : -1) : 0;
   };
-  // A click on the book turns the page (right forward, left back); outside it closes.
+  // A click on the book turns the page; outside it closes, except on phones, where a stray tap
+  // mid-read would lose the page (× , Escape and Back still close).
   const onBackdropClick = (e: React.MouseEvent) => {
     if (swipe.current?.moved) return void (swipe.current = null);
     const side = pageAt(e);
     if (side) return turn(side);
-    close();
+    if (!geo.single) close();
   };
   // The cursor shows which way a click would turn, or that the page cannot turn further.
   const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
@@ -174,7 +179,14 @@ export default function BookStage({ book, origin, base, next, onClosed }: Props)
   // Escape closes, arrows turn pages; resize keeps the opened book centred.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") close();
+      if (e.key === "Tab") {
+        // keep focus inside the dialog: wrap between its first and last controls
+        const items = [...rootRef.current!.querySelectorAll<HTMLElement>("button:not(:disabled), a[href]")];
+        const at = items.indexOf(document.activeElement as HTMLElement);
+        const to = e.shiftKey ? (at <= 0 ? items.length - 1 : at - 1) : at === items.length - 1 || at < 0 ? 0 : at + 1;
+        e.preventDefault();
+        items[to]?.focus();
+      } else if (e.key === "Escape") close();
       else if (e.key === "ArrowRight") turn(1);
       else if (e.key === "ArrowLeft") turn(-1);
     };
@@ -190,6 +202,20 @@ export default function BookStage({ book, origin, base, next, onClosed }: Props)
       window.removeEventListener("resize", onResize);
     };
   }, [close, turn]);
+
+  // Opening adds a history entry (same URL), so the browser's Back closes the book instead of leaving the site.
+  const popped = useRef(false);
+  useEffect(() => {
+    // going straight on to the next book reuses the entry, so one Back always returns to the shelf
+    if (history.state?.bookStage) history.replaceState({ bookStage: book.slug }, "");
+    else history.pushState({ bookStage: book.slug }, "");
+    const onPop = () => {
+      popped.current = true;
+      close();
+    };
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, []);
 
   // Modal: everything else on the page is inert while the book is out.
   useEffect(() => {
@@ -300,7 +326,11 @@ export default function BookStage({ book, origin, base, next, onClosed }: Props)
     spread === 0
       ? { short: "書名頁", long: "書名頁" }
       : first <= last
-        ? { short: `${first === last ? first : `${first}–${last}`} / ${pages}`, long: `第 ${first === last ? first : `${first} 到 ${last}`} 頁，共 ${pages} 頁` }
+        ? // an odd page count ends with the last page on the left, opposite 完
+          {
+            short: `${first === last ? first : `${first}–${last}`} / ${pages}${atEnd ? " · 完" : ""}`,
+            long: `第 ${first === last ? first : `${first} 到 ${last}`} 頁，共 ${pages} 頁${atEnd ? "，心得結束" : ""}`,
+          }
         : pages
           ? { short: "完", long: "心得結束" }
           : book.hasNote

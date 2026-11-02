@@ -135,7 +135,29 @@ test("a note is read page by page inside the book", async ({ page }) => {
   expect(await pageLabel(page)).toBe(`${spreads}/${spreads}`);
   await expect(page.locator(".pg-end")).toHaveText("完");
   // an odd page count ends with the last page on the left, opposite 完
-  await expect(page.locator(".stage-page")).toHaveText(/^(完|(\d+) \/ \2)$/);
+  await expect(page.locator(".stage-page")).toHaveText(/^(完|(\d+) \/ \2 · 完)$/);
+});
+
+test("Back closes the book, focus stays in it, and the list view survives a visit to a book page", async ({ page }) => {
+  await spine(page, "001").click();
+  await page.waitForTimeout(OPENED);
+  // Tab cycles inside the dialog and never reaches the page behind it
+  for (let k = 0; k < 8; k++) {
+    await page.keyboard.press("Tab");
+    expect(await page.evaluate(() => !!document.activeElement?.closest(".stage"))).toBe(true);
+  }
+  await page.goBack();
+  await page.waitForTimeout(CLOSED);
+  await expect(page.locator(".stage")).toHaveCount(0);
+  expect(page.url()).toMatch(/\/book-reader\/$/);
+  // one Back closes the book; the history entry is gone again
+  expect(await page.evaluate(() => history.state?.bookStage ?? null)).toBeNull();
+
+  await page.getByRole("button", { name: "列表" }).click();
+  await page.locator("main a.book-card").first().click();
+  await page.waitForURL(/\/book\//);
+  await page.goBack();
+  await expect(page.getByRole("button", { name: "列表" })).toHaveAttribute("aria-pressed", "true");
 });
 
 test("a note that fails to load points to the book page", async ({ page }) => {
@@ -236,6 +258,14 @@ test.describe("phone", () => {
     await page.waitForTimeout(TURNED);
     await expect(page.locator(".stage")).toHaveCount(1);
     expect(await pageLabel(page)).toBe("2/2");
+    // a stray tap above the page does not close the book; the page's left third goes back
+    await page.touchscreen.tap(195, 60);
+    await page.waitForTimeout(400);
+    await expect(page.locator(".stage")).toHaveCount(1);
+    const pg = (await page.locator(".book3d").evaluate((e) => e.getBoundingClientRect().toJSON())) as DOMRect;
+    await page.touchscreen.tap(pg.x + pg.width / 6, pg.y + pg.height / 2);
+    await page.waitForTimeout(TURNED);
+    expect(await pageLabel(page)).toBe("1/2");
     await page.getByRole("button", { name: "收回書架" }).tap();
     await page.waitForTimeout(CLOSED);
     await expect(page.locator(".stage")).toHaveCount(0);

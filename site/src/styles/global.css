@@ -57,9 +57,10 @@ body {
 .catalog { max-width: 1200px; margin: 0 auto; padding: 8px 28px 110px; }
 /* header filter row: everything that narrows the catalogue in one place; the view switch stays put */
 .filters { max-width: 1200px; margin: 0 auto; padding: 0 28px 13px; display: flex; align-items: center; gap: 12px; }
-.filters .chips { display: flex; gap: 9px; overflow-x: auto; padding-bottom: 2px; flex: 1 1 auto; min-width: 0; }
+/* desktop: every category stays in view, wrapping onto a second line if it must */
+.filters .chips { display: flex; flex-wrap: wrap; gap: 9px; padding-bottom: 2px; flex: 1 1 auto; min-width: 0; }
 .chips-rule { flex: 0 0 1px; align-self: stretch; margin: 4px 2px; background: #d9cfbd; }
-.view-toggle { display: inline-flex; gap: 6px; flex: 0 0 auto; }
+.view-toggle { display: inline-flex; gap: 6px; flex: 0 0 auto; margin-left: auto; }
 .chip-notes .ribbon-mark { margin-right: 0; }
 
 /* intro: short enough that the first shelf is on the first screen */
@@ -68,9 +69,11 @@ body {
 .hero-en { font-family: var(--serif-en); font-style: italic; font-size: clamp(16px, 1.9vw, 21px); color: #6f675b; margin-bottom: 16px; }
 .hero p { max-width: 560px; font-size: 15.5px; line-height: 1.85; color: #5c544a; font-weight: 300; margin: 0; }
 @media (max-width: 639px) {
-  .masthead { padding: 11px 16px; gap: 16px; }
-  .filters { padding: 0 16px 11px; gap: 8px; flex-wrap: wrap; }
-  .filters .chips { flex-basis: 100%; }
+  .masthead { padding: 11px 16px 9px; gap: 10px 16px; flex-wrap: wrap; }
+  .masthead .search { order: 3; flex: 1 1 100% !important; }
+  .filters { padding: 0 16px 11px; gap: 8px; }
+  /* phones: one swipeable line, its far end fading to show there is more */
+  .filters .chips { flex-wrap: nowrap; overflow-x: auto; mask-image: linear-gradient(90deg, #000 calc(100% - 28px), transparent); }
   .catalog { padding: 8px 16px 90px; }
   .hero { padding: 26px 16px 22px; }
   .hero p { font-size: 14.5px; line-height: 1.8; }

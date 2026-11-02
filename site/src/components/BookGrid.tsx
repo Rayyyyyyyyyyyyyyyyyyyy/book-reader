@@ -241,7 +241,7 @@ export default function BookGrid({ books, cats, base }: Props) {
             <span style={{ fontSize: 14, color: "#5c544a" }}>
               找到 <strong style={{ fontWeight: 600, color: "var(--ink)" }}>{total}</strong> 本符合「{query}」的書
             </span>
-            <button onClick={() => setQuery("")} style={{ fontFamily: "var(--serif-tc)", fontSize: 13, color: "#a5623f", background: "transparent", border: "none", borderBottom: "1px solid #d8b6a6", cursor: "pointer", padding: "0 0 1px" }}>
+            <button onClick={() => { setQuery(""); searchRef.current?.focus(); }} style={{ fontFamily: "var(--serif-tc)", fontSize: 13, color: "#8f5434", background: "transparent", border: "none", borderBottom: "1px solid #d8b6a6", cursor: "pointer", padding: "0 0 1px" }}>
               清除搜尋
             </button>
           </div>
@@ -257,7 +257,7 @@ export default function BookGrid({ books, cats, base }: Props) {
                   <h2 style={{ fontWeight: 600, fontSize: "clamp(22px,3vw,30px)", color: "var(--ink)", margin: 0, letterSpacing: ".02em" }}>{sec.zh}</h2>
                   <span style={{ fontFamily: "var(--serif-en)", fontStyle: "italic", fontSize: 18, color: "var(--accent-ink)" }}>{sec.en}</span>
                 </div>
-                <span style={{ fontFamily: "var(--serif-en)", fontStyle: "italic", fontSize: 15, color: "#9a9183", letterSpacing: ".06em" }}>{sec.countLabel}</span>
+                <span style={{ fontFamily: "var(--serif-en)", fontStyle: "italic", fontSize: 15, color: "#6f675b", letterSpacing: ".06em" }}>{sec.countLabel}</span>
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(var(--cardmin),1fr))", gap: "38px 28px" }}>
                 {sec.books.map((book) => (

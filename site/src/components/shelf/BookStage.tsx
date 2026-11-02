@@ -188,7 +188,7 @@ export default function BookStage({ book, origin, base, next, onClosed }: Props)
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Tab") {
         // keep focus inside the dialog: wrap between its first and last controls
-        const items = [...rootRef.current!.querySelectorAll<HTMLElement>("button:not(:disabled), a[href]")];
+        const items = [...rootRef.current!.querySelectorAll<HTMLElement>(".stage-ui button:not(:disabled), .stage-ui a[href]")];
         const at = items.indexOf(document.activeElement as HTMLElement);
         const to = e.shiftKey ? (at <= 0 ? items.length - 1 : at - 1) : at === items.length - 1 || at < 0 ? 0 : at + 1;
         e.preventDefault();

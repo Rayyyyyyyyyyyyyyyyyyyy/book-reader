@@ -147,8 +147,12 @@ export default function BookStage({ book, origin, base, onClosed }: Props) {
     swipe.current = { x: e.clientX, moved: true };
     turn(dx < 0 ? 1 : -1);
   };
-  const onBackdropClick = () => {
+  // On the open book a click turns the page (right page forward, left page back); outside it closes.
+  const onBackdropClick = (e: React.MouseEvent) => {
     if (swipe.current?.moved) return void (swipe.current = null);
+    const r = bookRef.current!.getBoundingClientRect(); // the right-hand page; the open cover mirrors it on the left
+    const onBook = e.clientY >= r.top && e.clientY <= r.bottom && e.clientX >= r.left - r.width && e.clientX <= r.right;
+    if (phase.current === "opened" && onBook) return turn(e.clientX >= r.left ? 1 : -1);
     close();
   };
 
@@ -220,7 +224,7 @@ export default function BookStage({ book, origin, base, onClosed }: Props) {
     <>
       <div className="pg-meta">
         <span>{book.numStr}</span>
-        <span>讀書心得</span>
+        <span>{book.dCover}</span>
       </div>
       <div className="note-flow" aria-hidden="true">
         <div
@@ -234,52 +238,27 @@ export default function BookStage({ book, origin, base, onClosed }: Props) {
     </>
   );
   const notes = Array.from({ length: pages }, (_, i) => notePage(i));
-  // Desktop reads a spread (back = left page, front = right page); phones only ever see fronts.
-  const noteSheets = geo.single
-    ? notes.map((p) => [p, null])
-    : Array.from({ length: Math.ceil(notes.length / 2) }, (_, k) => [notes[2 * k], notes[2 * k + 1] ?? null]);
-
-  // turnable sheets, top first; the intro keeps every fact on a right-hand page so phones see it all
-  const sheets: React.ReactNode[][] = [
-      [
-        <>
-          <div className="pg-meta">
-            <span>{book.numStr}</span>
-            <span>{book.catZh}</span>
-          </div>
-          <h2 className="pg-title">{coverTitle(book)}</h2>
-          <div className="pg-caption">{book.dCaption}</div>
-          <div className="pg-author">{book.author}</div>
-          <div className="pg-foot">{book.hasNote ? "已收錄讀書心得" : "心得整理中"}</div>
-        </>,
-        <dl className="pg-card">
-          <dt>編號</dt>
-          <dd>{book.numStr}</dd>
-          <dt>分類</dt>
-          <dd>{book.catZh}</dd>
-          <dt>作者</dt>
-          <dd>{book.author}</dd>
-          {book.zh && book.en && (
-            <>
-              <dt>原文書名</dt>
-              <dd>{book.en}</dd>
-            </>
-          )}
-        </dl>,
-      ],
-      [
-        <>
-          <div className="pg-meta">
-            <span>{book.numStr}</span>
-            <span>關於這本書</span>
-          </div>
-          <h3 className="pg-head">{book.dCover}</h3>
-          <p className="pg-desc">{book.desc}</p>
-        </>,
-        <div className="pg-ornament">❦</div>,
-      ],
-    ...noteSheets,
-  ];
+  const titlePage = (
+    <>
+      <div className="pg-meta">
+        <span>{book.numStr}</span>
+        <span>{book.catZh}</span>
+      </div>
+      <h2 className="pg-title">{coverTitle(book)}</h2>
+      <div className="pg-caption">{book.dCaption}</div>
+      <div className="pg-author">{book.author}</div>
+      <p className="pg-desc">{book.desc}</p>
+      <div className="pg-foot">{book.hasNote ? "翻頁閱讀讀書心得 →" : "心得整理中"}</div>
+    </>
+  );
+  // Turnable sheets, top first. Desktop reads spreads, so the note starts on the back of the
+  // title page (left) and continues front (right) / back (left); phones only ever see fronts.
+  const sheets: React.ReactNode[][] = geo.single
+    ? [[titlePage, null], ...notes.map((p) => [p, null])]
+    : [
+        [titlePage, notes[0] ?? null],
+        ...Array.from({ length: Math.ceil((notes.length - 1) / 2) }, (_, k) => [notes[2 * k + 1], notes[2 * k + 2] ?? null]),
+      ];
 
   const { W, H, T, start } = geo;
 
@@ -386,8 +365,8 @@ export default function BookStage({ book, origin, base, onClosed }: Props) {
         <button type="button" className="stage-btn stage-arrow" onClick={() => turn(1)} disabled={spread === sheets.length} aria-label="下一頁">
           ›
         </button>
-        <a className={"stage-cta" + (book.hasNote ? " has-note" : "")} href={href}>
-          {book.hasNote ? "閱讀我的讀書心得" : "查看書頁 · 整理中"} <span aria-hidden="true">→</span>
+        <a className="stage-cta" href={href}>
+          完整書頁 <span aria-hidden="true">→</span>
         </a>
       </div>
     </div>

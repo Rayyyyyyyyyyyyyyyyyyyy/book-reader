@@ -30,7 +30,7 @@ test("the picked book leaves from its spine and comes back to it, leaving no ove
   await page.waitForTimeout(OPENED);
   await expect(page.locator(".stage[role=dialog]")).toHaveCount(1);
   await expect(page.locator(".stage-cta")).toHaveAttribute("href", "/book-reader/book/060-the-courage-to-be-disliked");
-  await expect(page.locator(".stage-cta")).toContainText("查看書頁 · 整理中");
+  await expect(page.locator(".stage-cta")).toContainText("完整書頁");
   expect(await page.evaluate(() => document.querySelector("input")!.closest("[inert]") !== null)).toBe(true);
 
   await page.keyboard.press("Escape");
@@ -51,32 +51,48 @@ test("closing mid-extraction cleans up, and a spine opens from the keyboard", as
   await expect(page.locator(".stage")).toHaveCount(0);
   await page.keyboard.press("Enter");
   await page.waitForTimeout(OPENED);
-  await expect(page.locator(".stage-cta")).toContainText("閱讀我的讀書心得");
+  await expect(page.locator(".stage-cta")).toContainText("完整書頁");
   await page.locator(".stage-backdrop").click({ position: { x: 20, y: 20 } });
   await page.waitForTimeout(CLOSED);
   await expect(page.locator(".stage")).toHaveCount(0);
 });
 
-test("pages turn one sheet at a time and fall back when the book closes", async ({ page }) => {
-  await spine(page, "060").click(); // no note yet: just the three intro spreads
+test("pages turn by arrows, buttons and clicks on the book, and fall back when it closes", async ({ page }) => {
+  await spine(page, "001").click();
   await page.waitForTimeout(OPENED);
-  expect(await pageLabel(page)).toBe("1/3");
+  const spreads = Number((await pageLabel(page))!.split("/")[1]);
   await page.keyboard.press("ArrowRight");
   await page.waitForTimeout(250);
   await page.keyboard.press("ArrowRight"); // ignored while the sheet is still turning
   await page.waitForTimeout(TURNED);
-  expect(await pageLabel(page)).toBe("2/3");
+  expect(await pageLabel(page)).toBe(`2/${spreads}`);
   await page.getByRole("button", { name: "下一頁" }).click();
   await page.waitForTimeout(TURNED);
-  expect(await pageLabel(page)).toBe("3/3");
-  await expect(page.getByRole("button", { name: "下一頁" })).toBeDisabled();
-  await page.keyboard.press("ArrowLeft");
+  expect(await pageLabel(page)).toBe(`3/${spreads}`);
+  // clicking the right page turns forward, the left page back; neither closes the book
+  const r = (await page.locator(".book3d").evaluate((e) => e.getBoundingClientRect().toJSON())) as DOMRect;
+  await page.mouse.click(r.x + r.width / 2, r.y + r.height / 2);
   await page.waitForTimeout(TURNED);
-  expect(await pageLabel(page)).toBe("2/3");
+  expect(await pageLabel(page)).toBe(`4/${spreads}`);
+  await page.mouse.click(r.x - r.width / 2, r.y + r.height / 2);
+  await page.waitForTimeout(TURNED);
+  expect(await pageLabel(page)).toBe(`3/${spreads}`);
+  await expect(page.locator(".stage")).toHaveCount(1);
   await page.keyboard.press("Escape");
   await page.waitForTimeout(CLOSED + 500);
   await expect(page.locator(".stage")).toHaveCount(0);
-  expect(await focusedRank(page)).toBe("060");
+  expect(await focusedRank(page)).toBe("001");
+});
+
+test("a book without a note has a title page and a note-pending page", async ({ page }) => {
+  await spine(page, "060").click();
+  await page.waitForTimeout(OPENED);
+  expect(await pageLabel(page)).toBe("1/2");
+  await page.keyboard.press("ArrowRight");
+  await page.waitForTimeout(TURNED);
+  expect(await pageLabel(page)).toBe("2/2");
+  await expect(page.getByRole("button", { name: "下一頁" })).toBeDisabled();
+  await expect(page.locator(".b-base")).toContainText("心得整理中");
 });
 
 test("a note is read page by page inside the book", async ({ page }) => {
@@ -85,7 +101,7 @@ test("a note is read page by page inside the book", async ({ page }) => {
   const label = (await pageLabel(page))!;
   const spreads = Number(label.split("/")[1]);
   expect(label).toBe(`1/${spreads}`);
-  expect(spreads).toBeGreaterThan(3);
+  expect(spreads).toBeGreaterThan(2);
   // every page shows its own column of the note, and together they cover all of it
   const r = await page.evaluate(() => {
     const cols = [...document.querySelectorAll<HTMLElement>(".b-leaf .note-cols")];
@@ -107,7 +123,7 @@ test("a note that fails to load points to the book page", async ({ page }) => {
   await page.route("**/book/001-*", (r) => r.abort());
   await spine(page, "001").click();
   await page.waitForTimeout(OPENED);
-  expect(await pageLabel(page)).toBe("1/3");
+  expect(await pageLabel(page)).toBe("1/2");
   await expect(page.locator(".b-base")).toContainText("心得載入失敗");
 });
 
@@ -193,7 +209,7 @@ test.describe("phone", () => {
     });
     await page.waitForTimeout(TURNED);
     await expect(page.locator(".stage")).toHaveCount(1);
-    expect(await pageLabel(page)).toBe("2/3");
+    expect(await pageLabel(page)).toBe("2/2");
     await page.getByRole("button", { name: "收回書架" }).tap();
     await page.waitForTimeout(CLOSED);
     await expect(page.locator(".stage")).toHaveCount(0);

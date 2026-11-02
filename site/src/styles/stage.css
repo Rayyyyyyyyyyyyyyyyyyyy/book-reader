@@ -2,7 +2,7 @@
 
 /* ---------- stage ---------- */
 .stage { position: fixed; inset: 0; z-index: 200; }
-.stage-backdrop { position: absolute; inset: 0; background: rgba(26, 18, 11, .74); opacity: 0; touch-action: none; }
+.stage-backdrop { position: absolute; inset: 0; background: rgba(26, 18, 11, .86); opacity: 0; touch-action: none; }
 .stage-scene { position: absolute; inset: 0; perspective: 1800px; pointer-events: none; }
 
 .book3d {
@@ -133,9 +133,6 @@
 .pg-desc { margin: 1.4em 0 0; padding-top: 1.2em; border-top: 1px solid #e3d9c6; line-height: 1.9; color: #5c544a; font-weight: 300; }
 .pg-head { font-size: 1.4em; font-weight: 600; line-height: 1.4; margin: 1.6em 0 0; }
 .pg-foot { margin-top: auto; font-size: .85em; letter-spacing: .1em; color: var(--accent); }
-.pg-card { margin: auto 0; display: grid; grid-template-columns: auto 1fr; gap: .9em 1.2em; font-size: .95em; }
-.pg-card dt { color: var(--accent); letter-spacing: .1em; }
-.pg-card dd { margin: 0; color: #5c544a; }
 /* note pages: the whole note flows into one-column-wide columns that overflow sideways;
    page i shifts column i into the clipped window (JS only counts the columns) */
 .note-flow { flex: 1; min-height: 0; overflow: hidden; margin-top: 1.2em; }
@@ -155,7 +152,6 @@
 .pg-folio { margin-top: .8em; text-align: center; font-family: var(--serif-en); font-size: .8em; letter-spacing: .12em; color: #9a9183; }
 .pg-end { margin: auto; font-size: 1.6em; letter-spacing: .3em; color: var(--accent); }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
-.pg-ornament { margin: auto; font-size: 2.4em; color: #c9b993; }
 
 /* ---------- stage controls (2D, so links stay clickable on every engine) ---------- */
 .stage-ui {
@@ -173,7 +169,6 @@
   padding: 10px 16px; border-radius: 999px; cursor: pointer; text-decoration: none;
   border: 1px solid #cdc2ad; background: transparent; color: #5c544a;
 }
-.stage-cta.has-note { background: var(--ink); border-color: var(--ink); color: var(--paper); }
 .stage-arrow { padding: 8px 14px; font-size: 18px; line-height: 1; }
 .stage-arrow:disabled { opacity: .35; cursor: default; }
 .stage-page { font-family: var(--serif-en); font-size: 15px; color: #6f675b; min-width: 3.2em; text-align: center; }

@@ -154,7 +154,9 @@ test("search, categories, notes-only and the grid toggle drive the shelf", async
   await page.getByRole("button", { name: /篇讀書筆記/ }).click();
   await page.getByRole("button", { name: "列表" }).click();
   expect(await count()).toBe(0);
-  await expect(page.locator("main article")).toHaveCount(111);
+  // list cards are plain links to the book page (no second, different "open a book" modal)
+  await expect(page.locator("main a.book-card")).toHaveCount(111);
+  await expect(page.locator("main a.book-card").first()).toHaveAttribute("href", /\/book-reader\/book\/\d{3}/);
   await page.getByRole("button", { name: "書架" }).click();
   expect(await count()).toBe(111);
 });

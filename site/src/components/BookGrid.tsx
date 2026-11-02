@@ -23,7 +23,6 @@ export default function BookGrid({ books, cats, base }: Props) {
   const [activeCategory, setActiveCategory] = useState("all");
   const [notesOnly, setNotesOnly] = useState(false);
   const [view, setView] = useState<"shelf" | "grid">("shelf");
-  const [selected, setSelected] = useState<BookMeta | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
 
   const q = query.trim().toLowerCase();
@@ -61,21 +60,6 @@ export default function BookGrid({ books, cats, base }: Props) {
 
   const total = sections.reduce((a, s) => a + s.books.length, 0);
   const hasResults = sections.length > 0;
-
-  // Modal is an ephemeral quick-view (no history entry). The canonical,
-  // shareable URL is the full /book/<slug> page that the modal links to —
-  // so browser "back" from a book page returns cleanly to the catalog.
-  const openBook = (b: BookMeta) => setSelected(b);
-  const closeBook = () => setSelected(null);
-
-  // Escape closes the modal.
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setSelected(null);
-    };
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, []);
 
   // reveal-on-scroll + cover clip-path + parallax (ported from the prototype,
   // minus the wheel scroll-hijack). Re-armed whenever the visible set changes.
@@ -272,7 +256,7 @@ export default function BookGrid({ books, cats, base }: Props) {
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(var(--cardmin),1fr))", gap: "38px 28px" }}>
                 {sec.books.map((book) => (
-                  <article key={book.slug} data-reveal="1" onClick={() => openBook(book)} style={{ display: "flex", flexDirection: "column", gap: 15, cursor: "pointer" }}>
+                  <a key={book.slug} href={bookHref(base, book.slug)} className="book-card" data-reveal="1" style={{ display: "flex", flexDirection: "column", gap: 15, color: "inherit", textDecoration: "none" }}>
                     <div className="cover" style={{ position: "relative", aspectRatio: "2/3", border: "1px solid rgba(44,38,32,.12)", overflow: "hidden" }}>
                       {book.cover ? (
                         <img src={book.cover} alt={book.dCover} loading="lazy" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
@@ -290,7 +274,7 @@ export default function BookGrid({ books, cats, base }: Props) {
                         <span style={{ fontFamily: "var(--serif-en)", fontSize: 14, color: "var(--accent)", letterSpacing: ".04em" }}>{book.tagStr}</span>
                       </div>
                     </div>
-                  </article>
+                  </a>
                 ))}
               </div>
             </section>
@@ -303,41 +287,6 @@ export default function BookGrid({ books, cats, base }: Props) {
         )}
       </main>
 
-      {selected && (
-        <div onClick={closeBook} style={{ position: "fixed", inset: 0, zIndex: 100, background: "rgba(28,22,16,.52)", backdropFilter: "blur(5px)", WebkitBackdropFilter: "blur(5px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
-          <div className={"cat-" + selected.cat} onClick={(e) => e.stopPropagation()} style={{ background: "#fbf7ee", maxWidth: 720, width: "100%", border: "1px solid #e3dacb", boxShadow: "0 40px 100px rgba(28,22,16,.35)", display: "flex", position: "relative", maxHeight: "90vh", overflow: "auto" }}>
-            <button onClick={closeBook} aria-label="關閉" style={{ position: "absolute", top: 16, right: 16, zIndex: 2, width: 34, height: 34, borderRadius: "50%", border: "1px solid #e0d6c4", background: "#fbf7ee", color: "#6f675b", cursor: "pointer", fontSize: 17, lineHeight: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>×</button>
-            <div style={{ flex: "0 0 210px", padding: "32px 26px", borderRight: "1px solid #ece3d2", display: "flex", alignItems: "center", justifyContent: "center", background: "#f6f0e4" }}>
-              {selected.cover ? (
-                <img src={selected.cover} alt={selected.dCover} style={{ width: "100%", aspectRatio: "2/3", objectFit: "cover", border: "1px solid rgba(44,38,32,.14)" }} />
-              ) : (
-                <div style={{ position: "relative", width: "100%", aspectRatio: "2/3", background: "var(--wash)", border: "1px solid rgba(44,38,32,.14)", display: "flex", alignItems: "center", justifyContent: "center", padding: "22px 16px", textAlign: "center" }}>
-                  <div style={{ fontFamily: "var(--serif-tc)", fontWeight: 600, fontSize: 19, lineHeight: 1.42, color: "var(--ink)" }}>{selected.dCover}</div>
-                </div>
-              )}
-            </div>
-            <div style={{ flex: 1, padding: "38px 36px 36px", minWidth: 0 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 18 }}>
-                <span style={{ fontSize: 11, letterSpacing: ".14em", color: "var(--accent)", border: "1px solid var(--accent)", borderRadius: 999, padding: "4px 11px" }}>{selected.catZh}</span>
-                <span style={{ fontFamily: "var(--serif-en)", fontSize: 15, color: "#a59b89", letterSpacing: ".05em" }}>{selected.numStr}</span>
-              </div>
-              <h2 style={{ fontFamily: "var(--serif-tc)", fontWeight: 600, fontSize: 28, lineHeight: 1.3, color: "var(--ink)", margin: "0 0 8px" }}>{selected.dCover}</h2>
-              <div style={{ fontFamily: "var(--serif-en)", fontStyle: "italic", fontSize: 18, color: "#6f675b", marginBottom: 6 }}>{selected.dCaption}</div>
-              <div style={{ fontSize: 13, color: "#9a9183", letterSpacing: ".03em", marginBottom: 24 }}>{selected.author}</div>
-              <p style={{ fontSize: 15.5, lineHeight: 1.95, color: "#5c544a", fontWeight: 300, margin: "0 0 30px", borderTop: "1px solid #ece3d2", paddingTop: 24 }}>{selected.desc}</p>
-              {selected.hasNote ? (
-                <a href={bookHref(base, selected.slug)} style={{ display: "inline-flex", alignItems: "center", gap: 9, fontFamily: "var(--serif-tc)", fontSize: 14, color: "#f3ede1", background: "#2c2620", border: "none", padding: "12px 20px", cursor: "pointer", letterSpacing: ".04em", textDecoration: "none" }}>
-                  閱讀我的讀書心得 <span style={{ fontFamily: "var(--serif-en)", fontSize: 16 }}>→</span>
-                </a>
-              ) : (
-                <a href={bookHref(base, selected.slug)} style={{ display: "inline-flex", alignItems: "center", gap: 9, fontFamily: "var(--serif-tc)", fontSize: 14, color: "#6f675b", border: "1px solid #cdc2ad", padding: "12px 20px", letterSpacing: ".04em", textDecoration: "none" }}>
-                  查看書籍頁 <span style={{ fontFamily: "var(--serif-en)", fontStyle: "italic", fontSize: 13 }}>整理中</span>
-                </a>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

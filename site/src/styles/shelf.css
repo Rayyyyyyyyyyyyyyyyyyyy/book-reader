@@ -104,4 +104,20 @@
   outline: 2px solid #f3ede1; outline-offset: 2px;
 }
 /* the picked book keeps its slot so the shelf never reflows */
-.spine-slot[data-out] .spine-face { visibility: hidden; transition: none; }
+.spine-slot[data-out] .spine-face, .spine-slot[data-out] .ribbon { visibility: hidden; transition: none; }
+
+/* a book with a note keeps a cloth bookmark: its tail hangs over the shelf board */
+.spine-slot { position: relative; isolation: isolate; }
+.ribbon, .ribbon-mark {
+  background: linear-gradient(90deg, #7d2420, #a8392f 45%, #8a2a24);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 76%, 0 100%);
+}
+.ribbon {
+  position: absolute; z-index: -1; left: calc(50% - 4px); bottom: -15px;
+  width: 8px; height: 24px;
+  transition: transform .22s cubic-bezier(.2, .7, .3, 1);
+}
+.spine-slot:focus-visible .ribbon { transform: translateY(-10px); }
+@media (hover: hover) { .spine-slot:hover .ribbon { transform: translateY(-10px); } }
+/* same mark, inline, as the legend on the notes filter */
+.ribbon-mark { display: inline-block; width: 7px; height: 15px; margin-right: .45em; vertical-align: -2px; }

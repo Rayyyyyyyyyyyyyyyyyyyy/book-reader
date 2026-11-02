@@ -266,12 +266,29 @@ export default function BookStage({ book, origin, base, next, onClosed }: Props)
       <div className="pg-foot">{book.hasNote ? "翻頁閱讀讀書心得 →" : "心得整理中"}</div>
     </>
   );
+  // Until (or unless) the note fills it, the page opposite the title holds the catalogue card.
+  const catalogCard = (
+    <dl className="pg-card">
+      <dt>編號</dt>
+      <dd>{book.numStr}</dd>
+      <dt>分類</dt>
+      <dd>{book.catZh}</dd>
+      <dt>作者</dt>
+      <dd>{book.author}</dd>
+      {book.zh && book.en && (
+        <>
+          <dt>原文書名</dt>
+          <dd>{book.en}</dd>
+        </>
+      )}
+    </dl>
+  );
   // Turnable sheets, top first. Desktop reads spreads, so the note starts on the back of the
   // title page (left) and continues front (right) / back (left); phones only ever see fronts.
   const sheets: React.ReactNode[][] = geo.single
     ? [[titlePage, null], ...notes.map((p) => [p, null])]
     : [
-        [titlePage, notes[0] ?? null],
+        [titlePage, notes[0] ?? catalogCard],
         ...Array.from({ length: Math.ceil((notes.length - 1) / 2) }, (_, k) => [notes[2 * k + 1], notes[2 * k + 2] ?? null]),
       ];
 

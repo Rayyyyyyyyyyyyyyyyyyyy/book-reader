@@ -154,6 +154,9 @@
 .note-cols ul, .note-cols ol { margin: 0 0 .8em; padding-left: 1.3em; }
 .note-cols hr { border: 0; border-top: 1px solid #e3d9c6; margin: 1.2em 0; }
 .pg-folio { margin-top: .8em; text-align: center; font-family: var(--serif-en); font-size: .8em; letter-spacing: .12em; color: #9a9183; }
+.pg-card { margin: auto 0; display: grid; grid-template-columns: auto 1fr; gap: .9em 1.2em; font-size: .95em; }
+.pg-card dt { color: var(--accent); letter-spacing: .1em; }
+.pg-card dd { margin: 0; color: #5c544a; }
 .pg-next { margin-top: auto; display: flex; flex-direction: column; gap: .3em; padding-top: 1em; border-top: 1px solid #e3d9c6; }
 .pg-next span { font-size: .8em; letter-spacing: .12em; color: var(--accent); }
 .pg-next strong { font-weight: 600; color: var(--ink); }

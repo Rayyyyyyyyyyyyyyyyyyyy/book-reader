@@ -36,6 +36,7 @@ export function BookSpine({ book, out, onSelect }: SpineProps) {
       onClick={(e) => onSelect(book, e.currentTarget)}
     >
       <SpineFace book={book} style={{ height: `calc(var(--row) * ${look.height})` }} />
+      {book.hasNote && <span className="ribbon" aria-hidden="true" />}
     </button>
   );
 }

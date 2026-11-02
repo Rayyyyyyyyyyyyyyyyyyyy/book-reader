@@ -172,18 +172,22 @@ test("search, categories, notes-only and the grid toggle drive the shelf", async
   expect(await count()).toBe(111);
 });
 
-test("every spine shows its whole title, tallest books first", async ({ page }) => {
+test("every spine shows its whole title; books with a note first, each group tallest first", async ({ page }) => {
   await page.evaluate(() => document.fonts.ready);
   const r = await page.evaluate(() => ({
     clipped: [...document.querySelectorAll<HTMLElement>(".spine-title")]
       .filter((t) => t.scrollHeight > t.clientHeight + 1 || t.scrollWidth > t.clientWidth + 1)
       .map((t) => t.textContent),
     unsorted: [...document.querySelectorAll(".shelf")].filter((s) => {
-      const hs = [...s.querySelectorAll(".spine-face")].map((f) => f.getBoundingClientRect().height);
-      return hs.some((h, i) => i > 0 && h > hs[i - 1] + 0.5);
+      const books = [...s.querySelectorAll(".spine-slot")].map((b) => ({
+        note: !!b.querySelector(".ribbon"),
+        h: b.querySelector(".spine-face")!.getBoundingClientRect().height,
+      }));
+      return books.some((b, i) => i > 0 && (b.note && !books[i - 1].note || (b.note === books[i - 1].note && b.h > books[i - 1].h + 0.5)));
     }).length,
   }));
   expect(r.clipped).toEqual([]);
+  expect(await page.locator(".spine-slot .ribbon").count()).toBe(14);
   expect(r.unsorted).toBe(0);
 });
 

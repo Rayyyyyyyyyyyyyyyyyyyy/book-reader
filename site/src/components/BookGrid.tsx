@@ -217,6 +217,7 @@ export default function BookGrid({ books, cats, base }: Props) {
               borderColor: notesOnly ? "#a5623f" : "transparent",
             }}
           >
+            <span className="ribbon-mark" aria-hidden="true" />
             {noteTotal} 篇讀書筆記
           </button>
           <span role="group" aria-label="檢視方式" style={{ display: "inline-flex", gap: 6, fontStyle: "normal" }}>

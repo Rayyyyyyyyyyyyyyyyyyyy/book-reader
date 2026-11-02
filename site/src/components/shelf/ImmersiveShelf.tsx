@@ -12,9 +12,10 @@ type Props = { sections: ShelfSection[]; base: string };
 
 type Selection = { book: BookMeta; button: HTMLButtonElement; face: HTMLElement };
 
-// Tallest first, like books stood on a real shelf; rank breaks ties so the order is stable.
+// Books with a note stand at the front of each shelf; within each group tallest first, like a real
+// shelf, and rank breaks ties so the order is stable.
 const byHeight = (books: BookMeta[]) =>
-  [...books].sort((a, b) => spineLook(b).height - spineLook(a).height || a.rank - b.rank);
+  [...books].sort((a, b) => +b.hasNote - +a.hasNote || spineLook(b).height - spineLook(a).height || a.rank - b.rank);
 
 function lockScroll(on: boolean) {
   const html = document.documentElement;

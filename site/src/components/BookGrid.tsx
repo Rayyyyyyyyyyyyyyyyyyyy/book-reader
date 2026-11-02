@@ -271,7 +271,10 @@ export default function BookGrid({ books, cats, base }: Props) {
                     <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
                       <div style={{ fontFamily: "var(--serif-en)", fontStyle: "italic", fontSize: 15, color: "#6f675b", lineHeight: 1.35 }}>{book.dCaption}</div>
                       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
-                        <span style={{ fontSize: 12, color: "#9a9183", letterSpacing: ".02em" }}>{book.author}</span>
+                        <span style={{ fontSize: 12, color: "#9a9183", letterSpacing: ".02em" }}>
+                          {book.hasNote && <span className="ribbon-mark" role="img" aria-label="有讀書心得" />}
+                          {book.author}
+                        </span>
                         <span style={{ fontFamily: "var(--serif-en)", fontSize: 14, color: "var(--accent)", letterSpacing: ".04em" }}>{book.tagStr}</span>
                       </div>
                     </div>

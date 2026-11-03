@@ -40,7 +40,7 @@ npm run covers
 
 TypeScript、TSX、Astro 使用兩格縮排、雙引號及分號，保持 strict TypeScript。React 元件 PascalCase，函式與變數 camelCase。
 
-書籍檔名為 `NNN-english-slug.md`，沒有英文名時可只用排名。Frontmatter 的 `rank`、`cat`、`zh`、`en`、`author`、`desc` 遵守 `src/content.config.ts`；`cat` 使用 `src/data/categories.ts` 的 key。封面斷句記在 `src/data/title-breaks.ts`，不寫入書目 frontmatter。
+書籍檔名為 `NNN-english-slug.md`，沒有英文名時可只用排名。Frontmatter 的 `rank`、`cat`、`zh`、`en`、`author`、`desc`、選填的 `summary`（書本摘要，200–300 字）遵守 `src/content.config.ts`；`cat` 使用 `src/data/categories.ts` 的 key。封面斷句記在 `src/data/title-breaks.ts`，不寫入書目 frontmatter。
 
 ## Git 與資產
 

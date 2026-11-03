@@ -12,6 +12,7 @@ const books = defineCollection({
     en: z.string(), // may be empty string (中文原創,無英文書名)
     author: z.string(),
     desc: z.string(),
+    summary: z.string().min(200).max(300).optional(), // kept out of the body: a non-empty body means "has a note"
     cover: z.string().optional(), // filename under public/covers/, defaults by rank
   }),
 });

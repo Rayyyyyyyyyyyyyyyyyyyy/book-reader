@@ -57,6 +57,13 @@ const ogImage = `${base}og/${entry.id}.png`;
       </div>
     </article>
 
+    {d.summary && (
+      <section class="summary" aria-label="書本摘要">
+        <div class="note-label">書本摘要</div>
+        <p>{d.summary}</p>
+      </section>
+    )}
+
     {hasNote ? (
       <article id="note" class="note">
         <div class="note-label">讀書筆記</div>
@@ -96,6 +103,8 @@ const ogImage = `${base}og/${entry.id}.png`;
   .desc { font-size: 16px; line-height: 1.95; color: #5c544a; font-weight: 300; border-top: 1px solid #ece3d2; padding-top: 22px; margin: 0 0 24px; }
   .jump { font-family: var(--serif-tc); font-size: 14px; color: #f3ede1; background: #2c2620; padding: 11px 18px; text-decoration: none; display: inline-block; }
 
+  .summary { padding: 56px 0 0; }
+  .summary p { font-size: 17px; line-height: 2.05; color: #4a4339; font-weight: 300; margin: 0; text-wrap: pretty; }
   .note { padding: 72px 0 0; }
   .note-label { font-size: 11px; letter-spacing: .18em; color: var(--accent-ink); margin-bottom: 18px; }
   .note :global(h2) { font-family: var(--serif-tc); font-weight: 600; font-size: 22px; line-height: 1.5; color: var(--ink); margin: 50px 0 6px; letter-spacing: .02em; }

@@ -152,8 +152,10 @@
 .note-cols h3 { font-size: 1.1em; }
 .note-cols p { margin: 0 0 .8em; }
 .note-cols ul, .note-cols ol { margin: 0 0 .8em; padding-left: 1.3em; }
-.note-cols .note-label { font-size: .8em; letter-spacing: .18em; color: var(--accent-ink); font-weight: 400; margin: 1.6em 0 .6em; break-after: avoid; }
-.note-cols .summary .note-label { margin-top: 0; }
+.note-cols .note-label { font-size: .8em; letter-spacing: .18em; color: var(--accent-ink); font-weight: 400; margin: 0 0 .6em; break-after: avoid; }
+/* the summary keeps its own page, tight enough that even the longest fits; the note starts on a fresh one */
+.note-cols .summary { break-after: column; }
+.note-cols .summary p { font-size: .95em; line-height: 1.65; margin: 0; }
 .note-cols hr { border: 0; border-top: 1px solid #e3d9c6; margin: 1.2em 0; }
 .pg-folio { margin-top: .8em; text-align: center; font-family: var(--serif-en); font-size: .8em; letter-spacing: .12em; color: #6f675b; }
 .pg-card { margin: auto 0; display: grid; grid-template-columns: auto 1fr; gap: .9em 1.2em; font-size: .95em; }

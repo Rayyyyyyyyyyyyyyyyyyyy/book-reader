@@ -94,14 +94,17 @@ test("pages turn by arrows, buttons and clicks on the book, and fall back when i
   expect(await focusedRank(page)).toBe("001");
 });
 
-test("a book without a note has a title page and a note-pending page", async ({ page }) => {
+test("a book without a note shows its summary, then a note-pending page", async ({ page }) => {
   await spine(page, "060").click();
   await page.waitForTimeout(OPENED);
-  expect(await pageLabel(page)).toBe("1/2");
-  await page.keyboard.press("ArrowRight");
-  await page.waitForTimeout(TURNED);
-  expect(await pageLabel(page)).toBe("2/2");
-  await expect(page.locator(".stage-page")).toHaveText("整理中");
+  await expect(page.locator(".b-leaf .note-cols").first()).toContainText("書本摘要");
+  const spreads = Number((await pageLabel(page))!.split("/")[1]);
+  for (let k = 1; k < spreads; k++) {
+    await page.keyboard.press("ArrowRight");
+    await page.waitForTimeout(TURNED);
+  }
+  expect(await pageLabel(page)).toBe(`${spreads}/${spreads}`);
+  await expect(page.locator(".stage-page")).toHaveText(/整理中$/);
   await expect(page.locator(".b-base")).toContainText("心得整理中");
   // the end offers the next book that has a note, and going on opens it
   const next = (await page.locator(".pg-next strong").textContent())!;
@@ -127,7 +130,8 @@ test("a note is read page by page inside the book", async ({ page }) => {
     return { pages: cols.length, needed: Math.round((c.scrollWidth + step - c.clientWidth) / step), sr: document.querySelector(".sr-only")!.textContent };
   });
   expect(r.pages).toBe(r.needed);
-  expect(r.sr).toContain("讀書心得");
+  expect(r.sr).toContain("書本摘要");
+  expect(r.sr).toContain("讀書筆記");
   for (let k = 1; k < spreads; k++) {
     await page.keyboard.press("ArrowRight");
     await page.waitForTimeout(TURNED);

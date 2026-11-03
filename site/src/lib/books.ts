@@ -13,6 +13,7 @@ export type BookMeta = {
   cover: string; // optimized cover URL (filled by the page)
   coverColor: string; // dominant cover colour "#rrggbb", "" without a cover
   hasNote: boolean;
+  hasSummary: boolean;
   dCover: string; // display title
   dCaption: string; // display caption
   numStr: string; // "No.066"
@@ -37,6 +38,7 @@ export function entryToMeta(entry: CollectionEntry<"books">, cover = "", coverCo
     cover,
     coverColor,
     hasNote,
+    hasSummary: !!d.summary,
     dCover: d.zh || d.en,
     dCaption: d.zh ? d.en : "台灣尚未出版",
     numStr: "No." + pad(d.rank),

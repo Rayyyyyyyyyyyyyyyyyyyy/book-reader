@@ -54,7 +54,7 @@ export default function BookStage({ book, origin, base, next, onClosed }: Props)
   const [spread, setSpread] = useState(0);
   const turning = useRef(false);
   const swipe = useRef<{ x: number; moved: boolean } | null>(null);
-  // The note is fetched from the book's own page, then cut into pages by CSS columns (see .note-cols).
+  // The summary and note are fetched from the book's own page, then cut into pages by CSS columns (see .note-cols).
   const [note, setNote] = useState<{ html: string; pages: number } | "failed" | null>(null);
   const measureRef = useRef<HTMLDivElement>(null);
 
@@ -237,16 +237,19 @@ export default function BookStage({ book, origin, base, next, onClosed }: Props)
   const href = `${base}book/${book.slug}`;
 
   useEffect(() => {
-    if (!book.hasNote) return;
+    if (!book.hasNote && !book.hasSummary) return;
     const ctl = new AbortController();
     fetch(href, { signal: ctl.signal })
       .then((r) => (r.ok ? r.text() : Promise.reject(new Error(`HTTP ${r.status}`))))
       .then((text) => {
         // our own built page (same origin), so its HTML is trusted
-        const el = new DOMParser().parseFromString(text, "text/html").querySelector("#note.note");
-        if (!el) throw new Error("note missing");
-        el.querySelector(".note-label")?.remove();
-        setNote({ html: el.innerHTML, pages: 0 });
+        const doc = new DOMParser().parseFromString(text, "text/html");
+        const summary = doc.querySelector("section.summary");
+        const el = doc.querySelector("#note.note");
+        if (book.hasNote ? !el : !summary) throw new Error("content missing");
+        // the label only tells the note apart from a summary before it
+        if (!summary) el!.querySelector(".note-label")?.remove();
+        setNote({ html: (summary?.outerHTML ?? "") + (el?.innerHTML ?? ""), pages: 0 });
       })
       .catch((e) => e.name !== "AbortError" && setNote("failed"));
     return () => ctl.abort();
@@ -296,7 +299,7 @@ export default function BookStage({ book, origin, base, next, onClosed }: Props)
       <div className="pg-caption">{book.dCaption}</div>
       <div className="pg-author">{book.author}</div>
       <p className="pg-desc">{book.desc}</p>
-      <div className="pg-foot">{book.hasNote ? "翻頁閱讀讀書心得 →" : "心得整理中"}</div>
+      <div className="pg-foot">{book.hasSummary ? (book.hasNote ? "翻頁閱讀書摘與心得 →" : "翻頁閱讀書本摘要 →") : book.hasNote ? "翻頁閱讀讀書心得 →" : "心得整理中"}</div>
     </>
   );
   // Until (or unless) the note fills it, the page opposite the title holds the catalogue card.
@@ -329,17 +332,18 @@ export default function BookStage({ book, origin, base, next, onClosed }: Props)
   const atEnd = spread === sheets.length;
   const first = geo.single ? spread : 2 * spread - 1;
   const last = Math.min(geo.single ? spread : 2 * spread, pages);
+  const ending = book.hasNote ? { short: "完", long: "心得結束" } : { short: "整理中", long: "心得整理中" };
   const where =
     spread === 0
       ? { short: "書名頁", long: "書名頁" }
       : first <= last
         ? // an odd page count ends with the last page on the left, opposite 完
           {
-            short: `${first === last ? first : `${first}–${last}`} / ${pages}${atEnd ? " · 完" : ""}`,
-            long: `第 ${first === last ? first : `${first} 到 ${last}`} 頁，共 ${pages} 頁${atEnd ? "，心得結束" : ""}`,
+            short: `${first === last ? first : `${first}–${last}`} / ${pages}${atEnd ? ` · ${ending.short}` : ""}`,
+            long: `第 ${first === last ? first : `${first} 到 ${last}`} 頁，共 ${pages} 頁${atEnd ? `，${ending.long}` : ""}`,
           }
         : pages
-          ? { short: "完", long: "心得結束" }
+          ? ending
           : book.hasNote
             ? { short: note === "failed" ? "載入失敗" : "載入中", long: note === "failed" ? "心得載入失敗" : "心得載入中" }
             : { short: "整理中", long: "心得整理中" };
@@ -372,14 +376,16 @@ export default function BookStage({ book, origin, base, next, onClosed }: Props)
               <span>{book.numStr}</span>
               <span>讀書心得</span>
             </div>
-            {pages ? (
+            {pages && book.hasNote ? (
               <div className="pg-end">完</div>
             ) : (
               <>
                 <h3 className="pg-head">{book.hasNote ? "我的讀書心得" : "心得整理中"}</h3>
                 <p className="pg-desc">
                   {!book.hasNote
-                    ? "書頁已建立，心得完成後會發布在那裡。"
+                    ? note === "failed"
+                      ? "書本摘要載入失敗，點下方按鈕到書頁閱讀。"
+                      : "書頁已建立，心得完成後會發布在那裡。"
                     : note === "failed"
                       ? "心得載入失敗，點下方按鈕到書頁閱讀全文。"
                       : "心得載入中…"}

@@ -3,9 +3,7 @@
 ## Purpose
 
 定義「百冊」網站的書籍內容模型:以一書一個 Markdown 檔作為書目與心得的唯一資料來源,規範 frontmatter schema、心得判定與封面對應規則。
-
 ## Requirements
-
 ### Requirement: 單一來源的書籍內容集合
 
 系統 SHALL 以一本書一個 Markdown 檔的方式,在 Astro content collection 中管理所有書籍,作為書目與心得的唯一資料來源。書名、作者、分類、簡介等後設資料 MUST 存於檔案 frontmatter,讀書心得 MUST 為檔案內文。系統 MUST NOT 另外維護重複的書籍清單(例如寫死在元件中的陣列或獨立的 notes JS 包)。
@@ -22,22 +20,17 @@
 
 ### Requirement: frontmatter Schema 與驗證
 
-每個書籍 Markdown 檔的 frontmatter SHALL 至少包含 `rank`(數字)、`cat`(分類鍵)、`zh`(中文書名,允許空字串)、`en`(英文書名)、`author`、`desc`(簡介),並 MAY 包含 `cover`(封面檔名)。系統 SHALL 在建置時對 frontmatter 進行型別驗證,欄位缺漏或型別錯誤時建置 MUST 失敗並指出問題檔案。
+每個書籍 Markdown 檔的 frontmatter SHALL 至少包含 `rank`(數字)、`cat`(分類鍵)、`zh`(中文書名,允許空字串)、`en`(英文書名)、`author`、`desc`(簡介),並 MAY 包含 `cover`(封面檔名)與 `summary`(書本摘要,200–300 字,不計標點與空白,連續英文或數字算 1 字)。系統 SHALL 在建置時對 frontmatter 進行型別驗證,欄位缺漏、型別錯誤或 `summary` 長度不符時建置 MUST 失敗並指出問題檔案。`summary` MUST NOT 影響該書是否有心得的判斷。
 
-#### Scenario: 合法 frontmatter 通過驗證
+#### Scenario: 摘要長度不符
 
-- **WHEN** 一個書籍檔的 frontmatter 含全部必填欄位且型別正確
-- **THEN** 建置 SHALL 成功並將其納入 collection
+- **WHEN** 某書的 `summary` 少於 200 字或超過 300 字
+- **THEN** 建置 MUST 失敗並指出問題檔案
 
-#### Scenario: 缺欄位導致建置失敗
+#### Scenario: 只有摘要的書
 
-- **WHEN** 某書籍檔缺少必填欄位或 `rank` 非數字
-- **THEN** 建置 SHALL 失敗並明確指出該檔案與問題欄位
-
-#### Scenario: 未在台灣出版的書
-
-- **WHEN** 某書 `zh` 為空字串
-- **THEN** 系統 SHALL 視為合法,並在顯示時以英文書名為主標、副標呈現「台灣尚未出版」
+- **WHEN** 某書有 `summary` 但正文為空
+- **THEN** 系統 SHALL 視該書為沒有心得
 
 ### Requirement: 心得即內文
 
@@ -66,3 +59,4 @@
 
 - **WHEN** 某書對應的封面圖檔不存在
 - **THEN** 系統 SHALL 顯示版式佔位封面(分類底色 + 書名),不得出現破圖
+

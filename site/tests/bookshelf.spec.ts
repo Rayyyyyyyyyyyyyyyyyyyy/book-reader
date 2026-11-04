@@ -164,6 +164,30 @@ test("Back closes the book, focus stays in it, and the list view survives a visi
   await expect(page.getByRole("button", { name: "列表" })).toHaveAttribute("aria-pressed", "true");
 });
 
+test("reloading with a book open leaves no dead Back", async ({ page }) => {
+  await spine(page, "001").click();
+  await page.waitForTimeout(OPENED);
+  await page.reload();
+  await page.waitForLoadState("networkidle");
+  await expect(page.locator(".stage")).toHaveCount(0);
+  await expect.poll(() => page.evaluate(() => history.state?.bookStage ?? null)).toBeNull();
+  await page.goBack();
+  expect(page.url()).toBe("about:blank");
+});
+
+test("returning from the full book page leaves no dead Back", async ({ page }) => {
+  await spine(page, "001").click();
+  await page.waitForTimeout(OPENED);
+  await page.locator(".stage-cta").click();
+  await page.waitForURL(/\/book\//);
+  await page.goBack();
+  await page.waitForLoadState("networkidle");
+  await expect(page.locator(".stage")).toHaveCount(0);
+  await expect.poll(() => page.evaluate(() => history.state?.bookStage ?? null)).toBeNull();
+  await page.goBack();
+  expect(page.url()).toBe("about:blank");
+});
+
 test("a note that fails to load points to the book page", async ({ page }) => {
   await page.route("**/book/001-*", (r) => r.abort());
   await spine(page, "001").click();
@@ -261,7 +285,7 @@ test.describe("phone", () => {
     });
     await page.waitForTimeout(TURNED);
     await expect(page.locator(".stage")).toHaveCount(1);
-    expect(await pageLabel(page)).toBe("2/2");
+    expect(await pageLabel(page)).toBe("2/3");
     // a stray tap above the page does not close the book; the page's left third goes back
     await page.touchscreen.tap(195, 60);
     await page.waitForTimeout(400);
@@ -269,7 +293,7 @@ test.describe("phone", () => {
     const pg = (await page.locator(".book3d").evaluate((e) => e.getBoundingClientRect().toJSON())) as DOMRect;
     await page.touchscreen.tap(pg.x + pg.width / 6, pg.y + pg.height / 2);
     await page.waitForTimeout(TURNED);
-    expect(await pageLabel(page)).toBe("1/2");
+    expect(await pageLabel(page)).toBe("1/3");
     await page.getByRole("button", { name: "收回書架" }).tap();
     await page.waitForTimeout(CLOSED);
     await expect(page.locator(".stage")).toHaveCount(0);

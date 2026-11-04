@@ -69,8 +69,8 @@ export default function ImmersiveShelf({ sections, base, fit }: Props) {
   }, [selected]);
 
   useEffect(() => {
-    // a reload or return onto an entry pushed by an open book: there is no book out now
-    if (history.state?.bookStage) history.replaceState(null, "");
+    // a reload or return onto an entry pushed by an open book: no book is out now, so step off it or Back would do nothing
+    if (history.state?.bookStage) history.back();
     return () => lockScroll(false);
   }, []);
 

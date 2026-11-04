@@ -22,6 +22,21 @@
 
 每個書籍 Markdown 檔的 frontmatter SHALL 至少包含 `rank`(數字)、`cat`(分類鍵)、`zh`(中文書名,允許空字串)、`en`(英文書名)、`author`、`desc`(簡介),並 MAY 包含 `cover`(封面檔名)與 `summary`(書本摘要,200–300 字,不計標點與空白,連續英文或數字算 1 字)。系統 SHALL 在建置時對 frontmatter 進行型別驗證,欄位缺漏、型別錯誤或 `summary` 長度不符時建置 MUST 失敗並指出問題檔案。`summary` MUST NOT 影響該書是否有心得的判斷。
 
+#### Scenario: 合法 frontmatter 通過驗證
+
+- **WHEN** 一個書籍檔的 frontmatter 含全部必填欄位且型別正確
+- **THEN** 建置 SHALL 成功並將其納入 collection
+
+#### Scenario: 缺欄位導致建置失敗
+
+- **WHEN** 某書籍檔缺少必填欄位或 `rank` 非數字
+- **THEN** 建置 SHALL 失敗並明確指出該檔案與問題欄位
+
+#### Scenario: 未在台灣出版的書
+
+- **WHEN** 某書 `zh` 為空字串
+- **THEN** 系統 SHALL 視為合法,並在顯示時以英文書名為主標、副標呈現「台灣尚未出版」
+
 #### Scenario: 摘要長度不符
 
 - **WHEN** 某書的 `summary` 少於 200 字或超過 300 字

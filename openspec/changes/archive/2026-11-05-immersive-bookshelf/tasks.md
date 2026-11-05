@@ -18,7 +18,7 @@
 - [x] 3.2 關閉時先翻回書頁再合上封面；開書途中改變視窗大小後重新置中
 - [x] 3.3 `npm run test:e2e`（Playwright，Chromium）
 - [ ] 3.4 真實 Safari（macOS / iOS）與實機觸控驗收
-- [ ] 3.5 合併後同步主規格並歸檔本 change
+- [x] 3.5 合併後同步主規格並歸檔本 change
 
 ## 4. 在書中閱讀心得（Phase D）
 

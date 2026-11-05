@@ -209,7 +209,7 @@ test("a remembered list view reloads without the entrance, its chip already sele
   const first = page.locator(".catalog-desktop .book-card").first();
   await first.waitFor();
   expect(await first.evaluate((el: HTMLElement) => el.style.opacity)).toBe("");
-  await expect(page.locator('.chip[data-view="grid"]')).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator('.chip[data-view="grid"]').first()).toHaveAttribute("aria-pressed", "true");
 });
 
 test.describe("landscape phone", () => {

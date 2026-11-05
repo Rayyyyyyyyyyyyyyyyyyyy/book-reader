@@ -14,6 +14,8 @@ Astro 預先產生首頁與每本書的靜態頁，首頁為 client:load 的 Rea
 7. 內容載入完成後，尾端提供下一本有心得的書，順序沿用目前檢視。前往下一本以 replaceState 取代書籍 entry，一次返回回到書目，焦點與捲動回到最初打開的那本。
 8. 來源 entry 的 catalogReturn 只用一次；收書或還原後清除，之後重新整理不會回到舊篩選。
 
+9. 重新整理後，靜態書頁與身後的書目 entry 在 Chromium 仍算同一文件，返回只會改網址、畫面停在書頁（e2e 實測）。靜態頁監聽 popstate，路徑改變就重新載入。
+
 ## Validation Limits
 
 本次只執行 Astro check、covers、Astro build 與 OpenSpec validate。e2e 只撰寫，不執行。動畫連續性、sticky/display:contents、原生 dialog 的 VoiceOver、bfcache 真實事件順序、iOS Safari 的固定 body 與動態工具列，需真實瀏覽器確認。不得將原始碼推論視為瀏覽器通過證據。

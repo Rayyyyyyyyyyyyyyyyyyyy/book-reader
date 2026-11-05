@@ -26,7 +26,7 @@
 
 ### Requirement: 手機網址與返回恢復
 
-手機開書 SHALL 以 pushState 將網址設為 `/book/<slug>`（含部署 base）。返回或回到書目 SHALL 消耗開書 entry，恢復來源捲動位置與焦點，MUST NOT 留下無效返回。若來源元素消失 SHALL 安全收回並聚焦搜尋框。重新整理 SHALL 留在該書靜態頁；Forward 與 pageshow 的 bfcache 還原 MUST NOT 留下已開啟的預覽。靜態書頁頂部回到書目 SHALL 在有開書來源時返回來源，直接分享進入則取代目前 entry 回書目，避免返回迴圈。
+手機開書 SHALL 以 pushState 將網址設為 `/book/<slug>/`（含部署 base，結尾斜線避開 GitHub Pages 的 301）。返回或回到書目 SHALL 消耗開書 entry，恢復來源捲動位置與焦點，MUST NOT 留下無效返回。若來源元素消失 SHALL 安全收回並聚焦搜尋框。重新整理 SHALL 留在該書靜態頁；Forward 與 pageshow 的 bfcache 還原 MUST NOT 留下已開啟的預覽。靜態書頁頂部回到書目 SHALL 在有開書來源時返回來源，直接分享進入則取代目前 entry 回書目，避免返回迴圈。
 
 #### Scenario: 收書恢復
 

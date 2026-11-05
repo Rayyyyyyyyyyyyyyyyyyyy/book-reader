@@ -18,4 +18,4 @@ Astro 預先產生首頁與每本書的靜態頁，首頁為 client:load 的 Rea
 
 ## Validation Limits
 
-本次只執行 Astro check、covers、Astro build 與 OpenSpec validate。e2e 只撰寫，不執行。動畫連續性、sticky/display:contents、原生 dialog 的 VoiceOver、bfcache 真實事件順序、iOS Safari 的固定 body 與動態工具列，需真實瀏覽器確認。不得將原始碼推論視為瀏覽器通過證據。
+已執行 Astro check、covers、Astro build、OpenSpec validate，以及 Chromium 的 bookshelf e2e（31/31，`a7c9777`）。bfcache 只測合成事件；正式站的 301 未涵蓋。動畫連續性、sticky/display:contents、原生 dialog 的 VoiceOver、bfcache 真實事件順序、iOS Safari 的固定 body 與動態工具列，需真實瀏覽器確認。不得將原始碼推論視為瀏覽器通過證據。

@@ -21,5 +21,7 @@
 - [x] Astro check：0 errors / 0 warnings
 - [x] 產生封面與 Astro build
 - [x] openspec validate redesign-mobile
-- [ ] 瀏覽器驗收：首頁首次繪製、動畫、返回、刷新、Forward、bfcache、焦點、字級與觸控目標
+- [x] Chromium e2e：bookshelf.spec.ts 31/31（`a7c9777`）
+- [ ] 人工看畫面：首頁首次繪製、開書動畫觀感
+- [ ] 真實 bfcache 與正式站 301 下的重新整理與返回
 - [ ] iOS Safari 真機：直橫向、safe area、動態網址列、dialog / VoiceOver 與背景鎖定

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import type { BookMeta } from "../../lib/books";
+import { PHONE } from "../../lib/phone";
 import { SHELF_ROW, spineLook } from "../../lib/spine";
 import { BookSpine } from "./BookSpine";
 import BookStage from "./BookStage";
@@ -8,13 +9,13 @@ import "../../styles/shelf.css";
 
 export type ShelfSection = { key: string; zh: string; en: string; books: BookMeta[]; countLabel?: string };
 
-type Props = { sections: ShelfSection[]; base: string; fit?: boolean };
+type Props = { sections: ShelfSection[]; base: string; fit?: boolean; onMobileSelect?: (book: BookMeta, trigger: HTMLElement, origin: HTMLElement) => void; mobileSlug?: string };
 
 type Selection = { book: BookMeta; button: HTMLButtonElement; face: HTMLElement };
 
 // Books with a note stand at the front of each shelf; within each group tallest first, like a real
 // shelf, and rank breaks ties so the order is stable.
-const byHeight = (books: BookMeta[]) =>
+export const byHeight = (books: BookMeta[]) =>
   [...books].sort((a, b) => +b.hasNote - +a.hasNote || spineLook(b).height - spineLook(a).height || a.rank - b.rank);
 
 function lockScroll(on: boolean) {
@@ -29,7 +30,7 @@ function lockScroll(on: boolean) {
   }
 }
 
-export default function ImmersiveShelf({ sections, base, fit }: Props) {
+export default function ImmersiveShelf({ sections, base, fit, onMobileSelect, mobileSlug }: Props) {
   const [selected, setSelected] = useState<Selection | null>(null);
   const returnFocus = useRef<HTMLButtonElement | null>(null);
 
@@ -38,6 +39,7 @@ export default function ImmersiveShelf({ sections, base, fit }: Props) {
     if (selected) return;
     const face = button.querySelector<HTMLElement>(".spine-face");
     if (!face) return;
+    if (matchMedia(PHONE).matches && onMobileSelect) return onMobileSelect(book, button, face);
     lockScroll(true);
     setSelected({ book, button, face });
   };
@@ -69,15 +71,15 @@ export default function ImmersiveShelf({ sections, base, fit }: Props) {
   }, [selected]);
 
   useEffect(() => {
-    // a reload or return onto an entry pushed by an open book: there is no book out now
-    if (history.state?.bookStage) history.replaceState(null, "");
+    // a reload or return onto an entry pushed by an open book: no book is out now, so step off it or Back would do nothing
+    if (history.state?.bookStage) history.back();
     return () => lockScroll(false);
   }, []);
 
   return (
     <>
       {sections.map((sec) => (
-        <section key={sec.key} className={`shelf-section cat-${sec.key}${fit ? " shelf-fit" : ""}`} aria-label={sec.zh}>
+        <section key={sec.key} className={`shelf-section cat-${sec.key}${fit ? " shelf-fit" : ""}`} aria-label={sec.zh} data-category={sec.key}>
           <div className="shelf-head">
             <h2>{sec.zh}</h2>
             <span className="shelf-en">{sec.en}</span>
@@ -85,7 +87,7 @@ export default function ImmersiveShelf({ sections, base, fit }: Props) {
           </div>
           <div className="shelf" style={{ "--row": `${SHELF_ROW}px` } as React.CSSProperties}>
             {byHeight(sec.books).map((b) => (
-              <BookSpine key={b.slug} book={b} out={selected?.book.slug === b.slug} onSelect={select} />
+              <BookSpine key={b.slug} book={b} out={selected?.book.slug === b.slug || mobileSlug === b.slug} onSelect={select} />
             ))}
           </div>
         </section>

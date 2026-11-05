@@ -29,7 +29,18 @@ const ogImage = `${base}og/${entry.id}.png`;
 ---
 
 <Base title={`${dCover}｜百冊`} description={d.desc} image={ogImage}>
-  <div class={"page cat-" + cat}>
+  <!-- Inline, ahead of the content: a bundled module runs late, and a quick Back before it would strand this page under the wrong URL. -->
+  <script is:inline>
+    // After a reload, the entry behind this one still counts as the same document, so Back only changes the URL.
+    // Load whatever page that URL really is. Comparing the path leaves in-page jumps like #note alone.
+    (() => {
+      const path = location.pathname;
+      addEventListener("popstate", () => {
+        if (location.pathname !== path) location.reload();
+      });
+    })();
+  </script>
+  <div class={"page mobile-reading cat-" + cat}>
     <header class="topbar">
       <a class="back" href={base}><span class="arrow">←</span> 回到書目</a>
       <span class="badge">{CATEGORY_ZH[cat]}</span>
@@ -57,23 +68,40 @@ const ogImage = `${base}og/${entry.id}.png`;
       </div>
     </article>
 
-    {d.summary && (
-      <section class="summary" aria-label="書本摘要">
-        <div class="note-label">書本摘要</div>
-        <p>{d.summary}</p>
-      </section>
-    )}
-
-    {hasNote ? (
-      <article id="note" class="note">
-        <div class="note-label">讀書筆記</div>
-        <Content />
-      </article>
-    ) : (
-      <div id="note" class="note-pending">讀書心得整理中 <span>coming soon</span></div>
-    )}
+    <div class="reading-body">
+      {d.summary && (
+        <section class="summary" aria-label="書本摘要">
+          <div class="note-label">書本摘要</div>
+          <p>{d.summary}</p>
+        </section>
+      )}
+  
+      {hasNote ? (
+        <article id="note" class="note">
+          <div class="note-label">讀書筆記</div>
+          <Content />
+        </article>
+      ) : (
+        <div id="note" class="note-pending">讀書心得整理中 <span>coming soon</span></div>
+      )}
+    </div>
   </div>
 </Base>
+
+<script>
+  import { PHONE } from "../../lib/phone";
+
+  const back = document.querySelector<HTMLAnchorElement>(".topbar .back");
+  back?.addEventListener("click", (e) => {
+    if (!matchMedia(PHONE).matches || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    e.preventDefault();
+    const saved = history.state?.mobileReader;
+    const home = new URL(back.href);
+    const returnUrl = saved?.returnUrl && new URL(saved.returnUrl, location.origin);
+    if (saved?.slug && returnUrl?.origin === location.origin && returnUrl.pathname === home.pathname && history.length > 1) history.back();
+    else location.replace(back.href);
+  });
+</script>
 
 <style>
   .page { max-width: 760px; margin: 0 auto; padding: 0 28px 130px; }
@@ -112,4 +140,20 @@ const ogImage = `${base}og/${entry.id}.png`;
   .note :global(p) { font-size: 17px; line-height: 2.05; color: #4a4339; font-weight: 300; margin: 0 0 20px; text-wrap: pretty; }
   .note-pending { padding: 72px 0; text-align: center; font-family: var(--serif-tc); color: #6f675b; }
   .note-pending span { font-family: var(--serif-en); font-style: italic; }
+  @media (max-width: 639px), (pointer: coarse) and (max-height: 500px) {
+    .page { max-width: 640px; padding: 0 max(22px, env(safe-area-inset-right)) max(64px, env(safe-area-inset-bottom)) max(22px, env(safe-area-inset-left)); min-height: 100dvh; }
+    .topbar { margin: 0; padding: env(safe-area-inset-top) 0 0; background: var(--paper); backdrop-filter: none; gap: 12px; }
+    .back { min-height: 48px; min-width: 44px; font-size: 14px; }
+    .back:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+    .topbar .badge { border: 0; padding: 0; font-size: 14px; color: var(--muted); letter-spacing: 0; }
+    .detail { display: block; padding-top: 28px; }
+    .cover-col, .eyebrow, .jump { display: none; }
+    .meta-col { min-width: 0; overflow-wrap: anywhere; }
+    h1 { font-size: 30px; line-height: 1.4; margin-bottom: 12px; text-wrap: balance; }
+    .caption { line-height: 1.4; margin-bottom: 12px; }
+    .author { font-size: 16px; margin-bottom: 24px; letter-spacing: 0; }
+    .desc { border: 0; padding: 0; margin: 0; font-size: 17px; line-height: 1.95; font-weight: 400; color: var(--ink); }
+    .note-pending { padding: 40px 0 0; text-align: left; font-size: 17px; }
+    .note-pending span { display: none; }
+  }
 </style>

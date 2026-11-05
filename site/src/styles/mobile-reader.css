@@ -1,0 +1,59 @@
+/* The phone reader stays usable if a rotation crosses the 640px breakpoint. */
+.mobile-reader {
+  position: fixed; inset: 0; width: 100%; max-width: none; height: 100dvh; max-height: none;
+  margin: 0; border: 0; padding: 0; overflow: hidden; color: var(--ink); background: transparent;
+  font-family: var(--serif-tc);
+}
+.mobile-reader::backdrop { background: rgba(26, 18, 11, .86); }
+.reader-sheet { position: absolute; inset: 0; display: flex; flex-direction: column; background: var(--paper); }
+.reader-bar {
+  flex: none; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: env(safe-area-inset-top, 0px) max(16px, env(safe-area-inset-right)) 0 max(16px, env(safe-area-inset-left));
+  color: var(--muted); background: var(--paper); border-bottom: 1px solid #d6cbb8; font-size: 14px;
+}
+.reader-bar button {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 48px; min-width: 44px;
+  border: 0; padding: 0 8px; margin-left: -8px; background: transparent; color: var(--ink); font: inherit; cursor: pointer;
+}
+.reader-scroll { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+.reader-content {
+  max-width: 640px; margin: auto; padding: 28px max(22px, env(safe-area-inset-right)) max(64px, env(safe-area-inset-bottom)) max(22px, env(safe-area-inset-left));
+  font-size: 17px; line-height: 1.95; overflow-wrap: anywhere;
+}
+.reader-meta h1 { font-size: 30px; line-height: 1.4; margin: 0 0 12px; font-weight: 600; text-wrap: balance; }
+.reader-meta .caption { font-family: var(--serif-en); font-style: italic; font-size: 20px; line-height: 1.4; color: var(--muted); margin: 0 0 12px; }
+.reader-meta .author { color: var(--muted); margin: 0 0 24px; font-size: 16px; }
+.reader-meta .desc { margin: 0; color: var(--ink); }
+.reader-content .note-pending { margin: 40px 0 0; color: var(--muted); }
+.reader-recover { display: inline-flex; align-items: center; min-height: 44px; color: var(--accent-ink); text-underline-offset: 4px; }
+.reader-next {
+  display: flex; flex-direction: column; gap: 4px; width: 100%; min-height: 44px; margin-top: 48px; padding: 16px 0 0;
+  border: 0; border-top: 1px solid #d6cbb8; background: transparent; color: var(--ink); font: inherit; text-align: left; cursor: pointer;
+}
+.reader-next span { font-size: 14px; color: var(--accent-ink); }
+.reader-next strong { font-weight: 600; }
+.mobile-reader :focus-visible { outline: 2px solid var(--ink); outline-offset: -2px; }
+.mobile-flight { perspective: 1400px; position: absolute; background: var(--paper); box-shadow: 0 18px 40px #0005; pointer-events: none; }
+.mobile-flight-front { position: absolute; inset: 0; transform-origin: left center; transform-style: preserve-3d; }
+.mobile-flight-source, .mobile-flight-cover { position: absolute; inset: 0; overflow: hidden; backface-visibility: hidden; }
+.mobile-flight-cover { display: grid; place-items: center; background: var(--wash); color: var(--ink); text-align: center; font-size: 24px; padding: 16px; }
+.mobile-flight-cover:has(img) { padding: 0; }
+.mobile-flight-cover img { width: 100%; height: 100%; object-fit: cover; }
+@media (max-width: 639px), (pointer: coarse) and (max-height: 500px) {
+  .mobile-reading .reading-body { font-size: 17px; line-height: 1.95; color: var(--ink); overflow-wrap: anywhere; }
+  .mobile-reading .reading-body :is(.summary, .note) { margin: 0; padding: 40px 0 0; }
+  .mobile-reading .reading-body :is(.summary, .note) p { font-size: 17px; line-height: 1.95; font-weight: 400; color: var(--ink); margin: 0 0 22px; }
+  .mobile-reading .reading-body :is(ul, ol) { font-size: 17px; padding-left: 1.4em; }
+  .mobile-reading .reading-body :is(h2, h3) { line-height: 1.55; font-weight: 600; color: var(--ink); margin: 36px 0 12px; }
+  .mobile-reading .reading-body h2 { font-size: 23px; }
+  .mobile-reading .reading-body h3 { font-size: 20px; }
+  .mobile-reading .reading-body .note-label { font-size: 17px; font-weight: 600; letter-spacing: .04em; color: var(--accent-ink); margin: 0 0 18px; }
+  .mobile-reading .reading-body a { color: var(--accent-ink); text-underline-offset: 4px; }
+  .mobile-reading .reading-body img { max-width: 100%; height: auto; }
+  .mobile-reading .reading-body pre { overflow-x: auto; }
+}
+/* A phone session rotated into landscape keeps the same full-size text. */
+.reader-content .reading-body { font-size: 17px; line-height: 1.95; }
+.reader-content .reading-body :is(.summary, .note) { padding-top: 40px; }
+.reader-content .reading-body .note-label { color: var(--accent-ink); font-weight: 600; }
+.reader-content .reading-body p { font-size: 17px; }

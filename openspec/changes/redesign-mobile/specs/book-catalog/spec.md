@@ -2,7 +2,7 @@
 
 ### Requirement: 保留視覺風格與動畫
 
-系統 SHALL 保留原型的米色襯線視覺風格。在手機以外 SHALL 保留捲動滑入（含 clip-path）動畫與封面視差；手機（寬度 <640px，或觸控且高度 ≤500px，下同）SHALL 以開書作為唯一主要動態，不播放書卡滑入與視差。系統 MUST 移除原型的自訂滑輪平滑捲動劫持，改用瀏覽器原生捲動。動畫 SHALL 在使用者開啟 `prefers-reduced-motion` 時停用。
+系統 SHALL 保留原型的米色襯線視覺風格。在手機以外 SHALL 保留捲動滑入（含 clip-path）動畫與封面視差；手機（寬度 <640px，或觸控且高度 ≤500px，下同）MUST NOT 播放書卡滑入、視差與開書動畫。系統 MUST 移除原型的自訂滑輪平滑捲動劫持，改用瀏覽器原生捲動。動畫 SHALL 在使用者開啟 `prefers-reduced-motion` 時停用。
 
 #### Scenario: 滑入動畫
 

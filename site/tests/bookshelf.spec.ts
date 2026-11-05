@@ -349,16 +349,16 @@ test.describe("phone", () => {
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   });
 
-  test("cover opens at its own bounds, changes URL, and Back restores scroll and focus", async ({ page }) => {
+  test("cover goes straight to the text, changes URL, and Back restores scroll and focus", async ({ page }) => {
     await card(page, "060").scrollIntoViewIfNeeded();
     const before = await page.evaluate(() => scrollY);
-    const origin = await card(page, "060").locator(".cover").boundingBox();
-    const start = await page.evaluate(async () => {
+    // no animation: the reader is on screen in the same task as the tap
+    const shown = await page.evaluate(async () => {
       document.querySelector<HTMLElement>('.catalog-mobile [data-slug^="060"]')!.click();
       await Promise.resolve();
-      return document.querySelector(".mobile-flight")!.getBoundingClientRect().toJSON();
+      return !!document.querySelector("dialog[open] .reader-content");
     });
-    for (const k of ["x", "y", "width", "height"] as const) expect(Math.abs(start[k] - origin![k])).toBeLessThan(1);
+    expect(shown).toBe(true);
     await expect(page).toHaveURL(/\/book\/060-/);
     await expect(reader(page)).toHaveCount(1);
     await expect(reader(page)).toHaveAttribute("aria-modal", "true");
@@ -378,7 +378,6 @@ test.describe("phone", () => {
   test("full text scrolls at 17px, traps focus, and Escape returns to the cover", async ({ page }) => {
     await card(page, "001").click();
     await expect(page.locator(".reader-content #note.note")).toBeVisible();
-    await page.waitForTimeout(1100);
     const content = await page.locator(".reader-content").evaluate((el) => ({
       order: [...el.querySelectorAll(".reader-meta, .summary, #note")].map((n) => n.className),
       fonts: [...el.querySelectorAll(".desc, .summary p, .note p")].map((n) => parseFloat(getComputedStyle(n).fontSize)),
@@ -446,7 +445,7 @@ test.describe("phone", () => {
     await expect(spine(page, "001")).toBeFocused();
   });
 
-  test("Back mid-animation, repeated activation, resize and a missing origin clean up", async ({ page }) => {
+  test("repeated activation, Back, resize and a missing trigger clean up", async ({ page }) => {
     await card(page, "001").evaluate((el: HTMLElement) => { el.click(); el.click(); });
     await expect(reader(page)).toHaveCount(1);
     await page.goBack();
@@ -455,7 +454,7 @@ test.describe("phone", () => {
     await expect(page).toHaveURL(home);
     await card(page, "001").click();
     await page.setViewportSize({ width: 844, height: 390 });
-    await expect(page.locator(".reader-sheet")).toHaveCSS("opacity", "1");
+    await expect(reader(page)).toBeVisible();
     await page.setViewportSize({ width: 390, height: 844 });
     // Model a filter result removing the original trigger while the modal owns focus.
     await card(page, "001").evaluate((el) => el.remove());
@@ -553,18 +552,5 @@ test.describe("phone", () => {
     await page.getByRole("textbox", { name: "搜尋書籍" }).fill("");
     await page.reload();
     await expect(page.getByRole("textbox", { name: "搜尋書籍" })).toHaveValue("");
-  });
-
-  test.describe("reduced motion", () => {
-    test.use({ contextOptions: { reducedMotion: "reduce" } });
-    test("opens and closes immediately with the same URL and focus behavior", async ({ page }) => {
-      await card(page, "001").click();
-      await expect(page.locator(".reader-sheet")).toHaveCSS("opacity", "1");
-      await expect(page.locator(".mobile-flight")).toHaveCSS("visibility", "hidden");
-      await expect(page).toHaveURL(/\/book\/001-/);
-      await page.keyboard.press("Escape");
-      await expect(reader(page)).toHaveCount(0);
-      await expect(card(page, "001")).toBeFocused();
-    });
   });
 });

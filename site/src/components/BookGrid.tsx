@@ -109,11 +109,11 @@ export default function BookGrid({ books, cats, base }: Props) {
     document.documentElement.dataset.catalogView = v;
     try { sessionStorage.setItem("view", v); } catch {}
   };
-  const openMobile = (book: BookMeta, trigger: HTMLElement, origin: HTMLElement) => {
+  const openMobile = (book: BookMeta, trigger: HTMLElement) => {
     if (!matchMedia(PHONE).matches || selectionRef.current) return;
     const scrollY = window.scrollY;
     const returnUrl = location.pathname + location.search + location.hash;
-    const selection = { book, originSlug: book.slug, trigger, origin, rect: origin.getBoundingClientRect(), scrollY, returnUrl };
+    const selection = { book, originSlug: book.slug, trigger, scrollY, returnUrl };
     const shelves = Object.fromEntries([...rootRef.current!.querySelectorAll<HTMLElement>(".shelf-section")]
       .map((section) => [section.dataset.category, section.querySelector(".shelf")?.scrollLeft ?? 0]));
     history.replaceState({ ...history.state, catalogReturn: { query, category: activeCategory, notesOnly, scrollY, slug: book.slug, shelves } }, "");
@@ -280,11 +280,11 @@ export default function BookGrid({ books, cats, base }: Props) {
       </div>
       <div className="cover-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(var(--cardmin),1fr))", gap: "38px 28px" }}>
         {(mobile ? phoneOrder(sec.books) : sec.books).map((book) => (
-          <a key={book.slug} href={bookHref(base, book.slug)} className="book-card" data-slug={book.slug} data-note={book.hasNote || undefined} data-out={mobile && selected?.originSlug === book.slug || undefined} data-reveal="1"
+          <a key={book.slug} href={bookHref(base, book.slug)} className="book-card" data-slug={book.slug} data-note={book.hasNote || undefined} data-reveal="1"
             onClick={(e) => {
               if (!mobile || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
               e.preventDefault();
-              openMobile(book, e.currentTarget, e.currentTarget.querySelector<HTMLElement>(".cover")!);
+              openMobile(book, e.currentTarget);
             }} style={{ display: "flex", flexDirection: "column", gap: 15, color: "inherit", textDecoration: "none" }}>
             <div className="cover" style={{ position: "relative", aspectRatio: "2/3", border: "1px solid rgba(44,38,32,.12)", overflow: "hidden" }}>
               {book.cover ? (
@@ -408,7 +408,7 @@ export default function BookGrid({ books, cats, base }: Props) {
 
         {hasResults ? (
           <>
-            {(view === null || view === "shelf") && <div className="catalog-shelf"><ImmersiveShelf sections={sections} base={base} fit={notesOnly} onMobileSelect={openMobile} mobileSlug={selected?.originSlug} /></div>}
+            {(view === null || view === "shelf") && <div className="catalog-shelf"><ImmersiveShelf sections={sections} base={base} fit={notesOnly} onMobileSelect={openMobile} /></div>}
             {(view === null || view === "grid") && <div className="catalog-grid">
               {phone !== false && <div className="catalog-mobile">{renderGrid(true)}</div>}
               {phone === false && <div className="catalog-desktop">{renderGrid(false)}</div>}

@@ -33,12 +33,6 @@
 .reader-next span { font-size: 14px; color: var(--accent-ink); }
 .reader-next strong { font-weight: 600; }
 .mobile-reader :focus-visible { outline: 2px solid var(--ink); outline-offset: -2px; }
-.mobile-flight { perspective: 1400px; position: absolute; background: var(--paper); box-shadow: 0 18px 40px #0005; pointer-events: none; }
-.mobile-flight-front { position: absolute; inset: 0; transform-origin: left center; transform-style: preserve-3d; }
-.mobile-flight-source, .mobile-flight-cover { position: absolute; inset: 0; overflow: hidden; backface-visibility: hidden; }
-.mobile-flight-cover { display: grid; place-items: center; background: var(--wash); color: var(--ink); text-align: center; font-size: 24px; padding: 16px; }
-.mobile-flight-cover:has(img) { padding: 0; }
-.mobile-flight-cover img { width: 100%; height: 100%; object-fit: cover; }
 @media (max-width: 639px), (pointer: coarse) and (max-height: 500px) {
   .mobile-reading .reading-body { font-size: 17px; line-height: 1.95; color: var(--ink); overflow-wrap: anywhere; }
   .mobile-reading .reading-body :is(.summary, .note) { margin: 0; padding: 40px 0 0; }

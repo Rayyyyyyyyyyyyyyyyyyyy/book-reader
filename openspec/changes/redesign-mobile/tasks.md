@@ -6,7 +6,7 @@
 
 ## 2. 閱讀與返回
 
-- [x] 網格與書脊共用來源矩形開書動畫與全文捲動 dialog
+- [x] 網格與書脊共用全文捲動 dialog，點選後立即進入（2026-11-05 使用者取消開書動畫）
 - [x] 17px 正文、safe area、dvh、44px 目標、焦點與 Esc
 - [x] pushState 正式書頁、返回與捲動焦點恢復、刷新與分享靜態書頁
 - [x] 載入與失敗恢復、無內容狀態、resize、減少動態、pageshow 清理
@@ -22,6 +22,6 @@
 - [x] 產生封面與 Astro build
 - [x] openspec validate redesign-mobile
 - [x] Chromium e2e：bookshelf.spec.ts 31/31（`a7c9777`）
-- [ ] 人工看畫面：首頁首次繪製、開書動畫觀感
+- [ ] 人工看畫面：首頁首次繪製
 - [ ] 真實 bfcache 與正式站 301 下的重新整理與返回
 - [ ] iOS Safari 真機：直橫向、safe area、動態網址列、dialog / VoiceOver 與背景鎖定

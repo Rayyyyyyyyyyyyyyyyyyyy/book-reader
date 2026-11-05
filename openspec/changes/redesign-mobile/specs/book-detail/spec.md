@@ -2,17 +2,17 @@
 
 ### Requirement: 手機共用開書與全文閱讀
 
-手機（寬度 <640px，或觸控且高度 ≤500px）的網格封面與書架書脊 SHALL 進入同一閱讀器。開書 SHALL 從被點元素的實際位置與尺寸放大並打開，網格初始 pose MUST NOT 依賴書脊尺寸。之後 SHALL 顯示全螢幕原生捲動內容，順序為書籍資訊、摘要、心得；無摘要不留空段，無心得顯示整理中。正文 SHALL 約 17px 且至少 16px，不隨書本動畫幾何縮小，手機 MUST NOT 分頁翻書。載入中 SHALL 可辨識，失敗 SHALL 引導至正式書頁。桌機 3D 翻頁與 reader-back 修正 SHALL 保持原狀。
+手機（寬度 <640px，或觸控且高度 ≤500px）的網格封面與書架書脊 SHALL 進入同一閱讀器。點選後 SHALL 立即顯示全螢幕原生捲動內容，MUST NOT 播放開書或收書動畫，順序為書籍資訊、摘要、心得；無摘要不留空段，無心得顯示整理中。正文 SHALL 約 17px 且至少 16px，手機 MUST NOT 分頁翻書。載入中 SHALL 可辨識，失敗 SHALL 引導至正式書頁。桌機 3D 翻頁與 reader-back 修正 SHALL 保持原狀。
 
 #### Scenario: 兩種開書來源
 
 - **WHEN** 使用者點手機網格封面或書架書脊
-- **THEN** 同一套動畫 SHALL 由該來源矩形開始，只有一本書開啟，完成後可捲動閱讀全文
+- **THEN** 系統 SHALL 立即進入同一閱讀器，只有一本書開啟，可捲動閱讀全文
 
 #### Scenario: 開書期間操作
 
-- **WHEN** 開書動畫中使用者重複啟動、返回或改變視窗
-- **THEN** 系統 SHALL 忽略重複啟動，安全收回或完成當前動畫，不留下預覽、鎖定或無法操作的畫面
+- **WHEN** 使用者連續點選、開書後立刻返回或改變視窗
+- **THEN** 系統 SHALL 忽略重複啟動，不留下鎖定或無法操作的畫面
 
 #### Scenario: 內容組合與失敗
 
@@ -50,7 +50,7 @@
 
 ### Requirement: 手機閱讀基本可用性
 
-手機閱讀器 SHALL 使用模態 dialog 語意、將焦點移入閱讀器且不進入背景頁面、提供文字收回控制與 Esc。互動目標 SHALL 至少 44×44px；頁面 SHALL 使用 viewport-fit=cover、safe area 與 dvh，直橫向皆可閱讀。減少動態時開書與收書 SHALL 立即完成。
+手機閱讀器 SHALL 使用模態 dialog 語意、將焦點移入閱讀器且不進入背景頁面、提供文字收回控制與 Esc。互動目標 SHALL 至少 44×44px；頁面 SHALL 使用 viewport-fit=cover、safe area 與 dvh，直橫向皆可閱讀。開書與收書 SHALL 立即完成。
 
 #### Scenario: 鍵盤與螢幕閱讀器
 
@@ -59,5 +59,5 @@
 
 #### Scenario: 視窗與動態偏好
 
-- **WHEN** 手機旋轉、動態網址列改變可視高度，或啟用減少動態
-- **THEN** 控制與正文 SHALL 保持可用並避開 safe area；減少動態 SHALL 略過過場動畫
+- **WHEN** 手機旋轉或動態網址列改變可視高度
+- **THEN** 控制與正文 SHALL 保持可用並避開 safe area

@@ -9,7 +9,7 @@ import "../../styles/shelf.css";
 
 export type ShelfSection = { key: string; zh: string; en: string; books: BookMeta[]; countLabel?: string };
 
-type Props = { sections: ShelfSection[]; base: string; fit?: boolean; onMobileSelect?: (book: BookMeta, trigger: HTMLElement, origin: HTMLElement) => void; mobileSlug?: string };
+type Props = { sections: ShelfSection[]; base: string; fit?: boolean; onMobileSelect?: (book: BookMeta, trigger: HTMLElement) => void };
 
 type Selection = { book: BookMeta; button: HTMLButtonElement; face: HTMLElement };
 
@@ -30,7 +30,7 @@ function lockScroll(on: boolean) {
   }
 }
 
-export default function ImmersiveShelf({ sections, base, fit, onMobileSelect, mobileSlug }: Props) {
+export default function ImmersiveShelf({ sections, base, fit, onMobileSelect }: Props) {
   const [selected, setSelected] = useState<Selection | null>(null);
   const returnFocus = useRef<HTMLButtonElement | null>(null);
 
@@ -39,7 +39,7 @@ export default function ImmersiveShelf({ sections, base, fit, onMobileSelect, mo
     if (selected) return;
     const face = button.querySelector<HTMLElement>(".spine-face");
     if (!face) return;
-    if (matchMedia(PHONE).matches && onMobileSelect) return onMobileSelect(book, button, face);
+    if (matchMedia(PHONE).matches && onMobileSelect) return onMobileSelect(book, button);
     lockScroll(true);
     setSelected({ book, button, face });
   };
@@ -87,7 +87,7 @@ export default function ImmersiveShelf({ sections, base, fit, onMobileSelect, mo
           </div>
           <div className="shelf" style={{ "--row": `${SHELF_ROW}px` } as React.CSSProperties}>
             {byHeight(sec.books).map((b) => (
-              <BookSpine key={b.slug} book={b} out={selected?.book.slug === b.slug || mobileSlug === b.slug} onSelect={select} />
+              <BookSpine key={b.slug} book={b} out={selected?.book.slug === b.slug} onSelect={select} />
             ))}
           </div>
         </section>

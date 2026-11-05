@@ -8,7 +8,7 @@ import "../../styles/shelf.css";
 
 export type ShelfSection = { key: string; zh: string; en: string; books: BookMeta[]; countLabel?: string };
 
-type Props = { sections: ShelfSection[]; base: string; fit?: boolean };
+type Props = { sections: ShelfSection[]; base: string; fit?: boolean; onMobileSelect?: (book: BookMeta, trigger: HTMLElement, origin: HTMLElement) => void; mobileSlug?: string };
 
 type Selection = { book: BookMeta; button: HTMLButtonElement; face: HTMLElement };
 
@@ -29,7 +29,7 @@ function lockScroll(on: boolean) {
   }
 }
 
-export default function ImmersiveShelf({ sections, base, fit }: Props) {
+export default function ImmersiveShelf({ sections, base, fit, onMobileSelect, mobileSlug }: Props) {
   const [selected, setSelected] = useState<Selection | null>(null);
   const returnFocus = useRef<HTMLButtonElement | null>(null);
 
@@ -38,6 +38,7 @@ export default function ImmersiveShelf({ sections, base, fit }: Props) {
     if (selected) return;
     const face = button.querySelector<HTMLElement>(".spine-face");
     if (!face) return;
+    if (matchMedia("(max-width: 639px)").matches && onMobileSelect) return onMobileSelect(book, button, face);
     lockScroll(true);
     setSelected({ book, button, face });
   };
@@ -77,7 +78,7 @@ export default function ImmersiveShelf({ sections, base, fit }: Props) {
   return (
     <>
       {sections.map((sec) => (
-        <section key={sec.key} className={`shelf-section cat-${sec.key}${fit ? " shelf-fit" : ""}`} aria-label={sec.zh}>
+        <section key={sec.key} className={`shelf-section cat-${sec.key}${fit ? " shelf-fit" : ""}`} aria-label={sec.zh} data-category={sec.key}>
           <div className="shelf-head">
             <h2>{sec.zh}</h2>
             <span className="shelf-en">{sec.en}</span>
@@ -85,7 +86,7 @@ export default function ImmersiveShelf({ sections, base, fit }: Props) {
           </div>
           <div className="shelf" style={{ "--row": `${SHELF_ROW}px` } as React.CSSProperties}>
             {byHeight(sec.books).map((b) => (
-              <BookSpine key={b.slug} book={b} out={selected?.book.slug === b.slug} onSelect={select} />
+              <BookSpine key={b.slug} book={b} out={selected?.book.slug === b.slug || mobileSlug === b.slug} onSelect={select} />
             ))}
           </div>
         </section>

@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import MobileReader, { type MobileSelection } from "./reader/MobileReader";
 import type { BookMeta } from "../lib/books";
 import ImmersiveShelf from "./shelf/ImmersiveShelf";
 
@@ -22,22 +24,104 @@ export default function BookGrid({ books, cats, base }: Props) {
   const [query, setQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("all");
   const [notesOnly, setNotesOnly] = useState(false);
-  const [view, setView] = useState<"shelf" | "grid">("shelf");
+  const [view, setView] = useState<"shelf" | "grid" | null>(null);
+  const [phone, setPhone] = useState<boolean | null>(null);
+  const [selected, setSelected] = useState<MobileSelection | null>(null);
+  const selectionRef = useRef<MobileSelection | null>(null);
+  const restoreRef = useRef<{ scrollY: number; slug: string; shelves?: Record<string, number> } | null>(null);
+  const preferredView = useRef<"shelf" | "grid" | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
 
-  // Remember the list view for this tab, so Back from a book page returns to the list.
+  // SSR renders both responsive variants; the head script selects one before first paint.
   useEffect(() => {
-    try {
-      if (sessionStorage.getItem("view") === "grid") setView("grid");
-    } catch {}
+    const media = matchMedia("(max-width: 639px)");
+    const sync = () => {
+      let saved: string | null = null;
+      try { saved = sessionStorage.getItem("view"); } catch {}
+      const v = preferredView.current ?? (saved === "grid" || saved === "shelf" ? saved : media.matches ? "grid" : "shelf");
+      document.documentElement.dataset.catalogView = v;
+      setView(v);
+      setPhone(media.matches);
+    };
+    sync();
+    const saved = history.state?.catalogReturn;
+    if (saved) {
+      setQuery(saved.query ?? "");
+      setActiveCategory(saved.category ?? "all");
+      setNotesOnly(!!saved.notesOnly);
+      restoreRef.current = saved;
+    }
+    const pop = () => {
+      if (!selectionRef.current && history.state?.mobileReader) location.reload();
+    };
+    const shown = (e: PageTransitionEvent) => {
+      if (!e.persisted) return;
+      if (history.state?.mobileReader) {
+        location.reload();
+      } else {
+        closed();
+      }
+    };
+    media.addEventListener("change", sync);
+    window.addEventListener("popstate", pop);
+    window.addEventListener("pageshow", shown);
+    return () => {
+      media.removeEventListener("change", sync);
+      window.removeEventListener("popstate", pop);
+      window.removeEventListener("pageshow", shown);
+    };
   }, []);
+  useEffect(() => {
+    if (view === null || !restoreRef.current) return;
+    const saved = restoreRef.current;
+    restoreRef.current = null;
+    let live = true;
+    document.fonts.ready.then(() => {
+      if (!live) return;
+      for (const [category, left] of Object.entries(saved.shelves ?? {})) {
+        const shelf = rootRef.current?.querySelector<HTMLElement>(`.shelf-section[data-category="${CSS.escape(category)}"] .shelf`);
+        if (shelf) shelf.scrollLeft = left;
+      }
+      window.scrollTo(0, saved.scrollY);
+      rootRef.current?.querySelector<HTMLElement>(`[data-slug="${CSS.escape(saved.slug)}"]`)?.focus({ preventScroll: true });
+    });
+    return () => { live = false; };
+  }, [view]);
   const chooseView = (v: "shelf" | "grid") => {
+    preferredView.current = v;
     setView(v);
-    try {
-      sessionStorage.setItem("view", v);
-    } catch {}
+    document.documentElement.dataset.catalogView = v;
+    try { sessionStorage.setItem("view", v); } catch {}
   };
+  const openMobile = (book: BookMeta, trigger: HTMLElement, origin: HTMLElement) => {
+    if (!matchMedia("(max-width: 639px)").matches || selectionRef.current) return;
+    const scrollY = window.scrollY;
+    const returnUrl = location.pathname + location.search + location.hash;
+    const selection = { book, trigger, origin, rect: origin.getBoundingClientRect(), scrollY, returnUrl };
+    const shelves = Object.fromEntries([...rootRef.current!.querySelectorAll<HTMLElement>(".shelf-section")]
+      .map((section) => [section.dataset.category, section.querySelector(".shelf")?.scrollLeft ?? 0]));
+    history.replaceState({ ...history.state, catalogReturn: { query, category: activeCategory, notesOnly, scrollY, slug: book.slug, shelves } }, "");
+    history.pushState({ mobileReader: { slug: book.slug, returnUrl } }, "", bookHref(base, book.slug));
+    selectionRef.current = selection;
+    setSelected(selection);
+  };
+  const closed = () => {
+    const previous = selectionRef.current;
+    selectionRef.current = null;
+    setSelected(null);
+    requestAnimationFrame(() => {
+      if (selectionRef.current || !previous) return;
+      window.scrollTo(0, previous.scrollY);
+      (previous.trigger.isConnected && previous.trigger.getClientRects().length ? previous.trigger : searchRef.current)?.focus({ preventScroll: true });
+    });
+  };
+  const viewButtons = (
+    <span className="view-toggle" role="group" aria-label="檢視方式">
+      <button type="button" className={"chip " + (view === "shelf" ? "on" : "")} aria-pressed={view === "shelf"} onClick={() => chooseView("shelf")}>書架</button>
+      <button type="button" className={"chip " + (view === "grid" ? "on" : "")} aria-pressed={view === "grid"} onClick={() => chooseView("grid")}>列表</button>
+    </span>
+  );
 
   const q = query.trim().toLowerCase();
   const hasQuery = q.length > 0;
@@ -82,7 +166,7 @@ export default function BookGrid({ books, cats, base }: Props) {
     const root = rootRef.current;
     if (!root) return;
     const items = Array.from(root.querySelectorAll<HTMLElement>("[data-reveal]"));
-    if (reduce) {
+    if (reduce || matchMedia("(max-width: 639px)").matches) {
       items.forEach((el) => {
         el.style.opacity = "";
         el.style.transform = "";
@@ -147,7 +231,51 @@ export default function BookGrid({ books, cats, base }: Props) {
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [sections]);
+  }, [sections, view, phone]);
+
+  const renderGrid = (mobile: boolean) => sections.map((sec) => (
+    <section key={sec.key} className={"grid-section cat-" + sec.key} style={{ marginBottom: 72 }}>
+      <div className="grid-section-head" data-reveal="1" style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 18, flexWrap: "wrap", borderBottom: "1px solid #d6cbb8", paddingBottom: 14, marginBottom: 34 }}>
+        <div style={{ display: "flex", alignItems: "baseline", gap: 16, flexWrap: "wrap" }}>
+          <h2 style={{ fontWeight: 600, fontSize: "clamp(22px,3vw,30px)", color: "var(--ink)", margin: 0, letterSpacing: ".02em" }}>{sec.zh}</h2>
+          <span style={{ fontFamily: "var(--serif-en)", fontStyle: "italic", fontSize: 18, color: "var(--accent-ink)" }}>{sec.en}</span>
+        </div>
+        <span style={{ fontFamily: "var(--serif-en)", fontStyle: "italic", fontSize: 15, color: "#6f675b", letterSpacing: ".06em" }}>{sec.countLabel}</span>
+      </div>
+      <div className="cover-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(var(--cardmin),1fr))", gap: "38px 28px" }}>
+        {(mobile ? [...sec.books].sort((a, b) => +b.hasNote - +a.hasNote || a.rank - b.rank) : sec.books).map((book) => (
+          <a key={book.slug} href={bookHref(base, book.slug)} className="book-card" data-slug={book.slug} data-note={book.hasNote || undefined} data-out={mobile && selected?.book.slug === book.slug || undefined} data-reveal="1"
+            onClick={(e) => {
+              if (!mobile || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+              e.preventDefault();
+              openMobile(book, e.currentTarget, e.currentTarget.querySelector<HTMLElement>(".cover")!);
+            }} style={{ display: "flex", flexDirection: "column", gap: 15, color: "inherit", textDecoration: "none" }}>
+            <div className="cover" style={{ position: "relative", aspectRatio: "2/3", border: "1px solid rgba(44,38,32,.12)", overflow: "hidden" }}>
+              {book.cover ? (
+                <img src={book.cover} alt={book.dCover} loading="lazy" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
+              ) : (
+                <div className="cover-inner" style={{ position: "absolute", left: 0, right: 0, top: "-9%", bottom: "-9%", background: "var(--wash)", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", padding: "24px 18px", textAlign: "center" }}>
+                  <div style={{ position: "relative", fontFamily: "var(--serif-tc)", fontWeight: 600, fontSize: 18, lineHeight: 1.42, color: "var(--ink)" }}>{book.dCover}</div>
+                </div>
+              )}
+              <div style={{ position: "absolute", inset: 9, border: "1px solid rgba(44,38,32,.13)", pointerEvents: "none", zIndex: 2 }} />
+            </div>
+            <div className="card-meta" style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+              {mobile && <div className="card-title">{book.dCover}{book.hasNote && <span className="ribbon-mark" role="img" aria-label="有讀書心得" />}</div>}
+              <div style={{ fontFamily: "var(--serif-en)", fontStyle: "italic", fontSize: 15, color: "#6f675b", lineHeight: 1.35 }}>{book.dCaption}</div>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
+                <span style={{ fontSize: 12.5, color: "#6f675b", letterSpacing: ".02em" }}>
+                  {book.hasNote && <span className="ribbon-mark" role="img" aria-label="有讀書心得" />}
+                  {book.author}
+                </span>
+                <span style={{ fontFamily: "var(--serif-en)", fontSize: 14, color: "var(--accent-ink)", letterSpacing: ".04em" }}>{book.tagStr}</span>
+              </div>
+            </div>
+          </a>
+        ))}
+      </div>
+    </section>
+  ));
 
   return (
     <div
@@ -170,16 +298,9 @@ export default function BookGrid({ books, cats, base }: Props) {
         <div className="masthead">
           <a href={base} style={{ display: "flex", flexDirection: "column", gap: 1, flex: "0 0 auto", textDecoration: "none", color: "inherit" }}>
             <div style={{ fontWeight: 700, fontSize: 21, letterSpacing: ".14em", color: "var(--ink)" }}>百冊</div>
-            <div style={{ fontFamily: "var(--serif-en)", fontStyle: "italic", fontSize: 11.5, letterSpacing: ".2em", color: "#6f675b" }}>ONE HUNDRED · 選書</div>
+            <div className="brand-subtitle" style={{ fontFamily: "var(--serif-en)", fontStyle: "italic", fontSize: 11.5, letterSpacing: ".2em", color: "#6f675b" }}>ONE HUNDRED · 選書</div>
           </a>
-          <span className="view-toggle" role="group" aria-label="檢視方式">
-            <button type="button" className={"chip " + (view === "shelf" ? "on" : "")} aria-pressed={view === "shelf"} onClick={() => chooseView("shelf")}>
-              書架
-            </button>
-            <button type="button" className={"chip " + (view === "grid" ? "on" : "")} aria-pressed={view === "grid"} onClick={() => chooseView("grid")}>
-              列表
-            </button>
-          </span>
+          <div className="desktop-view-toggle">{viewButtons}</div>
           <div className="search" style={{ display: "flex", alignItems: "center", gap: 10, flex: "0 1 340px", borderBottom: "1px solid #c9bda6", paddingBottom: 5 }}>
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#8a8070" strokeWidth="1.3">
               <circle cx="6" cy="6" r="4.2" />
@@ -223,6 +344,8 @@ export default function BookGrid({ books, cats, base }: Props) {
         </div>
       </header>
 
+      <div className="mobile-catalog-tools"><h1>我的書目 <span>{total} 本</span></h1>{viewButtons}</div>
+
       <section className="hero">
         <h1 data-reveal="1">
           影響一個世代的<br />一百本書。
@@ -241,52 +364,21 @@ export default function BookGrid({ books, cats, base }: Props) {
             <span style={{ fontSize: 14, color: "#5c544a" }}>
               找到 <strong style={{ fontWeight: 600, color: "var(--ink)" }}>{total}</strong> 本符合「{query}」的書
             </span>
-            <button onClick={() => { setQuery(""); searchRef.current?.focus(); }} style={{ fontFamily: "var(--serif-tc)", fontSize: 13, color: "#8f5434", background: "transparent", border: "none", borderBottom: "1px solid #d8b6a6", cursor: "pointer", padding: "0 0 1px" }}>
+            <button className="clear-search" onClick={() => { setQuery(""); searchRef.current?.focus(); }} style={{ fontFamily: "var(--serif-tc)", fontSize: 13, color: "#8f5434", background: "transparent", border: "none", borderBottom: "1px solid #d8b6a6", cursor: "pointer", padding: "0 0 1px" }}>
               清除搜尋
             </button>
           </div>
         )}
 
-        {hasResults && view === "shelf" ? (
-          <ImmersiveShelf sections={sections} base={base} fit={notesOnly} />
-        ) : hasResults ? (
-          sections.map((sec) => (
-            <section key={sec.key} className={"cat-" + sec.key} style={{ marginBottom: 72 }}>
-              <div data-reveal="1" style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 18, flexWrap: "wrap", borderBottom: "1px solid #d6cbb8", paddingBottom: 14, marginBottom: 34 }}>
-                <div style={{ display: "flex", alignItems: "baseline", gap: 16, flexWrap: "wrap" }}>
-                  <h2 style={{ fontWeight: 600, fontSize: "clamp(22px,3vw,30px)", color: "var(--ink)", margin: 0, letterSpacing: ".02em" }}>{sec.zh}</h2>
-                  <span style={{ fontFamily: "var(--serif-en)", fontStyle: "italic", fontSize: 18, color: "var(--accent-ink)" }}>{sec.en}</span>
-                </div>
-                <span style={{ fontFamily: "var(--serif-en)", fontStyle: "italic", fontSize: 15, color: "#6f675b", letterSpacing: ".06em" }}>{sec.countLabel}</span>
-              </div>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(var(--cardmin),1fr))", gap: "38px 28px" }}>
-                {sec.books.map((book) => (
-                  <a key={book.slug} href={bookHref(base, book.slug)} className="book-card" data-reveal="1" style={{ display: "flex", flexDirection: "column", gap: 15, color: "inherit", textDecoration: "none" }}>
-                    <div className="cover" style={{ position: "relative", aspectRatio: "2/3", border: "1px solid rgba(44,38,32,.12)", overflow: "hidden" }}>
-                      {book.cover ? (
-                        <img src={book.cover} alt={book.dCover} loading="lazy" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
-                      ) : (
-                        <div className="cover-inner" style={{ position: "absolute", left: 0, right: 0, top: "-9%", bottom: "-9%", background: "var(--wash)", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", padding: "24px 18px", textAlign: "center" }}>
-                          <div style={{ position: "relative", fontFamily: "var(--serif-tc)", fontWeight: 600, fontSize: 18, lineHeight: 1.42, color: "var(--ink)" }}>{book.dCover}</div>
-                        </div>
-                      )}
-                      <div style={{ position: "absolute", inset: 9, border: "1px solid rgba(44,38,32,.13)", pointerEvents: "none", zIndex: 2 }} />
-                    </div>
-                    <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
-                      <div style={{ fontFamily: "var(--serif-en)", fontStyle: "italic", fontSize: 15, color: "#6f675b", lineHeight: 1.35 }}>{book.dCaption}</div>
-                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
-                        <span style={{ fontSize: 12.5, color: "#6f675b", letterSpacing: ".02em" }}>
-                          {book.hasNote && <span className="ribbon-mark" role="img" aria-label="有讀書心得" />}
-                          {book.author}
-                        </span>
-                        <span style={{ fontFamily: "var(--serif-en)", fontSize: 14, color: "var(--accent-ink)", letterSpacing: ".04em" }}>{book.tagStr}</span>
-                      </div>
-                    </div>
-                  </a>
-                ))}
-              </div>
-            </section>
-          ))
+        {hasResults ? (
+          <>
+            {(view === null || view === "shelf") && <div className="catalog-shelf"><ImmersiveShelf sections={sections} base={base} fit={notesOnly} onMobileSelect={openMobile} mobileSlug={selected?.book.slug} /></div>}
+            {(view === null || view === "grid") && <div className="catalog-grid">
+              {phone !== false && <div className="catalog-mobile">{renderGrid(true)}</div>}
+              {phone !== true && <div className="catalog-desktop">{renderGrid(false)}</div>}
+            </div>}
+          </>
+
         ) : (
           <div className="empty" role="status">
             <h2>{hasQuery ? `找不到符合「${query}」的書` : "這個分類還沒有讀書心得"}</h2>
@@ -311,6 +403,7 @@ export default function BookGrid({ books, cats, base }: Props) {
           </div>
         )}
       </main>
+      {selected && createPortal(<MobileReader selection={selected} base={base} onClosed={closed} />, document.body)}
 
     </div>
   );

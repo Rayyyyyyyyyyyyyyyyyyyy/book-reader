@@ -189,9 +189,4 @@
 .stage-next { background: var(--ink); border-color: var(--ink); color: var(--paper); }
 .stage-arrow:disabled { opacity: .35; cursor: default; }
 .stage-page { font-family: var(--serif-en); font-size: 15px; color: #6f675b; min-width: 3.2em; text-align: center; }
-@media (max-width: 639px) {
-  .stage-ui { gap: 6px; }
-  .stage-lbl { display: none; }
-  .stage-btn, .stage-cta { padding: 9px 12px; font-size: 13px; }
-}
 .stage-btn:focus-visible, .stage-cta:focus-visible { outline: 2px solid var(--accent, #a5623f); outline-offset: 2px; }

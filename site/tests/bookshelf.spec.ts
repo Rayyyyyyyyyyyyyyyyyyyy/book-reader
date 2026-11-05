@@ -260,42 +260,240 @@ test.describe("reduced motion", () => {
 
 test.describe("phone", () => {
   test.use({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
-  test("one sideways row per shelf, a single readable page, swipe to turn", async ({ page }) => {
-    const shelf = page.locator(".shelf").first();
-    const [scroll, client] = await shelf.evaluate((s) => [s.scrollWidth, s.clientWidth]);
-    expect(scroll).toBeGreaterThan(client);
+  const card = (page: Page, rank: string) => page.locator(`.catalog-mobile .book-card[data-slug^="${rank}"]`);
+  const reader = (page: Page) => page.getByRole("dialog");
+  const home = /\/book-reader\/$/;
+
+  test("SSR and hydration default to two columns, with notes first and all 111 books", async ({ page }) => {
+    // Block only hydration modules: the head script and SSR must already choose the right view.
+    await page.route(/\.m?js(?:\?|$)/, (route) => route.abort());
+    await page.reload();
+    await expect(page.locator(".catalog-shelf")).toBeHidden();
+    await expect(page.locator(".catalog-mobile")).toBeVisible();
+    await expect(card(page, "001")).toBeVisible();
+    await page.unroute(/\.m?js(?:\?|$)/);
+    await page.reload();
+    await expect(page.getByRole("button", { name: "列表", exact: true })).toHaveAttribute("aria-pressed", "true");
+    await expect(page.locator(".catalog-mobile .book-card")).toHaveCount(111);
+    expect(await page.locator(".cover-grid").first().evaluate((el) => getComputedStyle(el).gridTemplateColumns.split(" ").length)).toBe(2);
+    const sorted = await page.locator(".catalog-mobile .cover-grid").evaluateAll((grids) => grids.every((grid) => {
+      let seenWithoutNote = false;
+      return [...grid.children].every((card) => {
+        const note = card.hasAttribute("data-note");
+        if (note && seenWithoutNote) return false;
+        if (!note) seenWithoutNote = true;
+        return true;
+      });
+    }));
+    expect(sorted).toBe(true);
+    await expect(page.locator(".catalog-mobile .card-title .ribbon-mark")).toHaveCount(14);
+    expect(await card(page, "001").locator(".cover").evaluate((el) => el.getBoundingClientRect().top)).toBeLessThan(844);
+    await page.getByRole("textbox", { name: "搜尋書籍" }).fill("zzzz");
+    await expect(page.getByRole("status")).toContainText("找不到");
+    await page.getByRole("button", { name: "清除搜尋" }).last().click();
+    await expect(page.getByRole("textbox", { name: "搜尋書籍" })).toBeFocused();
+    await expect(page.locator(".catalog-mobile .book-card")).toHaveCount(111);
+  });
+
+  test("only one sticky row, large targets, and no horizontal page overflow", async ({ page }) => {
+    await page.evaluate(() => scrollTo(0, 600));
+    const search = await page.getByRole("textbox", { name: "搜尋書籍" }).boundingBox();
+    expect(search!.y).toBeGreaterThanOrEqual(0);
+    expect(search!.y + search!.height).toBeLessThan(90);
+    expect(await page.locator(".filters").evaluate((el) => el.getBoundingClientRect().bottom)).toBeLessThan(0);
+    const small = await page.locator("#hundred-root button, #hundred-root input, #hundred-root a").evaluateAll((elements) => elements.filter((el) => {
+      const r = el.getBoundingClientRect();
+      return r.width > 0 && r.height > 0 && (r.width < 44 || r.height < 44);
+    }).map((el) => el.textContent));
+    expect(small).toEqual([]);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  });
 
-    await spine(page, "016").tap();
-    await page.waitForTimeout(OPENED);
-    const sheet = (await page.locator(".b-base").boundingBox())!;
-    expect(sheet.x).toBeGreaterThanOrEqual(0);
-    expect(sheet.x + sheet.width).toBeLessThanOrEqual(390);
-    const ui = (await page.locator(".stage-ui").boundingBox())!;
-    expect(ui.x + ui.width).toBeLessThanOrEqual(390);
-    expect(await page.locator(".pg-desc").first().evaluate((e) => parseFloat(getComputedStyle(e).fontSize))).toBeGreaterThanOrEqual(12);
-
-    // a swipe on the backdrop turns the page and must not also close the book
-    await page.evaluate(() => {
-      const t = document.querySelector<HTMLElement>(".stage-backdrop")!;
-      const ev = (type: string, x: number) => t.dispatchEvent(new PointerEvent(type, { clientX: x, clientY: 700, bubbles: true }));
-      ev("pointerdown", 300);
-      ev("pointerup", 120);
-      t.click();
+  test("cover opens at its own bounds, changes URL, and Back restores scroll and focus", async ({ page }) => {
+    await card(page, "060").scrollIntoViewIfNeeded();
+    const before = await page.evaluate(() => scrollY);
+    const origin = await card(page, "060").locator(".cover").boundingBox();
+    const start = await page.evaluate(async () => {
+      document.querySelector<HTMLElement>('.catalog-mobile [data-slug^="060"]')!.click();
+      await Promise.resolve();
+      return document.querySelector(".mobile-flight")!.getBoundingClientRect().toJSON();
     });
-    await page.waitForTimeout(TURNED);
-    await expect(page.locator(".stage")).toHaveCount(1);
-    expect(await pageLabel(page)).toBe("2/3");
-    // a stray tap above the page does not close the book; the page's left third goes back
-    await page.touchscreen.tap(195, 60);
-    await page.waitForTimeout(400);
-    await expect(page.locator(".stage")).toHaveCount(1);
-    const pg = (await page.locator(".book3d").evaluate((e) => e.getBoundingClientRect().toJSON())) as DOMRect;
-    await page.touchscreen.tap(pg.x + pg.width / 6, pg.y + pg.height / 2);
-    await page.waitForTimeout(TURNED);
-    expect(await pageLabel(page)).toBe("1/3");
-    await page.getByRole("button", { name: "收回書架" }).tap();
-    await page.waitForTimeout(CLOSED);
-    await expect(page.locator(".stage")).toHaveCount(0);
+    for (const k of ["x", "y", "width", "height"] as const) expect(Math.abs(start[k] - origin![k])).toBeLessThan(1);
+    await expect(page).toHaveURL(/\/book\/060-/);
+    await expect(reader(page)).toHaveCount(1);
+    await expect(reader(page)).toHaveAttribute("aria-modal", "true");
+    await expect(page.locator(".reader-content .summary")).toContainText("書本摘要");
+    await expect(page.locator(".reader-content .note-pending")).toContainText("整理中");
+    await page.goBack();
+    await expect(reader(page)).toHaveCount(0);
+    await expect(page).toHaveURL(home);
+    await expect(card(page, "060")).toBeFocused();
+    expect(Math.abs(await page.evaluate(() => scrollY) - before)).toBeLessThan(2);
+    expect(await page.evaluate(() => document.body.style.position)).toBe("");
+    // Closing must consume the book entry; another Back leaves the catalogue.
+    await page.goBack();
+    expect(page.url()).toBe("about:blank");
+  });
+
+  test("full text scrolls at 17px, traps focus, and Escape returns to the cover", async ({ page }) => {
+    await card(page, "001").click();
+    await expect(page.locator(".reader-content #note.note")).toBeVisible();
+    await page.waitForTimeout(1100);
+    const content = await page.locator(".reader-content").evaluate((el) => ({
+      order: [...el.querySelectorAll(".reader-meta, .summary, #note")].map((n) => n.className),
+      fonts: [...el.querySelectorAll(".desc, .summary p, .note p")].map((n) => parseFloat(getComputedStyle(n).fontSize)),
+    }));
+    expect(content.order[0]).toBe("reader-meta");
+    expect(content.order[1]).toBe("summary");
+    expect(content.order[2]).toBe("note");
+    expect(Math.min(...content.fonts)).toBeGreaterThanOrEqual(16);
+    const scroll = await page.locator(".reader-scroll").evaluate((el) => ({ height: el.clientHeight, total: el.scrollHeight }));
+    expect(scroll.total).toBeGreaterThan(scroll.height);
+    await expect(page.locator(".book3d, .stage-arrow")).toHaveCount(0);
+    for (let k = 0; k < 5; k++) {
+      await page.keyboard.press("Tab");
+      expect(await page.evaluate(() => !!document.activeElement?.closest("dialog"))).toBe(true);
+    }
+    const target = await reader(page).getByRole("button", { name: "回到書目" }).boundingBox();
+    expect(target!.width).toBeGreaterThanOrEqual(44);
+    expect(target!.height).toBeGreaterThanOrEqual(44);
+    await page.keyboard.press("Escape");
+    await expect(reader(page)).toHaveCount(0);
+    await expect(card(page, "001")).toBeFocused();
+  });
+
+  test("reload stays on the static book, and its back link restores catalogue state", async ({ page }) => {
+    await page.getByRole("textbox", { name: "搜尋書籍" }).fill("001");
+    await card(page, "001").click();
+    await page.reload();
+    await expect(page).toHaveURL(/\/book\/001-/);
+    await expect(page.locator(".detail h1")).toBeVisible();
+    await expect(page.locator("#note.note")).toBeVisible();
+    await expect(reader(page)).toHaveCount(0);
+    await page.getByRole("link", { name: "回到書目" }).click();
+    await expect(page).toHaveURL(home);
+    await expect(reader(page)).toHaveCount(0);
+    await expect(page.getByRole("textbox", { name: "搜尋書籍" })).toHaveValue("001");
+    await expect(card(page, "001")).toBeFocused();
+    await page.goBack();
+    expect(page.url()).toBe("about:blank");
+  });
+
+  test("direct shared link uses the catalogue without a return loop", async ({ page }) => {
+    await page.goto("about:blank");
+    await page.goto("./book/060-the-courage-to-be-disliked");
+    await expect(reader(page)).toHaveCount(0);
+    await expect(page.locator("section.summary")).toBeVisible();
+    await page.getByRole("link", { name: "回到書目" }).click();
+    await expect(page).toHaveURL(home);
+    await page.goBack();
+    expect(page.url()).toBe("about:blank");
+  });
+
+  test("shelf choice survives reload and its spine opens the same reader", async ({ page }) => {
+    await page.getByRole("button", { name: "書架", exact: true }).click();
+    await page.reload();
+    await expect(page.getByRole("button", { name: "書架", exact: true })).toHaveAttribute("aria-pressed", "true");
+    expect(await spine(page, "001").evaluate((el) => el.getBoundingClientRect().width)).toBeGreaterThanOrEqual(44);
+    const shelf = page.locator(".shelf").first();
+    expect(await shelf.evaluate((el) => el.scrollWidth > el.clientWidth)).toBe(true);
+    await spine(page, "001").click();
+    await expect(reader(page)).toHaveCount(1);
+    await expect(page).toHaveURL(/\/book\/001-/);
+    await reader(page).getByRole("button", { name: "回到書目" }).click();
+    await expect(reader(page)).toHaveCount(0);
+    await expect(spine(page, "001")).toBeFocused();
+  });
+
+  test("Back mid-animation, repeated activation, resize and a missing origin clean up", async ({ page }) => {
+    await card(page, "001").evaluate((el: HTMLElement) => { el.click(); el.click(); });
+    await expect(reader(page)).toHaveCount(1);
+    await page.goBack();
+    await page.setViewportSize({ width: 580, height: 390 });
+    await expect(reader(page)).toHaveCount(0);
+    await expect(page).toHaveURL(home);
+    await card(page, "001").click();
+    await page.setViewportSize({ width: 844, height: 390 });
+    await expect(page.locator(".reader-sheet")).toHaveCSS("opacity", "1");
+    await page.setViewportSize({ width: 390, height: 844 });
+    // Model a filter result removing the original trigger while the modal owns focus.
+    await card(page, "001").evaluate((el) => el.remove());
+    await page.keyboard.press("Escape");
+    await expect(reader(page)).toHaveCount(0);
+    await expect(page.getByRole("textbox", { name: "搜尋書籍" })).toBeFocused();
+  });
+
+  test("loading, failure and recovery use the real book without another history entry", async ({ page }) => {
+    let fail: (() => void) | undefined;
+    await page.route("**/book/001-*", async (route) => {
+      if (route.request().resourceType() === "document") return route.continue();
+      await new Promise<void>((resolve) => { fail = resolve; });
+      await route.abort();
+    });
+    await card(page, "001").click();
+    await expect(reader(page).getByRole("status")).toHaveText("內容載入中…");
+    fail!();
+    await expect(reader(page).getByRole("alert")).toContainText("載入失敗");
+    await page.getByRole("link", { name: "到書頁閱讀" }).click();
+    await expect(page.locator(".detail h1")).toBeVisible();
+    await page.goBack();
+    await expect(page).toHaveURL(home);
+    await expect(reader(page)).toHaveCount(0);
+  });
+
+  test("pageshow removes stale previews, and Forward loads the static book", async ({ page }) => {
+    await card(page, "001").click();
+    await page.goBack();
+    await expect(reader(page)).toHaveCount(0);
+    await page.goForward();
+    await expect(page.locator(".detail h1")).toBeVisible();
+    await page.goBack();
+    await expect(page).toHaveURL(home);
+    await page.evaluate(() => window.dispatchEvent(new PageTransitionEvent("pageshow", { persisted: true })));
+    await expect(reader(page)).toHaveCount(0);
+    await expect(page.locator("dialog[open]")).toHaveCount(0);
+    await card(page, "001").click();
+    await page.evaluate(() => window.dispatchEvent(new PageTransitionEvent("pageshow", { persisted: true })));
+    await expect(page.locator(".detail h1")).toBeVisible();
+    await expect(reader(page)).toHaveCount(0);
+  });
+
+  test("note-only and empty content keep the correct sections without changing source books", async ({ page }) => {
+    // Modify the serialized island props for fixtures, leaving published content untouched.
+    for (const hasNote of [true, false]) {
+      await page.route("**/book-reader/", async (route) => {
+        const response = await route.fetch();
+        const html = await response.text();
+        const modified = html.replace(/(&quot;hasSummary&quot;:\[0,)true/g, "$1false");
+        await route.fulfill({ response, body: hasNote ? modified : modified.replace(/(&quot;hasNote&quot;:\[0,)true/g, "$1false") });
+      });
+      await page.goto("./");
+      await expect(page.getByRole("button", { name: "列表", exact: true })).toHaveAttribute("aria-pressed", "true");
+      await page.route("**/book/001-*", async (route) => {
+        const response = await route.fetch();
+        await route.fulfill({ response, body: (await response.text()).replace(/<section class="summary"[\s\S]*?<\/section>/, "") });
+      });
+      await card(page, "001").click();
+      if (hasNote) await expect(page.locator(".reader-content .note")).toBeVisible();
+      else await expect(page.locator(".reader-content .note-pending")).toBeVisible();
+      await expect(page.locator(".reader-content .summary")).toHaveCount(0);
+      await expect(reader(page).getByRole("status")).toHaveCount(0);
+      await page.keyboard.press("Escape");
+      await expect(reader(page)).toHaveCount(0);
+      await page.unrouteAll();
+    }
+  });
+
+  test.describe("reduced motion", () => {
+    test.use({ contextOptions: { reducedMotion: "reduce" } });
+    test("opens and closes immediately with the same URL and focus behavior", async ({ page }) => {
+      await card(page, "001").click();
+      await expect(page.locator(".reader-sheet")).toHaveCSS("opacity", "1");
+      await expect(page.locator(".mobile-flight")).toHaveCSS("visibility", "hidden");
+      await expect(page).toHaveURL(/\/book\/001-/);
+      await page.keyboard.press("Escape");
+      await expect(reader(page)).toHaveCount(0);
+      await expect(card(page, "001")).toBeFocused();
+    });
   });
 });

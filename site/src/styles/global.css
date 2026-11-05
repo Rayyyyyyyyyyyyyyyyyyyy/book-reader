@@ -69,15 +69,60 @@ body {
 .hero h1 { font-weight: 600; font-size: clamp(30px, 4.6vw, 54px); line-height: 1.15; letter-spacing: .01em; color: var(--ink); margin: 0 0 12px; text-wrap: balance; }
 .hero-en { font-family: var(--serif-en); font-style: italic; font-size: clamp(16px, 1.9vw, 21px); color: #6f675b; margin-bottom: 16px; }
 .hero p { max-width: 560px; font-size: 15.5px; line-height: 1.85; color: #5c544a; font-weight: 300; margin: 0; }
+/* Both variants are SSR markup; the head script honors this tab's choice before paint. */
+.catalog-grid, .catalog-mobile, .mobile-catalog-tools { display: none; }
+html[data-catalog-view="grid"] .catalog-shelf { display: none; }
+html[data-catalog-view="grid"] .catalog-grid { display: block; }
+html[data-catalog-view="shelf"] .catalog-grid { display: none; }
+.desktop-view-toggle { margin-left: auto; }
 @media (max-width: 639px) {
-  .masthead { padding: 11px 16px 9px; gap: 10px 16px; flex-wrap: wrap; }
-  .masthead .search { order: 3; flex: 1 1 100% !important; }
-  .filters { padding: 0 16px 11px; gap: 8px; }
-  /* phones: one swipeable line, its far end fading to show there is more */
-  .filters .chips { flex-wrap: nowrap; overflow-x: auto; padding-right: 28px; mask-image: linear-gradient(90deg, #000 calc(100% - 28px), transparent); }
-  .catalog { padding: 8px 16px 90px; }
-  .hero { padding: 26px 16px 22px; }
-  .hero p { font-size: 14.5px; line-height: 1.8; }
+  #hundred-root { min-height: 100dvh !important; }
+  #hundred-root > header { display: contents; }
+  .masthead {
+    position: sticky; top: 0; z-index: 60; background: var(--paper);
+    padding: calc(8px + env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) 8px max(16px, env(safe-area-inset-left));
+    gap: 16px; flex-wrap: nowrap; border-bottom: 1px solid #d6cbb8;
+  }
+  .masthead > a { min-width: 44px; min-height: 44px; justify-content: center; }
+  .masthead .brand-subtitle, .desktop-view-toggle { display: none; }
+  .masthead .search { flex: 1 1 auto !important; min-width: 0; gap: 8px !important; padding-bottom: 0 !important; }
+  .masthead .search svg { flex: none; }
+  .masthead .search input { font-size: 16px !important; min-height: 44px; min-width: 0; }
+  .masthead .search:focus-within { outline: 2px solid var(--ink); outline-offset: 3px; }
+  .filters { padding: 12px max(16px, env(safe-area-inset-right)) 8px max(16px, env(safe-area-inset-left)); }
+  .filters .chips { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+  .chip { min-height: 44px; min-width: 44px; transition: none; }
+  .chip:focus-visible, .clear-search:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+  .mobile-catalog-tools {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 8px max(16px, env(safe-area-inset-right)) 20px max(16px, env(safe-area-inset-left));
+  }
+  .mobile-catalog-tools h1 { font-size: 18px; font-weight: 600; margin: 0; }
+  .mobile-catalog-tools h1 span { font-size: 14px; color: var(--muted); font-weight: 400; margin-left: 6px; }
+  .mobile-catalog-tools .chip { padding: 8px 12px; }
+  .catalog { padding: 0 max(16px, env(safe-area-inset-right)) max(64px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left)); }
+  .hero, .catalog-desktop { display: none; }
+  .catalog-mobile { display: block; }
+  html:not([data-catalog-view="shelf"]) .catalog-shelf { display: none; }
+  html:not([data-catalog-view="shelf"]) .catalog-grid { display: block; }
+  html[data-catalog-view="shelf"] .catalog-shelf { display: block; }
+  .grid-section { margin-bottom: 40px !important; }
+  .grid-section-head { margin-bottom: 20px !important; padding-bottom: 12px !important; gap: 8px !important; }
+  .grid-section-head > div { gap: 6px 12px !important; }
+  .grid-section-head h2 { font-size: 22px !important; }
+  .grid-section-head > div > span { font-size: 16px !important; }
+  .cover-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 26px 18px !important; }
+  .book-card { min-width: 0; gap: 12px !important; overflow-wrap: anywhere; }
+  .book-card[data-out] .cover { visibility: hidden; }
+  .card-title { font-size: 17px; font-weight: 600; line-height: 1.55; }
+  .card-meta > div:not(.card-title) { display: none !important; }
+  .card-title .ribbon-mark { margin-left: 7px; margin-right: 0; }
+  .clear-search { min-width: 44px; min-height: 44px; }
+  .empty { padding: 40px 0; }
+  /* Opening a book is the only principal motion on the phone catalogue. */
+  [data-reveal] { opacity: 1 !important; transform: none !important; }
+  [data-reveal] .cover { clip-path: none !important; transition: none; }
+  .cover-inner { transform: none !important; }
 }
 
 /* browser surfaces in the house palette */

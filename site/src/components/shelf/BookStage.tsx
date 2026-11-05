@@ -21,14 +21,12 @@ const UI_SPACE = 76; // room kept under the book for the control bar
 
 // Book size for this viewport. Pivot (transform-origin) is the spine plane, so
 // x/y below place the spine; at rotateY(90°) the spine face lies flat on screen
-// and, scaled by s, exactly covers the shelf spine. Phones show a single page:
-// the book fills the width and the opened cover swings off-screen to the left.
+// and, scaled by s, exactly covers the shelf spine.
 function stageSize() {
   const vw = window.innerWidth;
   const vh = window.innerHeight;
-  const single = vw < 640;
-  const H = Math.min((vh - UI_SPACE) * 0.78, 520, single ? vw * 0.84 * 1.5 : (vw * 0.92) / (4 / 3));
-  return { vw, vh, W: (H * 2) / 3, H, single };
+  const H = Math.min((vh - UI_SPACE) * 0.78, 520, (vw * 0.92) / (4 / 3));
+  return { vw, vh, W: (H * 2) / 3, H };
 }
 
 function shelfPose(origin: HTMLElement, H: number) {
@@ -68,7 +66,7 @@ export default function BookStage({ book, origin, base, next, onClosed }: Props)
   const center = () => {
     const { vw, vh } = stageSize();
     const xc = vw / 2 - geo.W / 2;
-    return { xc, xo: geo.single ? xc : vw / 2, y: (vh - UI_SPACE) / 2 - geo.H / 2 };
+    return { xc, xo: vw / 2, y: (vh - UI_SPACE) / 2 - geo.H / 2 };
   };
 
   const reduce = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -159,20 +157,19 @@ export default function BookStage({ book, origin, base, next, onClosed }: Props)
     turn(dx < 0 ? 1 : -1);
   };
   // Where a pointer is over the open book: 1 = forward, -1 = back, 0 = off the book (or not open yet).
-  // Desktop: right page forward, left page back. Phones show one page: its left third goes back.
+  // Right page forward, left page back.
   const pageAt = (e: React.MouseEvent) => {
     const r = bookRef.current!.getBoundingClientRect(); // the right-hand page; the open cover mirrors it on the left
     const onBook = e.clientY >= r.top && e.clientY <= r.bottom && e.clientX >= r.left - r.width && e.clientX <= r.right;
-    const split = geo.single ? r.left + r.width / 3 : r.left;
+    const split = r.left;
     return phase.current === "opened" && onBook ? (e.clientX >= split ? 1 : -1) : 0;
   };
-  // A click on the book turns the page; outside it closes, except on phones, where a stray tap
-  // mid-read would lose the page (× , Escape and Back still close).
+  // A click on the book turns the page; outside it closes.
   const onBackdropClick = (e: React.MouseEvent) => {
     if (swipe.current?.moved) return void (swipe.current = null);
     const side = pageAt(e);
     if (side) return turn(side);
-    if (!geo.single) close();
+    close();
   };
   // The cursor shows which way a click would turn, or that the page cannot turn further.
   const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
@@ -320,18 +317,16 @@ export default function BookStage({ book, origin, base, next, onClosed }: Props)
     </dl>
   );
   // Turnable sheets, top first. Desktop reads spreads, so the note starts on the back of the
-  // title page (left) and continues front (right) / back (left); phones only ever see fronts.
-  const sheets: React.ReactNode[][] = geo.single
-    ? [[titlePage, null], ...notes.map((p) => [p, null])]
-    : [
-        [titlePage, notes[0] ?? catalogCard],
-        ...Array.from({ length: Math.ceil((notes.length - 1) / 2) }, (_, k) => [notes[2 * k + 1], notes[2 * k + 2] ?? null]),
-      ];
+  // title page (left) and continues front (right) / back (left).
+  const sheets: React.ReactNode[][] = [
+    [titlePage, notes[0] ?? catalogCard],
+    ...Array.from({ length: Math.ceil((notes.length - 1) / 2) }, (_, k) => [notes[2 * k + 1], notes[2 * k + 2] ?? null]),
+  ];
 
   // Where the reader is, in pages: the title page, note pages a–b of N, or the end.
   const atEnd = spread === sheets.length;
-  const first = geo.single ? spread : 2 * spread - 1;
-  const last = Math.min(geo.single ? spread : 2 * spread, pages);
+  const first = 2 * spread - 1;
+  const last = Math.min(2 * spread, pages);
   const ending = book.hasNote ? { short: "完", long: "心得結束" } : { short: "整理中", long: "心得整理中" };
   const where =
     spread === 0
@@ -417,7 +412,7 @@ export default function BookStage({ book, origin, base, next, onClosed }: Props)
               <div className="b-page leaf-face" aria-hidden={i !== spread || undefined}>
                 {front}
               </div>
-              <div className="b-page leaf-face leaf-back" aria-hidden={geo.single || i + 1 !== spread || undefined}>
+              <div className="b-page leaf-face leaf-back" aria-hidden={i + 1 !== spread || undefined}>
                 {back}
               </div>
             </div>

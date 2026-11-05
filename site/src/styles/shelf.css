@@ -128,3 +128,10 @@
 @media (hover: hover) { .spine-slot:hover .ribbon { transform: translateY(-10px); } }
 /* same mark, inline, as the legend on the notes filter */
 .ribbon-mark { display: inline-block; width: 7px; height: 15px; margin-right: .45em; vertical-align: -2px; }
+
+@media (max-width: 639px) {
+  .spine-slot { min-width: 44px; }
+  .spine-face, .ribbon { transition: none; }
+  .spine-slot:hover .spine-face, .spine-slot:focus-visible .spine-face,
+  .spine-slot:hover .ribbon, .spine-slot:focus-visible .ribbon { transform: none; }
+}

@@ -188,6 +188,15 @@ test("returning from the full book page leaves no dead Back", async ({ page }) =
   expect(page.url()).toBe("about:blank");
 });
 
+test("a page restored from bfcache does not keep the book out", async ({ page }) => {
+  await spine(page, "001").click();
+  await page.waitForTimeout(OPENED);
+  await page.evaluate(() => window.dispatchEvent(new PageTransitionEvent("pageshow", { persisted: true })));
+  await page.waitForTimeout(CLOSED);
+  await expect(page.locator(".stage")).toHaveCount(0);
+  await expect.poll(() => page.evaluate(() => history.state?.bookStage ?? null)).toBeNull();
+});
+
 test("a note that fails to load points to the book page", async ({ page }) => {
   await page.route("**/book/001-*", (r) => r.abort());
   await spine(page, "001").click();

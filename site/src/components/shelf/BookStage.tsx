@@ -217,8 +217,16 @@ export default function BookStage({ book, origin, base, next, onClosed }: Props)
       popped.current = true;
       close();
     };
+    // bfcache brings the page back with the book still out: Back from the full page must land on the shelf
+    const onShow = (e: PageTransitionEvent) => {
+      if (e.persisted) close();
+    };
     window.addEventListener("popstate", onPop);
-    return () => window.removeEventListener("popstate", onPop);
+    window.addEventListener("pageshow", onShow);
+    return () => {
+      window.removeEventListener("popstate", onPop);
+      window.removeEventListener("pageshow", onShow);
+    };
   }, []);
 
   // Modal: everything else on the page is inert while the book is out.
@@ -282,7 +290,8 @@ export default function BookStage({ book, origin, base, next, onClosed }: Props)
           dangerouslySetInnerHTML={{ __html: html }}
         />
       </div>
-      <div className="pg-folio">{i < 0 ? "" : i + 1}</div>
+      {/* the measured copy keeps a line here too (nbsp: plain whitespace has no height), or it counts on taller columns than the real pages */}
+      <div className="pg-folio">{i < 0 ? "\u00a0" : i + 1}</div>
     </>
   );
   const notes = Array.from({ length: pages }, (_, i) => notePage(i));

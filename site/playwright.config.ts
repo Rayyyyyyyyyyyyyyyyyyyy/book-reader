@@ -6,5 +6,5 @@ export default defineConfig({
   testDir: "tests",
   timeout: 60_000,
   use: { baseURL: "http://localhost:4399/book-reader/", browserName: "chromium" },
-  webServer: { command: "npx astro preview --port 4399", url: "http://localhost:4399/book-reader/", reuseExistingServer: true },
+  webServer: { command: "npx astro preview --port 4399", url: "http://localhost:4399/book-reader/", reuseExistingServer: false },
 });

@@ -26,4 +26,4 @@
 
 影響 BookGrid、ImmersiveShelf、BookStage、Base、靜態書頁、樣式與 bookshelf e2e。新增 MobileReader；不新增依賴、不改書籍 Markdown、不改手機以外的既有書架、列表與 3D 翻頁流程（含 reader-back 修正）。
 
-本 change 的手機規定優先於進行中的 `immersive-bookshelf` change 裡手機單頁翻頁與同網址預覽規定；該 change 的桌機規定完整保留。本 change 應在 `immersive-bookshelf` 封存之後才封存。瀏覽器與 Safari 驗收需由使用者另外授權，不在本次執行。
+本 change 的手機規定優先於進行中的 `immersive-bookshelf` change 裡手機單頁翻頁與同網址預覽規定；該 change 的桌機規定完整保留。`immersive-bookshelf` 的相關條文已直接限定為手機以外，本 change 應在它封存之後才封存。瀏覽器與 Safari 驗收需由使用者另外授權，不在本次執行。

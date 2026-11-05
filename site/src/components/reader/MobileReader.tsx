@@ -34,8 +34,6 @@ export default function MobileReader({ selection, base, next, onNext, onClosed }
   useLayoutEffect(() => {
     const el = dialog.current!;
     const bodyStyle = document.body.getAttribute("style");
-    const scrollBehavior = document.documentElement.style.scrollBehavior;
-    document.documentElement.style.scrollBehavior = "auto";
     // Fixed body also locks the background on iOS; restore its exact inline styles on exit.
     Object.assign(document.body.style, { position: "fixed", top: `-${scrollY}px`, width: "100%" });
     el.showModal();
@@ -103,12 +101,18 @@ export default function MobileReader({ selection, base, next, onNext, onClosed }
       }
       close();
     };
+    let lastWidth = innerWidth;
     const resize = () => {
+      // the browser toolbar collapsing also fires resize; only a real layout change should cut the animation short
+      if (innerWidth === lastWidth) return;
+      lastWidth = innerWidth;
       if (phase === "opening") opening.progress(1);
       else if (phase === "closing") closing?.progress(1);
     };
     const motion = () => {
-      if (reduced.matches) resize();
+      if (!reduced.matches) return;
+      if (phase === "opening") opening.progress(1);
+      else if (phase === "closing") closing?.progress(1);
     };
     window.addEventListener("popstate", pop);
     window.addEventListener("resize", resize);
@@ -123,18 +127,19 @@ export default function MobileReader({ selection, base, next, onNext, onClosed }
       if (bodyStyle === null) document.body.removeAttribute("style");
       else document.body.setAttribute("style", bodyStyle);
       window.scrollTo(0, scrollY);
-      document.documentElement.style.scrollBehavior = scrollBehavior;
     };
   }, []);
 
-  useEffect(() => {
+  // On to the next book: before paint, so its title never shows over the last book's text.
+  useLayoutEffect(() => {
+    if (reading.current === book.slug) return;
+    reading.current = book.slug;
     setContent(null);
-    // on to the next book: start at its top, with focus (and so the screen reader) on its title
-    if (reading.current !== book.slug) {
-      reading.current = book.slug;
-      scroller.current?.scrollTo(0, 0);
-      title.current?.focus({ preventScroll: true });
-    }
+    scroller.current?.scrollTo(0, 0);
+    title.current?.focus({ preventScroll: true });
+  }, [book.slug]);
+
+  useEffect(() => {
     if (!book.hasNote && !book.hasSummary) return;
     const ctl = new AbortController();
     fetch(href, { signal: ctl.signal })
@@ -161,7 +166,7 @@ export default function MobileReader({ selection, base, next, onNext, onClosed }
           </button>
           <span>{book.catZh}</span>
         </header>
-        <div ref={scroller} className="reader-scroll" tabIndex={0} aria-label="書籍全文">
+        <div ref={scroller} className="reader-scroll" role="region" tabIndex={0} aria-label="書籍全文">
           <div className="reader-content">
             <article className="reader-meta">
               <h1 ref={title} id="reader-title" tabIndex={-1}>{book.dCover}</h1>

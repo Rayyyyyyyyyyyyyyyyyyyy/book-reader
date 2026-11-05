@@ -203,6 +203,15 @@ test("switching views on desktop does not replay the entrance", async ({ page })
   expect(await page.locator(".hero h1").evaluate((el: HTMLElement) => el.style.opacity)).toBe("");
 });
 
+test("a remembered list view reloads without the entrance, its chip already selected", async ({ page }) => {
+  await page.getByRole("button", { name: "列表" }).click();
+  await page.reload();
+  const first = page.locator(".catalog-desktop .book-card").first();
+  await first.waitFor();
+  expect(await first.evaluate((el: HTMLElement) => el.style.opacity)).toBe("");
+  await expect(page.locator('.chip[data-view="grid"]')).toHaveAttribute("aria-pressed", "true");
+});
+
 test.describe("landscape phone", () => {
   test.use({ viewport: { width: 844, height: 390 }, isMobile: true, hasTouch: true });
   test("opens the scrolling reader, not the 3D book", async ({ page }) => {
@@ -333,6 +342,10 @@ test.describe("phone", () => {
       return r.width > 0 && r.height > 0 && (r.width < 44 || r.height < 44);
     }).map((el) => el.textContent));
     expect(small).toEqual([]);
+    // the 44px floor must not squeeze a chip below its text
+    await page.evaluate(() => scrollTo(0, 0));
+    const clipped = await page.locator(".filters .chip").evaluateAll((chips) => chips.filter((c) => c.scrollWidth > c.clientWidth).map((c) => c.textContent));
+    expect(clipped).toEqual([]);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   });
 
@@ -377,9 +390,10 @@ test.describe("phone", () => {
     const scroll = await page.locator(".reader-scroll").evaluate((el) => ({ height: el.clientHeight, total: el.scrollHeight }));
     expect(scroll.total).toBeGreaterThan(scroll.height);
     await expect(page.locator(".book3d, .stage-arrow")).toHaveCount(0);
+    // a native modal hands Tab to the browser UI past its last control, but never to the page behind it
     for (let k = 0; k < 5; k++) {
       await page.keyboard.press("Tab");
-      expect(await page.evaluate(() => !!document.activeElement?.closest("dialog"))).toBe(true);
+      expect(await page.evaluate(() => !!document.activeElement?.closest("#hundred-root"))).toBe(false);
     }
     const target = await reader(page).getByRole("button", { name: "回到書目" }).boundingBox();
     expect(target!.width).toBeGreaterThanOrEqual(44);
@@ -459,6 +473,7 @@ test.describe("phone", () => {
     });
     await card(page, "001").click();
     await expect(reader(page).getByRole("status")).toHaveText("內容載入中…");
+    await expect.poll(() => fail).toBeTruthy();
     fail!();
     await expect(reader(page).getByRole("alert")).toContainText("載入失敗");
     await page.getByRole("link", { name: "到書頁閱讀" }).click();

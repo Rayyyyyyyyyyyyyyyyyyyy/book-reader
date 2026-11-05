@@ -14,6 +14,8 @@ type Props = {
 };
 
 const bookHref = (base: string, slug: string) => `${base}book/${slug}`;
+// GitHub Pages redirects the slashless URL, and a redirect can drop the entry's history state on reload.
+const readerUrl = (base: string, slug: string) => `${bookHref(base, slug)}/`;
 
 // "109" / "no.109" / "#109" / "第109" / "109本" → 109; non-numeric queries → null
 const queryToRank = (s: string): number | null => {
@@ -46,13 +48,15 @@ export default function BookGrid({ books, cats, base }: Props) {
   // SSR renders both responsive variants; the head script selects one before first paint.
   useEffect(() => {
     const media = matchMedia(PHONE);
-    const sync = () => {
+    const sync = (change?: MediaQueryListEvent) => {
+      setPhone(media.matches);
+      // a 3D book is open: switching view now would unmount it mid-read and strand its history entry
+      if (change && history.state?.bookStage) return;
       let saved: string | null = null;
       try { saved = sessionStorage.getItem("view"); } catch {}
       const v = preferredView.current ?? (saved === "grid" || saved === "shelf" ? saved : media.matches ? "grid" : "shelf");
       document.documentElement.dataset.catalogView = v;
       setView(v);
-      setPhone(media.matches);
     };
     sync();
     const saved = history.state?.catalogReturn;
@@ -113,7 +117,7 @@ export default function BookGrid({ books, cats, base }: Props) {
     const shelves = Object.fromEntries([...rootRef.current!.querySelectorAll<HTMLElement>(".shelf-section")]
       .map((section) => [section.dataset.category, section.querySelector(".shelf")?.scrollLeft ?? 0]));
     history.replaceState({ ...history.state, catalogReturn: { query, category: activeCategory, notesOnly, scrollY, slug: book.slug, shelves } }, "");
-    history.pushState({ mobileReader: { slug: book.slug, returnUrl } }, "", bookHref(base, book.slug));
+    history.pushState({ mobileReader: { slug: book.slug, returnUrl } }, "", readerUrl(base, book.slug));
     selectionRef.current = selection;
     setSelected(selection);
   };
@@ -121,7 +125,7 @@ export default function BookGrid({ books, cats, base }: Props) {
   const goNext = (next: BookMeta) => {
     const current = selectionRef.current;
     if (!current) return;
-    history.replaceState({ mobileReader: { slug: next.slug, returnUrl: current.returnUrl } }, "", bookHref(base, next.slug));
+    history.replaceState({ mobileReader: { slug: next.slug, returnUrl: current.returnUrl } }, "", readerUrl(base, next.slug));
     const selection = { ...current, book: next };
     selectionRef.current = selection;
     setSelected(selection);
@@ -134,13 +138,17 @@ export default function BookGrid({ books, cats, base }: Props) {
     requestAnimationFrame(() => {
       if (selectionRef.current || !previous) return;
       window.scrollTo(0, previous.scrollY);
-      (previous.trigger.isConnected && previous.trigger.getClientRects().length ? previous.trigger : searchRef.current)?.focus({ preventScroll: true });
+      const target = previous.trigger.isConnected && previous.trigger.getClientRects().length ? previous.trigger : searchRef.current;
+      target?.focus({ preventScroll: true });
+      // a rotation may have reflowed the catalogue, leaving the saved scroll position away from the book
+      const box = target?.getBoundingClientRect();
+      if (box && (box.bottom < 0 || box.top > innerHeight)) target!.scrollIntoView({ block: "center" });
     });
   };
   const viewButtons = (
     <span className="view-toggle" role="group" aria-label="檢視方式">
-      <button type="button" className={"chip " + (view === "shelf" ? "on" : "")} aria-pressed={view === "shelf"} onClick={() => chooseView("shelf")}>書架</button>
-      <button type="button" className={"chip " + (view === "grid" ? "on" : "")} aria-pressed={view === "grid"} onClick={() => chooseView("grid")}>列表</button>
+      <button type="button" data-view="shelf" className={"chip " + (view === "shelf" ? "on" : "")} aria-pressed={view === "shelf"} onClick={() => chooseView("shelf")}>書架</button>
+      <button type="button" data-view="grid" className={"chip " + (view === "grid" ? "on" : "")} aria-pressed={view === "grid"} onClick={() => chooseView("grid")}>列表</button>
     </span>
   );
 
@@ -259,7 +267,7 @@ export default function BookGrid({ books, cats, base }: Props) {
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [sections, phone]);
+  }, [sections, phone === true]);
 
   const renderGrid = (mobile: boolean) => sections.map((sec) => (
     <section key={sec.key} className={"grid-section cat-" + sec.key} style={{ marginBottom: 72 }}>

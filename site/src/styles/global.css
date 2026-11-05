@@ -54,6 +54,8 @@ body {
 }
 .chip:hover { border-color: #b09f83; color: var(--ink); }
 .chip.on { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+/* before hydration the head script knows the view but React does not: show the same selected chip */
+html[data-catalog-view="shelf"] .chip[data-view="shelf"], html[data-catalog-view="grid"] .chip[data-view="grid"] { background: var(--ink); border-color: var(--ink); color: var(--paper); }
 .masthead { max-width: 1200px; margin: 0 auto; padding: 13px 28px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
 .catalog { max-width: 1200px; margin: 0 auto; padding: 8px 28px 110px; }
 /* header filter row: everything that narrows the catalogue in one place; the view switch stays put */
@@ -91,6 +93,8 @@ html[data-catalog-view="shelf"] .catalog-grid { display: none; }
   .masthead .search:focus-within { outline: 2px solid var(--ink); outline-offset: 3px; }
   .filters { padding: 12px max(16px, env(safe-area-inset-right)) 8px max(16px, env(safe-area-inset-left)); }
   .filters .chips { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+  /* min-width replaces the flex auto minimum, so without this every chip shrinks to 44px over its neighbour */
+  .filters .chip { flex: none; }
   .chip { min-height: 44px; min-width: 44px; transition: none; }
   .chip:focus-visible, .clear-search:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
   .mobile-catalog-tools {
@@ -126,7 +130,7 @@ html[data-catalog-view="shelf"] .catalog-grid { display: none; }
 }
 
 /* a landscape phone is wide but short: two columns would make every cover taller than the screen */
-@media (pointer: coarse) and (max-height: 500px) {
+@media (pointer: coarse) and (max-height: 500px) and (orientation: landscape) {
   .cover-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)) !important; }
 }
 

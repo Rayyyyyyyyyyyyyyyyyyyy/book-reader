@@ -50,12 +50,12 @@
 
 ### Requirement: 手機閱讀基本可用性
 
-手機閱讀器 SHALL 使用模態 dialog 語意、將焦點移入並限制於閱讀器、提供文字收回控制與 Esc。互動目標 SHALL 至少 44×44px；頁面 SHALL 使用 viewport-fit=cover、safe area 與 dvh，直橫向皆可閱讀。減少動態時開書與收書 SHALL 立即完成。
+手機閱讀器 SHALL 使用模態 dialog 語意、將焦點移入閱讀器且不進入背景頁面、提供文字收回控制與 Esc。互動目標 SHALL 至少 44×44px；頁面 SHALL 使用 viewport-fit=cover、safe area 與 dvh，直橫向皆可閱讀。減少動態時開書與收書 SHALL 立即完成。
 
 #### Scenario: 鍵盤與螢幕閱讀器
 
 - **WHEN** 使用者開書並以 Tab、Shift+Tab 或 Esc 操作
-- **THEN** 焦點 SHALL 留在 dialog，全文以單份可讀語意呈現，Esc 收書後焦點回到來源
+- **THEN** 焦點 MUST NOT 進入背景頁面，全文以單份可讀語意呈現，Esc 收書後焦點回到來源
 
 #### Scenario: 視窗與動態偏好
 

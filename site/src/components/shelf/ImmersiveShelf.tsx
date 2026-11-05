@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import type { BookMeta } from "../../lib/books";
+import { PHONE } from "../../lib/phone";
 import { SHELF_ROW, spineLook } from "../../lib/spine";
 import { BookSpine } from "./BookSpine";
 import BookStage from "./BookStage";
@@ -14,7 +15,7 @@ type Selection = { book: BookMeta; button: HTMLButtonElement; face: HTMLElement 
 
 // Books with a note stand at the front of each shelf; within each group tallest first, like a real
 // shelf, and rank breaks ties so the order is stable.
-const byHeight = (books: BookMeta[]) =>
+export const byHeight = (books: BookMeta[]) =>
   [...books].sort((a, b) => +b.hasNote - +a.hasNote || spineLook(b).height - spineLook(a).height || a.rank - b.rank);
 
 function lockScroll(on: boolean) {
@@ -38,7 +39,7 @@ export default function ImmersiveShelf({ sections, base, fit, onMobileSelect, mo
     if (selected) return;
     const face = button.querySelector<HTMLElement>(".spine-face");
     if (!face) return;
-    if (matchMedia("(max-width: 639px)").matches && onMobileSelect) return onMobileSelect(book, button, face);
+    if (matchMedia(PHONE).matches && onMobileSelect) return onMobileSelect(book, button, face);
     lockScroll(true);
     setSelected({ book, button, face });
   };

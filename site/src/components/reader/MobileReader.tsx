@@ -4,7 +4,8 @@ import type { BookMeta } from "../../lib/books";
 import "../../styles/mobile-reader.css";
 
 export type MobileSelection = {
-  book: BookMeta;
+  book: BookMeta; // the book being read
+  originSlug: string; // the book first opened, where closing returns to
   trigger: HTMLElement;
   origin: HTMLElement;
   rect: DOMRect;
@@ -12,9 +13,9 @@ export type MobileSelection = {
   returnUrl: string;
 };
 
-type Props = { selection: MobileSelection; base: string; onClosed: () => void };
+type Props = { selection: MobileSelection; base: string; next: BookMeta | null; onNext: (next: BookMeta) => void; onClosed: () => void };
 
-export default function MobileReader({ selection, base, onClosed }: Props) {
+export default function MobileReader({ selection, base, next, onNext, onClosed }: Props) {
   const { book, origin, rect, returnUrl, scrollY } = selection;
   const dialog = useRef<HTMLDialogElement>(null);
   const sheet = useRef<HTMLDivElement>(null);
@@ -23,6 +24,9 @@ export default function MobileReader({ selection, base, onClosed }: Props) {
   const source = useRef<HTMLDivElement>(null);
   const cover = useRef<HTMLDivElement>(null);
   const closeButton = useRef<HTMLButtonElement>(null);
+  const scroller = useRef<HTMLDivElement>(null);
+  const title = useRef<HTMLHeadingElement>(null);
+  const reading = useRef(book.slug);
   const closeAction = useRef<() => void>(() => {});
   const [content, setContent] = useState<string | "failed" | null>(null);
   const href = `${base}book/${book.slug}`;
@@ -84,7 +88,7 @@ export default function MobileReader({ selection, base, onClosed }: Props) {
     closeAction.current = () => {
       if (requested || phase === "closing") return;
       requested = true;
-      if (history.state?.mobileReader?.slug === book.slug && history.state.mobileReader.returnUrl === returnUrl && history.length > 1) {
+      if (history.state?.mobileReader?.returnUrl === returnUrl && history.length > 1) {
         history.back();
       } else {
         history.replaceState(null, "", returnUrl);
@@ -124,6 +128,13 @@ export default function MobileReader({ selection, base, onClosed }: Props) {
   }, []);
 
   useEffect(() => {
+    setContent(null);
+    // on to the next book: start at its top, with focus (and so the screen reader) on its title
+    if (reading.current !== book.slug) {
+      reading.current = book.slug;
+      scroller.current?.scrollTo(0, 0);
+      title.current?.focus({ preventScroll: true });
+    }
     if (!book.hasNote && !book.hasSummary) return;
     const ctl = new AbortController();
     fetch(href, { signal: ctl.signal })
@@ -150,10 +161,10 @@ export default function MobileReader({ selection, base, onClosed }: Props) {
           </button>
           <span>{book.catZh}</span>
         </header>
-        <div className="reader-scroll" tabIndex={0} aria-label="書籍全文">
+        <div ref={scroller} className="reader-scroll" tabIndex={0} aria-label="書籍全文">
           <div className="reader-content">
             <article className="reader-meta">
-              <h1 id="reader-title">{book.dCover}</h1>
+              <h1 ref={title} id="reader-title" tabIndex={-1}>{book.dCover}</h1>
               <p className="caption">{book.dCaption}</p>
               <p className="author">{book.author} · {book.numStr}</p>
               <p className="desc">{book.desc}</p>
@@ -161,6 +172,12 @@ export default function MobileReader({ selection, base, onClosed }: Props) {
             {(book.hasNote || book.hasSummary) && content === null && <p role="status">內容載入中…</p>}
             {content === "failed" ? <p role="alert">內容載入失敗，請<a className="reader-recover" href={href} onClick={(e) => { if (!e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) { e.preventDefault(); location.reload(); } }}>到書頁閱讀</a>。</p> : content && <div className="reading-body" dangerouslySetInnerHTML={{ __html: content }} />}
             {!book.hasNote && <p className="note-pending">讀書心得整理中</p>}
+            {next && (content || (!book.hasNote && !book.hasSummary)) && content !== "failed" && (
+              <button type="button" className="reader-next" onClick={() => onNext(next)}>
+                <span>下一本有心得的書</span>
+                <strong>{next.dCover}</strong>
+              </button>
+            )}
           </div>
         </div>
       </div>

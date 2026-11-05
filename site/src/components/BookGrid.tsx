@@ -2,7 +2,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import MobileReader, { type MobileSelection } from "./reader/MobileReader";
 import type { BookMeta } from "../lib/books";
-import ImmersiveShelf from "./shelf/ImmersiveShelf";
+import { PHONE } from "../lib/phone";
+import ImmersiveShelf, { byHeight } from "./shelf/ImmersiveShelf";
 
 type Cat = { key: string; zh: string; en: string };
 
@@ -20,6 +21,15 @@ const queryToRank = (s: string): number | null => {
   return m ? parseInt(m[1], 10) : null;
 };
 
+// The return point is for one trip: a later reload must not bring back old filters or scroll.
+const clearReturn = () => {
+  if (!history.state?.catalogReturn) return;
+  const { catalogReturn, ...rest } = history.state;
+  history.replaceState(Object.keys(rest).length ? rest : null, "");
+};
+
+const phoneOrder = (books: BookMeta[]) => [...books].sort((a, b) => +b.hasNote - +a.hasNote || a.rank - b.rank);
+
 export default function BookGrid({ books, cats, base }: Props) {
   const [query, setQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("all");
@@ -35,7 +45,7 @@ export default function BookGrid({ books, cats, base }: Props) {
 
   // SSR renders both responsive variants; the head script selects one before first paint.
   useEffect(() => {
-    const media = matchMedia("(max-width: 639px)");
+    const media = matchMedia(PHONE);
     const sync = () => {
       let saved: string | null = null;
       try { saved = sessionStorage.getItem("view"); } catch {}
@@ -51,6 +61,7 @@ export default function BookGrid({ books, cats, base }: Props) {
       setActiveCategory(saved.category ?? "all");
       setNotesOnly(!!saved.notesOnly);
       restoreRef.current = saved;
+      clearReturn();
     }
     const pop = () => {
       if (!selectionRef.current && history.state?.mobileReader) location.reload();
@@ -95,10 +106,10 @@ export default function BookGrid({ books, cats, base }: Props) {
     try { sessionStorage.setItem("view", v); } catch {}
   };
   const openMobile = (book: BookMeta, trigger: HTMLElement, origin: HTMLElement) => {
-    if (!matchMedia("(max-width: 639px)").matches || selectionRef.current) return;
+    if (!matchMedia(PHONE).matches || selectionRef.current) return;
     const scrollY = window.scrollY;
     const returnUrl = location.pathname + location.search + location.hash;
-    const selection = { book, trigger, origin, rect: origin.getBoundingClientRect(), scrollY, returnUrl };
+    const selection = { book, originSlug: book.slug, trigger, origin, rect: origin.getBoundingClientRect(), scrollY, returnUrl };
     const shelves = Object.fromEntries([...rootRef.current!.querySelectorAll<HTMLElement>(".shelf-section")]
       .map((section) => [section.dataset.category, section.querySelector(".shelf")?.scrollLeft ?? 0]));
     history.replaceState({ ...history.state, catalogReturn: { query, category: activeCategory, notesOnly, scrollY, slug: book.slug, shelves } }, "");
@@ -106,9 +117,19 @@ export default function BookGrid({ books, cats, base }: Props) {
     selectionRef.current = selection;
     setSelected(selection);
   };
+  // Reading on replaces the book entry, so one Back still returns to the catalogue and the book first opened.
+  const goNext = (next: BookMeta) => {
+    const current = selectionRef.current;
+    if (!current) return;
+    history.replaceState({ mobileReader: { slug: next.slug, returnUrl: current.returnUrl } }, "", bookHref(base, next.slug));
+    const selection = { ...current, book: next };
+    selectionRef.current = selection;
+    setSelected(selection);
+  };
   const closed = () => {
     const previous = selectionRef.current;
     selectionRef.current = null;
+    clearReturn();
     setSelected(null);
     requestAnimationFrame(() => {
       if (selectionRef.current || !previous) return;
@@ -157,6 +178,13 @@ export default function BookGrid({ books, cats, base }: Props) {
   }, [books, cats, activeCategory, q, notesOnly]);
 
   const total = sections.reduce((a, s) => a + s.books.length, 0);
+
+  // Same order the reader sees on screen in the current view.
+  const nextNote = (book: BookMeta) => {
+    const order = sections.flatMap((sec) => (view === "shelf" ? byHeight(sec.books) : phoneOrder(sec.books)));
+    const at = order.findIndex((b) => b.slug === book.slug);
+    return [...order.slice(at + 1), ...order.slice(0, at)].find((b) => b.hasNote) ?? null;
+  };
   const hasResults = sections.length > 0;
 
   // reveal-on-scroll + cover clip-path + parallax (ported from the prototype,
@@ -166,7 +194,7 @@ export default function BookGrid({ books, cats, base }: Props) {
     const root = rootRef.current;
     if (!root) return;
     const items = Array.from(root.querySelectorAll<HTMLElement>("[data-reveal]"));
-    if (reduce || matchMedia("(max-width: 639px)").matches) {
+    if (reduce || matchMedia(PHONE).matches) {
       items.forEach((el) => {
         el.style.opacity = "";
         el.style.transform = "";
@@ -231,7 +259,7 @@ export default function BookGrid({ books, cats, base }: Props) {
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [sections, view, phone]);
+  }, [sections, phone]);
 
   const renderGrid = (mobile: boolean) => sections.map((sec) => (
     <section key={sec.key} className={"grid-section cat-" + sec.key} style={{ marginBottom: 72 }}>
@@ -243,8 +271,8 @@ export default function BookGrid({ books, cats, base }: Props) {
         <span style={{ fontFamily: "var(--serif-en)", fontStyle: "italic", fontSize: 15, color: "#6f675b", letterSpacing: ".06em" }}>{sec.countLabel}</span>
       </div>
       <div className="cover-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(var(--cardmin),1fr))", gap: "38px 28px" }}>
-        {(mobile ? [...sec.books].sort((a, b) => +b.hasNote - +a.hasNote || a.rank - b.rank) : sec.books).map((book) => (
-          <a key={book.slug} href={bookHref(base, book.slug)} className="book-card" data-slug={book.slug} data-note={book.hasNote || undefined} data-out={mobile && selected?.book.slug === book.slug || undefined} data-reveal="1"
+        {(mobile ? phoneOrder(sec.books) : sec.books).map((book) => (
+          <a key={book.slug} href={bookHref(base, book.slug)} className="book-card" data-slug={book.slug} data-note={book.hasNote || undefined} data-out={mobile && selected?.originSlug === book.slug || undefined} data-reveal="1"
             onClick={(e) => {
               if (!mobile || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
               e.preventDefault();
@@ -372,10 +400,10 @@ export default function BookGrid({ books, cats, base }: Props) {
 
         {hasResults ? (
           <>
-            {(view === null || view === "shelf") && <div className="catalog-shelf"><ImmersiveShelf sections={sections} base={base} fit={notesOnly} onMobileSelect={openMobile} mobileSlug={selected?.book.slug} /></div>}
+            {(view === null || view === "shelf") && <div className="catalog-shelf"><ImmersiveShelf sections={sections} base={base} fit={notesOnly} onMobileSelect={openMobile} mobileSlug={selected?.originSlug} /></div>}
             {(view === null || view === "grid") && <div className="catalog-grid">
               {phone !== false && <div className="catalog-mobile">{renderGrid(true)}</div>}
-              {phone !== true && <div className="catalog-desktop">{renderGrid(false)}</div>}
+              {phone === false && <div className="catalog-desktop">{renderGrid(false)}</div>}
             </div>}
           </>
 
@@ -403,7 +431,7 @@ export default function BookGrid({ books, cats, base }: Props) {
           </div>
         )}
       </main>
-      {selected && createPortal(<MobileReader selection={selected} base={base} onClosed={closed} />, document.body)}
+      {selected && createPortal(<MobileReader selection={selected} base={base} next={nextNote(selected.book)} onNext={goNext} onClosed={closed} />, document.body)}
 
     </div>
   );

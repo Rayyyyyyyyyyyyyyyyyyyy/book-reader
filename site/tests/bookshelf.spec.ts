@@ -197,6 +197,24 @@ test("a page restored from bfcache does not keep the book out", async ({ page })
   await expect.poll(() => page.evaluate(() => history.state?.bookStage ?? null)).toBeNull();
 });
 
+test("switching views on desktop does not replay the entrance", async ({ page }) => {
+  await page.waitForTimeout(1000);
+  await page.getByRole("button", { name: "列表" }).click();
+  expect(await page.locator(".hero h1").evaluate((el: HTMLElement) => el.style.opacity)).toBe("");
+});
+
+test.describe("landscape phone", () => {
+  test.use({ viewport: { width: 844, height: 390 }, isMobile: true, hasTouch: true });
+  test("opens the scrolling reader, not the 3D book", async ({ page }) => {
+    await page.locator('.catalog-mobile .book-card[data-slug^="001"]').click();
+    await expect(page.getByRole("dialog")).toHaveCount(1);
+    await expect(page.locator(".book3d")).toHaveCount(0);
+    await expect(page.locator(".reader-content .summary")).toBeVisible();
+    const size = await page.locator(".reader-content .summary p").evaluate((e) => parseFloat(getComputedStyle(e).fontSize));
+    expect(size).toBeGreaterThanOrEqual(16);
+  });
+});
+
 test("a note that fails to load points to the book page", async ({ page }) => {
   await page.route("**/book/001-*", (r) => r.abort());
   await spine(page, "001").click();
@@ -491,6 +509,35 @@ test.describe("phone", () => {
       await expect(reader(page)).toHaveCount(0);
       await page.unrouteAll();
     }
+  });
+
+  test("the end of a book goes on to the next note, and one Back returns to the book first opened", async ({ page }) => {
+    await card(page, "001").click();
+    const next = reader(page).locator(".reader-next");
+    await expect(next).toBeVisible();
+    const box = await next.boundingBox();
+    expect(box!.height).toBeGreaterThanOrEqual(44);
+    const before = page.url();
+    await next.click();
+    await expect.poll(() => page.url()).not.toBe(before);
+    await expect(page.url()).toMatch(/\/book\//);
+    await expect(reader(page).locator("#reader-title")).toBeFocused();
+    await page.goBack();
+    await expect(reader(page)).toHaveCount(0);
+    await expect(page).toHaveURL(home);
+    await expect(card(page, "001")).toBeFocused();
+  });
+
+  test("a later reload does not bring back an old search or scroll", async ({ page }) => {
+    await page.getByRole("textbox", { name: "搜尋書籍" }).fill("001");
+    await card(page, "001").click();
+    await expect(reader(page)).toHaveCount(1);
+    await page.goBack();
+    await expect(reader(page)).toHaveCount(0);
+    expect(await page.evaluate(() => history.state?.catalogReturn ?? null)).toBeNull();
+    await page.getByRole("textbox", { name: "搜尋書籍" }).fill("");
+    await page.reload();
+    await expect(page.getByRole("textbox", { name: "搜尋書籍" })).toHaveValue("");
   });
 
   test.describe("reduced motion", () => {

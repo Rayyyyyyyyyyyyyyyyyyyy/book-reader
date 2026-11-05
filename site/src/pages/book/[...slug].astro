@@ -78,9 +78,11 @@ const ogImage = `${base}og/${entry.id}.png`;
 </Base>
 
 <script>
+  import { PHONE } from "../../lib/phone";
+
   const back = document.querySelector<HTMLAnchorElement>(".topbar .back");
   back?.addEventListener("click", (e) => {
-    if (!matchMedia("(max-width: 639px)").matches || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    if (!matchMedia(PHONE).matches || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
     e.preventDefault();
     const saved = history.state?.mobileReader;
     const home = new URL(back.href);
@@ -127,7 +129,7 @@ const ogImage = `${base}og/${entry.id}.png`;
   .note :global(p) { font-size: 17px; line-height: 2.05; color: #4a4339; font-weight: 300; margin: 0 0 20px; text-wrap: pretty; }
   .note-pending { padding: 72px 0; text-align: center; font-family: var(--serif-tc); color: #6f675b; }
   .note-pending span { font-family: var(--serif-en); font-style: italic; }
-  @media (max-width: 639px) {
+  @media (max-width: 639px), (pointer: coarse) and (max-height: 500px) {
     .page { max-width: 640px; padding: 0 max(22px, env(safe-area-inset-right)) max(64px, env(safe-area-inset-bottom)) max(22px, env(safe-area-inset-left)); min-height: 100dvh; }
     .topbar { margin: 0; padding: env(safe-area-inset-top) 0 0; background: var(--paper); backdrop-filter: none; gap: 12px; }
     .back { min-height: 48px; min-width: 44px; font-size: 14px; }

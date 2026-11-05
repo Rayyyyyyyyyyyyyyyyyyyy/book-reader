@@ -75,7 +75,7 @@ html[data-catalog-view="grid"] .catalog-shelf { display: none; }
 html[data-catalog-view="grid"] .catalog-grid { display: block; }
 html[data-catalog-view="shelf"] .catalog-grid { display: none; }
 .desktop-view-toggle { margin-left: auto; }
-@media (max-width: 639px) {
+@media (max-width: 639px), (pointer: coarse) and (max-height: 500px) {
   #hundred-root { min-height: 100dvh !important; }
   #hundred-root > header { display: contents; }
   .masthead {
@@ -123,6 +123,11 @@ html[data-catalog-view="shelf"] .catalog-grid { display: none; }
   [data-reveal] { opacity: 1 !important; transform: none !important; }
   [data-reveal] .cover { clip-path: none !important; transition: none; }
   .cover-inner { transform: none !important; }
+}
+
+/* a landscape phone is wide but short: two columns would make every cover taller than the screen */
+@media (pointer: coarse) and (max-height: 500px) {
+  .cover-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)) !important; }
 }
 
 /* browser surfaces in the house palette */
